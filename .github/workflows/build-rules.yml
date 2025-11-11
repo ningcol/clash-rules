@@ -1,0 +1,102 @@
+name: Build and Deduplicate Clash Rules
+
+on:
+  schedule:
+    - cron: '0 3 * * *'
+  push:
+    branches:
+      - main
+    paths:
+      - 'my_reject.txt'
+      - 'sources.list'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      # 第 1 步：签出（Checkout）您的仓库代码
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 第 2 步：安装 yq (处理 YAML 的工具)
+      - name: Install yq
+        run: |
+          echo "Installing yq..."
+          sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq
+          sudo chmod +x /usr/bin/yq
+          echo "yq version:" $(yq --version)
+
+      # 第 3 步：智能下载并合并规则 (无需变动)
+      - name: Download, parse, and merge rules
+        run: |
+          echo "Starting rule download and merge process..."
+          touch all_rules.tmp
+
+          # 循环读取 sources.list 文件
+          while IFS= read -r url || [[ -n "$url" ]]; do
+            if [[ "$url" == \#* ]] || [[ -z "$url" ]]; then
+              continue
+            fi
+            
+            echo "Processing URL: $url"
+            
+            if [[ "$url" == *.yaml ]] || [[ "$url" == *.yml ]]; then
+              # YAML 文件: 使用 yq 提取 .payload 列表
+              curl -s -L "$url" | yq e '.payload[]' - >> all_rules.tmp
+              echo "  -> Parsed as YAML (extracted .payload[])"
+            else
+              # TXT 文件: 纯文本
+              curl -s -L "$url" >> all_rules.tmp
+              echo "  -> Parsed as TXT"
+            fi
+          done < sources.list
+          
+          # 添加您自己的本地规则
+          echo "Adding local rules from my_reject.txt..."
+          cat my_reject.txt >> all_rules.tmp
+          echo "Merge complete."
+
+      # ★★★ 第 4 步：处理、排序、去重并格式化为 YAML (核心修改) ★★★
+      - name: Process, sort, deduplicate, and format as YAML
+        run: |
+          echo "Cleaning, sorting, and deduplicating rules..."
+          # 1. 纯净的域名列表
+          cat all_rules.tmp \
+            | sed 's/DOMAIN-SUFFIX,//g' \
+            | sed 's/DOMAIN-KEYWORD,//g' \
+            | sed 's/DOMAIN,//g' \
+            | sed "s/'//g" \
+            | sed 's/+.//g' \
+            | grep -v '^#' \
+            | grep -v '^$' \
+            | grep -v 'payload:' \
+            | tr '[:upper:]' '[:lower:]' \
+            | sort \
+            | uniq \
+            > final_reject_domains.txt
+
+          # 2. 格式化为 YAML
+          echo "Reformatting for YAML payload..."
+          
+          # 写入 "payload:" 头部
+          echo "payload:" > final_reject.yaml
+          
+          # 将每个域名格式化为 "  - 'domain.com'" 并追加到文件
+          sed "s/^\(.*\)$/  - '\1'/" final_reject_domains.txt >> final_reject.yaml
+          
+          echo "Build complete. Final file is final_reject.yaml"
+
+      # ★★★ 第 5 步：将生成的 "final_reject.yaml" 文件提交 (核心修改) ★★★
+      - name: Commit and push changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: Auto-update reject rules (YAML payload format)"
+          
+          # 确保这里跟踪的是 .yaml 文件
+          file_pattern: final_reject.yaml
+          
+          commit_user_name: "GitHub Actions Bot"
+          commit_user_email: "github-actions-bot@users.noreply.github.com"
+          commit_author: "GitHub Actions Bot <github-actions-bot@users.noreply.github.com>"
