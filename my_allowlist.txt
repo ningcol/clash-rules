@@ -1,0 +1,3 @@
+stats.chinaz.com
+# 举例：我不想拦截 google analytics
+google-analytics.com
