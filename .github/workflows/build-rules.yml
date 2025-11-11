@@ -1,20 +1,28 @@
 name: Build and Deduplicate Clash Rules
 
 on:
+  # 1. 自动触发：每天凌晨3点
   schedule:
     - cron: '0 3 * * *'
+  
+  # 2. 自动触发：当您修改了任何规则源文件并推送到 main 分支时
   push:
     branches:
       - main
     paths:
-      - 'my_reject.txt'
-      - 'sources.list'
+      - 'my_reject.txt'     # 您的私有黑名单
+      - 'sources.list'      # 您的上游规则列表
+      - 'my_allowlist.txt'  # 您的私有白名单
+
+  # 3. 手动触发：允许您在 GitHub 的 "Actions" 页面手动运行
   workflow_dispatch:
 
 jobs:
   build:
+    # ★★★ 关键：授予 Action 写入仓库的权限 (解决 403 错误) ★★★
     permissions:
-        contents: write
+      contents: write
+
     runs-on: ubuntu-latest
     
     steps:
@@ -22,7 +30,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 第 2 步：安装 yq (处理 YAML 的工具)
+      # 第 2 步：安装 yq (用于处理 .yaml 文件的工具)
       - name: Install yq
         run: |
           echo "Installing yq..."
@@ -30,41 +38,57 @@ jobs:
           sudo chmod +x /usr/bin/yq
           echo "yq version:" $(yq --version)
 
-      # 第 3 步：智能下载并合并规则 (无需变动)
-      - name: Download, parse, and merge rules
+      # 第 3 步：智能下载并合并“黑名单”来源
+      # (合并 'sources.list' 中的所有文件 和 您的 'my_reject.txt')
+      - name: Download, parse, and merge rules (Blacklist)
         run: |
           echo "Starting rule download and merge process..."
-          touch all_rules.tmp
+          touch all_rules.tmp # 创建一个临时的合并文件
 
           # 循环读取 sources.list 文件
           while IFS= read -r url || [[ -n "$url" ]]; do
+            # 跳过注释行和空行
             if [[ "$url" == \#* ]] || [[ -z "$url" ]]; then
               continue
             fi
             
             echo "Processing URL: $url"
             
+            # 智能判断：根据文件后缀名选择不同处理方式
             if [[ "$url" == *.yaml ]] || [[ "$url" == *.yml ]]; then
-              # YAML 文件: 使用 yq 提取 .payload 列表
+              # 如果是 YAML 文件, 使用 yq 提取 .payload 列表
               curl -s -L "$url" | yq e '.payload[]' - >> all_rules.tmp
               echo "  -> Parsed as YAML (extracted .payload[])"
             else
-              # TXT 文件: 纯文本
+              # 否则, 默认为 TXT 纯文本文件
               curl -s -L "$url" >> all_rules.tmp
               echo "  -> Parsed as TXT"
             fi
           done < sources.list
           
-          # 添加您自己的本地规则
+          # 添加您自己的本地黑名单规则
           echo "Adding local rules from my_reject.txt..."
           cat my_reject.txt >> all_rules.tmp
-          echo "Merge complete."
+          echo "Blacklist merge complete."
 
-      # ★★★ 第 4 步：处理、排序、去重并格式化为 YAML (核心修改) ★★★
-      - name: Process, sort, deduplicate, and format as YAML
+      # 第 4 步：白名单过滤 (核心步骤)
+      # (从合并后的黑名单中，移除掉您白名单里的域名)
+      - name: Filter merged list against allowlist
         run: |
-          echo "Cleaning, sorting, and deduplicating rules..."
-          # 1. 纯净的域名列表
+          echo "Normalizing allowlist (my_allowlist.txt)..."
+          # 1. 清洗白名单 (my_allowlist.txt)
+          cat my_allowlist.txt \
+            | sed 's/DOMAIN-SUFFIX,//g' \
+            | sed "s/'//g" \
+            | grep -v '^#' \
+            | grep -v '^$' \
+            | tr '[:upper:]' '[:lower:]' \
+            | sort \
+            | uniq \
+            > normalized_allowlist.txt
+
+          echo "Normalizing merged blacklist (all_rules.tmp)..."
+          # 2. 清洗黑名单 (all_rules.tmp)，进行严格的语法验证
           cat all_rules.tmp \
             | sed 's/DOMAIN-SUFFIX,//g' \
             | sed 's/DOMAIN-KEYWORD,//g' \
@@ -74,7 +98,26 @@ jobs:
             | grep -v '^#' \
             | grep -v '^$' \
             | grep -v 'payload:' \
+            | grep -v '/' \
+            | grep -v ':' \
+            | grep -v '@' \
             | tr '[:upper:]' '[:lower:]' \
+            > normalized_blacklist.txt
+            
+          echo "Filtering blacklist against allowlist..."
+          # 3. 核心过滤：使用 grep -v -f
+          #    只保留那些“不在”白名单中的黑名单域名
+          grep -v -x -f normalized_allowlist.txt normalized_blacklist.txt > filtered_blacklist.txt
+          
+          echo "Allowlist filtering complete. $(wc -l < normalized_blacklist.txt) domains reduced to $(wc -l < filtered_blacklist.txt)."
+
+      # 第 5 步：排序、去重并格式化为 YAML
+      # (处理“过滤后”的列表)
+      - name: Sort, deduplicate, and format as YAML
+        run: |
+          echo "Sorting and deduplicating filtered list..."
+          # 1. 排序和去重（在过滤之后进行）
+          cat filtered_blacklist.txt \
             | sort \
             | uniq \
             > final_reject_domains.txt
@@ -90,15 +133,17 @@ jobs:
           
           echo "Build complete. Final file is final_reject.yaml"
 
-      # ★★★ 第 5 步：将生成的 "final_reject.yaml" 文件提交 (核心修改) ★★★
+      # 第 6 步：将生成的 "final_reject.yaml" 文件提交回仓库
       - name: Commit and push changes
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "chore: Auto-update reject rules (YAML payload format)"
+          # (权限已在 jobs 级别设置，这里无需 token)
+          commit_message: "chore: Auto-update reject rules (filtered by allowlist)"
           
           # 确保这里跟踪的是 .yaml 文件
           file_pattern: final_reject.yaml
           
+          # 机器人的提交信息
           commit_user_name: "GitHub Actions Bot"
           commit_user_email: "github-actions-bot@users.noreply.github.com"
           commit_author: "GitHub Actions Bot <github-actions-bot@users.noreply.github.com>"
