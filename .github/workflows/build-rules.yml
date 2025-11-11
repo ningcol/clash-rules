@@ -38,7 +38,7 @@ jobs:
           sudo chmod +x /usr/bin/yq
           echo "yq version:" $(yq --version)
 
-      # ★★★ 第 3 步：智能下载并合并“黑名单”来源 (核心升级) ★★★
+      # ★★★ 第 3 步：智能下载并合并“黑名单”来源 (v5 - Try/Catch 逻辑) ★★★
       - name: Download, parse, and merge rules (Blacklist)
         run: |
           echo "Starting rule download and merge process..."
@@ -62,16 +62,17 @@ jobs:
               continue
             fi
 
-            # 3. ★ 智能检测 ★
-            #    检查文件的第一行是否(不区分大小写)包含 'payload:'
-            if head -n 1 rule_content.tmp | grep -iq 'payload:'; then
-              # 如果包含, 强制使用 yq (YAML) 解析器
-              cat rule_content.tmp | yq e '.payload[]' - >> all_rules.tmp
-              echo "  -> Parsed as YAML (found 'payload:')"
+            # 3. ★ 核心逻辑：Try/Catch ★
+            #    我们首先“尝试”用 yq 解析。
+            #    "2>/dev/null" 是关键，它会“吞掉”yq的解析错误信息，防止刷屏。
+            if cat rule_content.tmp | yq e '.payload[]' - >> all_rules.tmp 2>/dev/null; then
+              # “成功”(Try): yq 解析成功，说明它是一个 YAML/payload 格式的文件
+              echo "  -> Parsed as YAML (yq success)"
             else
-              # 如果不包含, 当作纯文本(TXT)处理
+              # “失败/捕获”(Catch): yq 解析失败，说明它 100% 是一个纯文本 TXT 文件
+              # 我们就把原始文件内容加入
               cat rule_content.tmp >> all_rules.tmp
-              echo "  -> Parsed as TXT"
+              echo "  -> Parsed as TXT (yq failed, treating as plain text)"
             fi
             
           done < sources.list
