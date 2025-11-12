@@ -61,10 +61,10 @@ jobs:
           cat reject/reject.txt >> all_reject_rules.tmp
           echo "REJECT list merge complete."
 
-      # ★ 第 4 步：白名单过滤 (REJECT) - [优化了注释处理]
+      # ★ 第 4 步：白名单过滤 (REJECT) - [已修复]
       - name: 4. Filter REJECT List
         run: |
-          # 1. 规范化“排除列表” (exclude.txt) - 优化清理
+          # 1. 规范化“排除列表” (exclude.txt)
           echo "Normalizing REJECT allowlist (reject/exclude.txt)..."
           cat reject/exclude.txt \
             | sed "s/'//g" \
@@ -74,7 +74,7 @@ jobs:
             | sort | uniq \
             > normalized_reject_allowlist.txt
 
-          # 2. 规范化“大列表” (all_reject_rules.tmp) - 优化清理
+          # 2. 规范化“大列表” (all_reject_rules.tmp)
           echo "Normalizing merged REJECT list (all_reject_rules.tmp)..."
           cat all_reject_rules.tmp \
             | sed "s/'//g" \
@@ -86,7 +86,8 @@ jobs:
             
           # 3. 过滤
           echo "Filtering REJECT list against allowlist..."
-          grep -v -x -f normalized_reject_allowlist.txt normalized_reject_list.txt > filtered_reject_list.txt
+          # ★ 关键修复：添加 -F 标志
+          grep -F -v -x -f normalized_reject_allowlist.txt normalized_reject_list.txt > filtered_reject_list.txt
           echo "REJECT allowlist filtering complete."
 
       # 第 5 步：格式化为 YAML (REJECT)
@@ -98,7 +99,7 @@ jobs:
             | uniq \
             > final_reject_domains.txt
           echo "Reformatting for REJECT YAML payload..."
-          echo "payload:" > final_reject.yaml
+          echo "payload:" > final_reject.yaml 
           sed "s/^\(.*\)$/  - '\1'/" final_reject_domains.txt >> final_reject.yaml
           echo "REJECT build complete. Final file is final_reject.yaml"
           
@@ -130,7 +131,7 @@ jobs:
           cat proxy/proxy.txt >> all_proxy_rules.tmp
           echo "PROXY list merge complete."
 
-      # ★ 第 7 步：白名单过滤 (PROXY) - [优化了注释处理]
+      # ★ 第 7 步：白名单过滤 (PROXY) - [已修复]
       - name: 7. Filter PROXY List
         run: |
           echo "Normalizing PROXY allowlist (proxy/exclude.txt)..."
@@ -152,7 +153,8 @@ jobs:
             > normalized_proxy_list.txt
             
           echo "Filtering PROXY list against allowlist..."
-          grep -v -x -f normalized_proxy_allowlist.txt normalized_proxy_list.txt > filtered_proxy_list.txt
+          # ★ 关键修复：添加 -F 标志
+          grep -F -v -x -f normalized_proxy_allowlist.txt normalized_proxy_list.txt > filtered_proxy_list.txt
           echo "PROXY allowlist filtering complete."
 
       # 第 8 步：格式化为 YAML (PROXY)
@@ -196,7 +198,7 @@ jobs:
           cat direct/direct.txt >> all_direct_rules.tmp
           echo "DIRECT list merge complete."
 
-      # ★ 第 10 步：白名单过滤 (DIRECT) - [优化了注释处理]
+      # ★ 第 10 步：白名单过滤 (DIRECT) - [已修复]
       - name: 10. Filter DIRECT List
         run: |
           echo "Normalizing DIRECT allowlist (direct/exclude.txt)..."
@@ -218,7 +220,8 @@ jobs:
             > normalized_direct_list.txt
             
           echo "Filtering DIRECT list against allowlist..."
-          grep -v -x -f normalized_direct_allowlist.txt normalized_direct_list.txt > filtered_direct_list.txt
+          # ★ 关键修复：添加 -F 标志
+          grep -F -v -x -f normalized_direct_allowlist.txt normalized_direct_list.txt > filtered_direct_list.txt
           echo "DIRECT allowlist filtering complete."
 
       # 第 11 步：格式化为 YAML (DIRECT)
