@@ -1,2 +1,13 @@
-# 直连域名，一行一个
-啊甩分.com
++.synology.com
++.synology.cn
++.dyndns.org
++.ddns.net
++.myds.me
++.180520.xzy
++.synocircle.top
++.oraclecloud.com
++.ningcol.com
++.modelbest.co
++.imgse.com
+# 微软
++.azure.com
