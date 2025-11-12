@@ -1,3 +1,13 @@
-stats.chinaz.com
-# 举例：我不想拦截 google analytics
-google-analytics.com
++.synology.com
++.synology.cn
++.dyndns.org
++.ddns.net
++.myds.me
++.180520.xzy
++.synocircle.top
++.oraclecloud.com
++.ningcol.com
++.modelbest.co
++.imgse.com
+# 微软
++.azure.com
