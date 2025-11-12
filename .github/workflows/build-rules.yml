@@ -1,144 +1,248 @@
 name: Build and Deduplicate Clash Rules
 
 on:
-  # 1. 自动触发：每天凌晨3点
   schedule:
     - cron: '0 3 * * *'
   
-  # 2. 自动触发：当您修改了任何规则源文件并推送到 main 分支时
   push:
     branches:
       - main
     paths:
-      - 'my_reject.txt'     # 您的私有黑名单
-      - 'sources.list'      # 您的上游规则列表
-      - 'my_allowlist.txt'  # 您的私有白名单
+      # 路径已适配您的 tree
+      - 'reject/**'
+      - 'proxy/**'
+      - 'direct/**'
 
-  # 3. 手动触发：允许您在 GitHub 的 "Actions" 页面手动运行
   workflow_dispatch:
 
 jobs:
   build:
-    # ★ 权限：授予 Action 写入仓库的权限
     permissions:
       contents: write
 
     runs-on: ubuntu-latest
     
     steps:
-      # 第 1 步：签出（Checkout）您的仓库代码
+      # 第 1 步：签出
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 第 2 步：安装 yq (用于处理 .yaml 文件的工具)
+      # 第 2 步：安装 yq
       - name: Install yq
         run: |
-          echo "Installing yq..."
           sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq
           sudo chmod +x /usr/bin/yq
-          echo "yq version:" $(yq --version)
 
-      # ★★★ 第 3 步：智能下载并合并“黑名单”来源 (v5 - Try/Catch 逻辑) ★★★
-      - name: Download, parse, and merge rules (Blacklist)
+      # =======================================================
+      #  处理 REJECT 规则 (步骤 3, 4, 5)
+      # =======================================================
+
+      # 第 3 步：合并“黑名单” (REJECT)
+      - name: 3. Build REJECT List
         run: |
-          echo "Starting rule download and merge process..."
-          touch all_rules.tmp # 创建一个临时的合并文件
-
-          # 循环读取 sources.list 文件
+          echo "Starting REJECT rule download and merge process..."
+          touch all_reject_rules.tmp
           while IFS= read -r url || [[ -n "$url" ]]; do
-            # 跳过注释行和空行
-            if [[ "$url" == \#* ]] || [[ -z "$url" ]]; then
-              continue
-            fi
-            
-            echo "Processing URL: $url"
-            
-            # 1. 先把内容下载到临时文件
+            if [[ "$url" == \#* ]] || [[ -z "$url" ]]; then continue; fi
+            echo "  [REJECT] Processing URL: $url"
             curl -s -L -o rule_content.tmp "$url"
-
-            # 2. 检查文件是否下载成功且不为空
             if [ ! -s rule_content.tmp ]; then
               echo "  -> WARNING: Failed to download or file is empty."
               continue
             fi
-
-            # 3. ★ 核心逻辑：Try/Catch ★
-            #    我们首先“尝试”用 yq 解析。
-            #    "2>/dev/null" 是关键，它会“吞掉”yq的解析错误信息，防止刷屏。
-            if cat rule_content.tmp | yq e '.payload[]' - >> all_rules.tmp 2>/dev/null; then
-              # “成功”(Try): yq 解析成功，说明它是一个 YAML/payload 格式的文件
-              echo "  -> Parsed as YAML (yq success)"
+            if cat rule_content.tmp | yq e '.payload[]' - >> all_reject_rules.tmp 2>/dev/null; then
+              echo "  -> Parsed as YAML (raw merge)"
             else
-              # “失败/捕获”(Catch): yq 解析失败，说明它 100% 是一个纯文本 TXT 文件
-              # 我们就把原始文件内容加入
-              cat rule_content.tmp >> all_rules.tmp
-              echo "  -> Parsed as TXT (yq failed, treating as plain text)"
+              cat rule_content.tmp >> all_reject_rules.tmp
+              echo "  -> Parsed as TXT (raw merge)"
             fi
-            
-          done < sources.list
-          
-          # 清理临时下载文件
+          done < reject/reject_sources.list
           rm -f rule_content.tmp
-          
-          # 添加您自己的本地黑名单规则
-          echo "Adding local rules from my_reject.txt..."
-          cat my_reject.txt >> all_rules.tmp
-          echo "Blacklist merge complete."
+          cat reject/reject.txt >> all_reject_rules.tmp
+          echo "REJECT list merge complete."
 
-      # 第 4 步：白名单过滤 (保持不变)
-      - name: Filter merged list against allowlist
+      # ★ 第 4 步：白名单过滤 (REJECT) - [优化了注释处理]
+      - name: 4. Filter REJECT List
         run: |
-          echo "Normalizing allowlist (my_allowlist.txt)..."
-          cat my_allowlist.txt \
-            | sed 's/DOMAIN-SUFFIX,//g' \
+          # 1. 规范化“排除列表” (exclude.txt) - 优化清理
+          echo "Normalizing REJECT allowlist (reject/exclude.txt)..."
+          cat reject/exclude.txt \
             | sed "s/'//g" \
-            | grep -v '^#' \
-            | grep -v '^$' \
+            | sed -E 's/^\s*#.*//' \
+            | sed -E '/^\s*$/d' \
             | tr '[:upper:]' '[:lower:]' \
-            | sort \
-            | uniq \
-            > normalized_allowlist.txt
+            | sort | uniq \
+            > normalized_reject_allowlist.txt
 
-          echo "Normalizing merged blacklist (all_rules.tmp)..."
-          cat all_rules.tmp \
-            | sed 's/DOMAIN-SUFFIX,//g' \
-            | sed 's/DOMAIN-KEYWORD,//g' \
-            | sed 's/DOMAIN,//g' \
+          # 2. 规范化“大列表” (all_reject_rules.tmp) - 优化清理
+          echo "Normalizing merged REJECT list (all_reject_rules.tmp)..."
+          cat all_reject_rules.tmp \
             | sed "s/'//g" \
-            | sed 's/+.//g' \
-            | grep -v '^#' \
-            | grep -v '^$' \
-            | grep -v 'payload:' \
-            | grep -v '/' \
-            | grep -v ':' \
-            | grep -v '@' \
+            | sed -E 's/^\s*#.*//' \
+            | sed -E '/^\s*$/d' \
+            | grep -v 'payload:' | grep -v '/' | grep -v ':' | grep -v '@' \
             | tr '[:upper:]' '[:lower:]' \
-            > normalized_blacklist.txt
+            > normalized_reject_list.txt
             
-          echo "Filtering blacklist against allowlist..."
-          grep -v -x -f normalized_allowlist.txt normalized_blacklist.txt > filtered_blacklist.txt
-          echo "Allowlist filtering complete."
+          # 3. 过滤
+          echo "Filtering REJECT list against allowlist..."
+          grep -v -x -f normalized_reject_allowlist.txt normalized_reject_list.txt > filtered_reject_list.txt
+          echo "REJECT allowlist filtering complete."
 
-      # 第 5 步：排序、去重并格式化为 YAML (保持不变)
-      - name: Sort, deduplicate, and format as YAML
+      # 第 5 步：格式化为 YAML (REJECT)
+      - name: 5. Format REJECT List
         run: |
-          echo "Sorting and deduplicating filtered list..."
-          cat filtered_blacklist.txt \
+          echo "Sorting and deduplicating filtered REJECT list..."
+          cat filtered_reject_list.txt \
             | sort \
             | uniq \
             > final_reject_domains.txt
-
-          echo "Reformatting for YAML payload..."
+          echo "Reformatting for REJECT YAML payload..."
           echo "payload:" > final_reject.yaml
           sed "s/^\(.*\)$/  - '\1'/" final_reject_domains.txt >> final_reject.yaml
-          echo "Build complete. Final file is final_reject.yaml"
+          echo "REJECT build complete. Final file is final_reject.yaml"
+          
+      # =======================================================
+      #  处理 PROXY 规则 (步骤 6, 7, 8)
+      # =======================================================
+      
+      # 第 6 步：合并“代理名单” (PROXY)
+      - name: 6. Build PROXY List
+        run: |
+          echo "Starting PROXY rule download and merge process..."
+          touch all_proxy_rules.tmp
+          while IFS= read -r url || [[ -n "$url" ]]; do 
+            if [[ "$url" == \#* ]] || [[ -z "$url" ]]; then continue; fi
+            echo "  [PROXY] Processing URL: $url"
+            curl -s -L -o rule_content.tmp "$url"
+            if [ ! -s rule_content.tmp ]; then
+              echo "  -> WARNING: Failed to download or file is empty."
+              continue
+            fi
+            if cat rule_content.tmp | yq e '.payload[]' - >> all_proxy_rules.tmp 2>/dev/null; then
+              echo "  -> Parsed as YAML (raw merge)"
+            else
+              cat rule_content.tmp >> all_proxy_rules.tmp
+              echo "  -> Parsed as TXT (raw merge)"
+            fi
+          done < proxy/proxy_sources.list
+          rm -f rule_content.tmp
+          cat proxy/proxy.txt >> all_proxy_rules.tmp
+          echo "PROXY list merge complete."
 
-      # 第 6 步：将生成的 "final_reject.yaml" 文件提交回仓库 (保持不变)
-      - name: Commit and push changes
+      # ★ 第 7 步：白名单过滤 (PROXY) - [优化了注释处理]
+      - name: 7. Filter PROXY List
+        run: |
+          echo "Normalizing PROXY allowlist (proxy/exclude.txt)..."
+          cat proxy/exclude.txt \
+            | sed "s/'//g" \
+            | sed -E 's/^\s*#.*//' \
+            | sed -E '/^\s*$/d' \
+            | tr '[:upper:]' '[:lower:]' \
+            | sort | uniq \
+            > normalized_proxy_allowlist.txt
+
+          echo "Normalizing merged PROXY list (all_proxy_rules.tmp)..."
+          cat all_proxy_rules.tmp \
+            | sed "s/'//g" \
+            | sed -E 's/^\s*#.*//' \
+            | sed -E '/^\s*$/d' \
+            | grep -v 'payload:' | grep -v '/' | grep -v ':' | grep -v '@' \
+            | tr '[:upper:]' '[:lower:]' \
+            > normalized_proxy_list.txt
+            
+          echo "Filtering PROXY list against allowlist..."
+          grep -v -x -f normalized_proxy_allowlist.txt normalized_proxy_list.txt > filtered_proxy_list.txt
+          echo "PROXY allowlist filtering complete."
+
+      # 第 8 步：格式化为 YAML (PROXY)
+      - name: 8. Format PROXY List
+        run: |
+          echo "Sorting and deduplicating filtered PROXY list..."
+          cat filtered_proxy_list.txt \
+            | sort \
+            | uniq \
+            > final_proxy_domains.txt
+          echo "Reformatting for PROXY YAML payload..."
+          echo "payload:" > final_proxy.yaml
+          sed "s/^\(.*\)$/  - '\1'/" final_proxy_domains.txt >> final_proxy.yaml
+          echo "PROXY build complete. Final file is final_proxy.yaml"
+
+      # =======================================================
+      #  处理 DIRECT 规则 (步骤 9, 10, 11)
+      # =======================================================
+
+      # 第 9 步：合并“直连名单” (DIRECT)
+      - name: 9. Build DIRECT List
+        run: |
+          echo "Starting DIRECT rule download and merge process..."
+          touch all_direct_rules.tmp
+          while IFS= read -r url || [[ -n "$url" ]]; do 
+            if [[ "$url" == \#* ]] || [[ -z "$url" ]]; then continue; fi
+            echo "  [DIRECT] Processing URL: $url"
+            curl -s -L -o rule_content.tmp "$url"
+            if [ ! -s rule_content.tmp ]; then
+              echo "  -> WARNING: Failed to download or file is empty."
+              continue
+            fi
+            if cat rule_content.tmp | yq e '.payload[]' - >> all_direct_rules.tmp 2>/dev/null; then
+              echo "  -> Parsed as YAML (raw merge)"
+            else
+              cat rule_content.tmp >> all_direct_rules.tmp
+              echo "  -> Parsed as TXT (raw merge)"
+            fi
+          done < direct/direct_sources.list
+          rm -f rule_content.tmp
+          cat direct/direct.txt >> all_direct_rules.tmp
+          echo "DIRECT list merge complete."
+
+      # ★ 第 10 步：白名单过滤 (DIRECT) - [优化了注释处理]
+      - name: 10. Filter DIRECT List
+        run: |
+          echo "Normalizing DIRECT allowlist (direct/exclude.txt)..."
+          cat direct/exclude.txt \
+            | sed "s/'//g" \
+            | sed -E 's/^\s*#.*//' \
+            | sed -E '/^\s*$/d' \
+            | tr '[:upper:]' '[:lower:]' \
+            | sort | uniq \
+            > normalized_direct_allowlist.txt
+
+          echo "Normalizing merged DIRECT list (all_direct_rules.tmp)..."
+          cat all_direct_rules.tmp \
+            | sed "s/'//g" \
+            | sed -E 's/^\s*#.*//' \
+            | sed -E '/^\s*$/d' \
+            | grep -v 'payload:' | grep -v '/' | grep -v ':' | grep -v '@' \
+            | tr '[:upper:]' '[:lower:]' \
+            > normalized_direct_list.txt
+            
+          echo "Filtering DIRECT list against allowlist..."
+          grep -v -x -f normalized_direct_allowlist.txt normalized_direct_list.txt > filtered_direct_list.txt
+          echo "DIRECT allowlist filtering complete."
+
+      # 第 11 步：格式化为 YAML (DIRECT)
+      - name: 11. Format DIRECT List
+        run: |
+          echo "Sorting and deduplicating filtered DIRECT list..."
+          cat filtered_direct_list.txt \
+            | sort \
+            | uniq \
+            > final_direct_domains.txt
+          echo "Reformatting for DIRECT YAML payload..."
+          echo "payload:" > final_direct.yaml
+          sed "s/^\(.*\)$/  - '\1'/" final_direct_domains.txt >> final_direct.yaml
+          echo "DIRECT build complete. Final file is final_direct.yaml"
+
+      # =======================================================
+      #  第 12 步：提交所有更改
+      # =======================================================
+      
+      - name: 12. Commit and push changes
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "chore: Auto-update reject rules (filtered by allowlist)"
-          file_pattern: final_reject.yaml
+          commit_message: "chore: Auto-update REJECT, PROXY, and DIRECT rules"
+          file_pattern: final_reject.yaml final_proxy.yaml final_direct.yaml
           commit_user_name: "GitHub Actions Bot"
           commit_user_email: "github-actions-bot@users.noreply.github.com"
           commit_author: "GitHub Actions Bot <github-actions-bot@users.noreply.github.com>"
