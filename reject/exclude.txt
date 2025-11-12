@@ -1,2 +1,4 @@
-# 不想拦截 google analytics
 google-analytics.com
+firebasedynamiclinks.googleapis.com
+firebaseinstallations.googleapis.com
+firebaseremoteconfig.googleapis.com
