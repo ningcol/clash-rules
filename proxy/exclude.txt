@@ -3,7 +3,7 @@
 +.dyndns.org
 +.ddns.net
 +.myds.me
-+.180520.xzy
++.180520.xyz
 +.synocircle.top
 +.oraclecloud.com
 +.ningcol.com
