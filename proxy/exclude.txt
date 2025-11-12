@@ -11,3 +11,6 @@
 +.imgse.com
 # 微软
 +.azure.com
+cdn.jsdelivr.net
++.jsdelivr.net
+
