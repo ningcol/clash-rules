@@ -76,6 +76,15 @@ jobs:
       # ★ 第 4 步：白名单过滤 (REJECT) - [已修复]
       - name: 4. Filter REJECT List
         run: |
+          normalize_rules() {
+            sed "s/'//g" \
+            | sed -E 's/^\s*#.*//' \
+            | sed -E '/^\s*$/d' \
+            | sed -E 's/^(DOMAIN|DOMAIN-SUFFIX|IP-CIDR|IP-CIDR6),([^,]+).*/\2/' \
+            | grep -v 'payload:' | grep -v '/' | grep -v ':' | grep -v '@' \
+            | tr '[:upper:]' '[:lower:]'
+          }
+
           # 1. 规范化“排除列表” (exclude.txt)
           echo "Normalizing REJECT allowlist (reject/exclude.txt)..."
           cat reject/exclude.txt \
@@ -88,13 +97,12 @@ jobs:
 
           # 2. 规范化“大列表” (all_reject_rules.tmp) 使用统一函数
           echo "Normalizing merged REJECT list (all_reject_rules.tmp)..."
-          cat all_reject_rules.tmp | bash -c "$NORMALIZE_RULES" > normalized_reject_list.txt
+          cat all_reject_rules.tmp | normalize_rules > normalized_reject_list.txt || true
+
           # 3. 过滤
           echo "Filtering REJECT list against allowlist..."
-          # ★ 关键修复：添加 -F 标志
-          grep -F -v -x -f normalized_reject_allowlist.txt normalized_reject_list.txt > filtered_reject_list.txt
+          grep -F -v -x -f normalized_reject_allowlist.txt normalized_reject_list.txt > filtered_reject_list.txt || true
           echo "REJECT allowlist filtering complete."
-
       # 第 5 步：格式化为 YAML (REJECT)
       - name: 5. Format REJECT List
         run: |
@@ -119,24 +127,32 @@ jobs:
       # =======================================================
       
       # 第 6 步：合并“代理名单” (PROXY)
-      - name: 6. Build PROXY List
+      - name: 7. Filter PROXY List
         run: |
-          echo "Starting PROXY rule download and merge process..."
-          touch all_proxy_rules.tmp
-          while IFS= read -r url || [[ -n "$url" ]]; do 
-            if [[ "$url" == \#* ]] || [[ -z "$url" ]]; then continue; fi
-            echo "  [PROXY] Processing URL: $url"
-            curl -s -L -o rule_content.tmp "$url"
-            if [ ! -s rule_content.tmp ]; then
-              echo "  -> WARNING: Failed to download or file is empty."
-              continue
-            fi
-            if cat rule_content.tmp | yq e '.payload[]' - >> all_proxy_rules.tmp 2>/dev/null; then
-              echo "  -> Parsed as YAML (raw merge)"
-            else
-              cat rule_content.tmp >> all_proxy_rules.tmp
-              echo "  -> Parsed as TXT (raw merge)"
-            fi
+          normalize_rules() {
+            sed "s/'//g" \
+            | sed -E 's/^\s*#.*//' \
+            | sed -E '/^\s*$/d' \
+            | sed -E 's/^(DOMAIN|DOMAIN-SUFFIX|IP-CIDR|IP-CIDR6),([^,]+).*/\2/' \
+            | grep -v 'payload:' | grep -v '/' | grep -v ':' | grep -v '@' \
+            | tr '[:upper:]' '[:lower:]'
+          }
+
+          echo "Normalizing PROXY allowlist (proxy/exclude.txt)..."
+          cat proxy/exclude.txt \
+            | sed "s/'//g" \
+            | sed -E 's/^\s*#.*//' \
+            | sed -E '/^\s*$/d' \
+            | tr '[:upper:]' '[:lower:]' \
+            | sort | uniq \
+            > normalized_proxy_allowlist.txt
+
+          echo "Normalizing merged PROXY list (all_proxy_rules.tmp)..."
+          cat all_proxy_rules.tmp | normalize_rules > normalized_proxy_list.txt || true
+
+          echo "Filtering PROXY list against allowlist..."
+          grep -F -v -x -f normalized_proxy_allowlist.txt normalized_proxy_list.txt > filtered_proxy_list.txt || true
+          echo "PROXY allowlist filtering complete."
           done < proxy/proxy_sources.list
           rm -f rule_content.tmp
           cat proxy/proxy.txt >> all_proxy_rules.tmp
@@ -228,24 +244,32 @@ jobs:
           echo "DIRECT allowlist filtering complete."
 
       # 第 11 步：格式化为 YAML (DIRECT)
-      - name: 11. Format DIRECT List
+      - name: 10. Filter DIRECT List
         run: |
-          echo "Sorting and deduplicating filtered DIRECT list..."
-          cat filtered_direct_list.txt \
-            | sort \
-            | uniq \
-            > final_direct_domains.txt || true
-          echo "Reformatting for DIRECT YAML payload..."
-          echo "#########################################" > final_direct.yaml
-          echo "# 作者: ningcol" >> final_direct.yaml
-          echo "# 项目地址: https://github.com/ningcol/clash-rules" >> final_direct.yaml
-          echo "# 更新时间: $(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> final_direct.yaml
-          echo "# 说明: 本文件为自动生成的 Clash DIRECT 规则，仅包含域名。" >> final_direct.yaml
-          echo "#########################################" >> final_direct.yaml
-          echo "payload:" >> final_direct.yaml
-          sed "s/^\(.*\)$/  - '\1'/" final_direct_domains.txt >> final_direct.yaml
-          echo "DIRECT build complete. Final file is final_direct.yaml"
+          normalize_rules() {
+            sed "s/'//g" \
+            | sed -E 's/^\s*#.*//' \
+            | sed -E '/^\s*$/d' \
+            | sed -E 's/^(DOMAIN|DOMAIN-SUFFIX|IP-CIDR|IP-CIDR6),([^,]+).*/\2/' \
+            | grep -v 'payload:' | grep -v '/' | grep -v ':' | grep -v '@' \
+            | tr '[:upper:]' '[:lower:]'
+          }
 
+          echo "Normalizing DIRECT allowlist (direct/exclude.txt)..."
+          cat direct/exclude.txt \
+            | sed "s/'//g" \
+            | sed -E 's/^\s*#.*//' \
+            | sed -E '/^\s*$/d' \
+            | tr '[:upper:]' '[:lower:]' \
+            | sort | uniq \
+            > normalized_direct_allowlist.txt
+
+          echo "Normalizing merged DIRECT list (all_direct_rules.tmp)..."
+          cat all_direct_rules.tmp | normalize_rules > normalized_direct_list.txt || true
+
+          echo "Filtering DIRECT list against allowlist..."
+          grep -F -v -x -f normalized_direct_allowlist.txt normalized_direct_list.txt > filtered_direct_list.txt || true
+          echo "DIRECT allowlist filtering complete."
       # =======================================================
       #  处理 MICROSOFT 规则 (步骤 13, 14, 15)
       # =======================================================
@@ -274,6 +298,15 @@ jobs:
 
       - name: 14. Filter MICROSOFT List
         run: |
+          normalize_rules() {
+            sed "s/'//g" \
+            | sed -E 's/^\s*#.*//' \
+            | sed -E '/^\s*$/d' \
+            | sed -E 's/^(DOMAIN|DOMAIN-SUFFIX|IP-CIDR|IP-CIDR6),([^,]+).*/\2/' \
+            | grep -v 'payload:' | grep -v '/' | grep -v ':' | grep -v '@' \
+            | tr '[:upper:]' '[:lower:]'
+          }
+
           echo "Normalizing MICROSOFT allowlist (microsoft/exclude.txt)..."
           cat microsoft/exclude.txt \
             | sed "s/'//g" \
@@ -284,10 +317,10 @@ jobs:
             > normalized_microsoft_allowlist.txt
 
           echo "Normalizing merged MICROSOFT list (all_microsoft_rules.tmp)..."
-          cat all_microsoft_rules.tmp | bash -c "$NORMALIZE_RULES" > normalized_microsoft_list.txt
+          cat all_microsoft_rules.tmp | normalize_rules > normalized_microsoft_list.txt || true
 
           echo "Filtering MICROSOFT list against allowlist..."
-          grep -F -v -x -f normalized_microsoft_allowlist.txt normalized_microsoft_list.txt > filtered_microsoft_list.txt
+          grep -F -v -x -f normalized_microsoft_allowlist.txt normalized_microsoft_list.txt > filtered_microsoft_list.txt || true
           echo "MICROSOFT allowlist filtering complete."
 
       - name: 15. Format MICROSOFT List
