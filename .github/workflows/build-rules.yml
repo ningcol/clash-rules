@@ -249,14 +249,75 @@ jobs:
             echo "DIRECT build complete. Final file is final_direct.yaml"
 
       # =======================================================
-      #  第 12 步：提交所有更改
+      #  处理 MICROSOFT 规则 (步骤 13, 14, 15)
       # =======================================================
-      
-      - name: 12. Commit and push changes
+      - name: 13. Build MICROSOFT List
+        run: |
+          echo "Starting MICROSOFT rule download and merge process..."
+          touch all_microsoft_rules.tmp
+          while IFS= read -r url || [[ -n "$url" ]]; do
+            if [[ "$url" == \#* ]] || [[ -z "$url" ]]; then continue; fi
+            echo "  [MICROSOFT] Processing URL: $url"
+            curl -s -L -o rule_content.tmp "$url"
+            if [ ! -s rule_content.tmp ]; then
+              echo "  -> WARNING: Failed to download or file is empty."
+              continue
+            fi
+            if cat rule_content.tmp | yq e '.payload[]' - >> all_microsoft_rules.tmp 2>/dev/null; then
+              echo "  -> Parsed as YAML (raw merge)"
+            else
+              cat rule_content.tmp >> all_microsoft_rules.tmp
+              echo "  -> Parsed as TXT (raw merge)"
+            fi
+          done < microsoft/microsoft_sources.list
+          rm -f rule_content.tmp
+          cat microsoft/microsoft.txt >> all_microsoft_rules.tmp
+          echo "MICROSOFT list merge complete."
+
+      - name: 14. Filter MICROSOFT List
+        run: |
+          echo "Normalizing MICROSOFT allowlist (microsoft/exclude.txt)..."
+          cat microsoft/exclude.txt \
+            | sed "s/'//g" \
+            | sed -E 's/^\s*#.*//' \
+            | sed -E '/^\s*$/d' \
+            | tr '[:upper:]' '[:lower:]' \
+            | sort | uniq \
+            > normalized_microsoft_allowlist.txt
+
+        echo "Normalizing merged MICROSOFT list (all_microsoft_rules.tmp)..."
+        cat all_microsoft_rules.tmp | bash -c "$NORMALIZE_RULES" > normalized_microsoft_list.txt
+
+        echo "Filtering MICROSOFT list against allowlist..."
+        grep -F -v -x -f normalized_microsoft_allowlist.txt normalized_microsoft_list.txt > filtered_microsoft_list.txt
+        echo "MICROSOFT allowlist filtering complete."
+
+      - name: 15. Format MICROSOFT List
+        run: |
+          echo "Sorting and deduplicating filtered MICROSOFT list..."
+          cat filtered_microsoft_list.txt \
+            | sort \
+            | uniq \
+            > final_microsoft_domains.txt
+          echo "Reformatting for MICROSOFT YAML payload..."
+          echo "#########################################" > final_microsoft.yaml
+          echo "# 作者: ningcol" >> final_microsoft.yaml
+          echo "# 项目地址: https://github.com/ningcol/clash-rules" >> final_microsoft.yaml
+          echo "# 更新时间: $(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> final_microsoft.yaml
+          echo "# 说明: 本文件为自动生成的 Clash MICROSOFT 规则，仅包含域名。" >> final_microsoft.yaml
+          echo "#########################################" >> final_microsoft.yaml
+          echo "payload:" >> final_microsoft.yaml
+          sed "s/^\(.*\)$/  - '\1'/" final_microsoft_domains.txt >> final_microsoft.yaml
+          echo "MICROSOFT build complete. Final file is final_microsoft.yaml"
+
+      # =======================================================
+      #  第 16 步：提交所有更改
+      # =======================================================
+      - name: 16. Commit and push changes
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "chore: Auto-update REJECT, PROXY, and DIRECT rules"
-          file_pattern: final_reject.yaml final_proxy.yaml final_direct.yaml
+          commit_message: "chore: Auto-update REJECT, PROXY, DIRECT, and MICROSOFT rules"
+          file_pattern: final_reject.yaml final_proxy.yaml final_direct.yaml final_microsoft.yaml
           commit_user_name: "GitHub Actions Bot"
           commit_user_email: "github-actions-bot@users.noreply.github.com"
           commit_author: "GitHub Actions Bot <github-actions-bot@users.noreply.github.com>"
