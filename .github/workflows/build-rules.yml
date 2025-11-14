@@ -8,7 +8,6 @@ on:
     branches:
       - main
     paths:
-      # 路径已适配您的 tree
       - 'reject/**'
       - 'proxy/**'
       - 'direct/**'
@@ -23,33 +22,19 @@ jobs:
 
     runs-on: ubuntu-latest
     
-    # 统一规则格式化函数
-    env:
-      NORMALIZE_RULES: |
-        normalize_rules() {
-          sed "s/'//g" \
-          | sed -E 's/^\s*#.*//' \
-          | sed -E '/^\s*$/d' \
-          | sed -E 's/^(DOMAIN|DOMAIN-SUFFIX|IP-CIDR|IP-CIDR6),([^,]+).*/\2/' \
-          | grep -v 'payload:' | grep -v '/' | grep -v ':' | grep -v '@' \
-          | tr '[:upper:]' '[:lower:]'
-        }
     steps:
-      # 第 1 步：签出
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 第 2 步：安装 yq
       - name: Install yq
         run: |
           sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq
           sudo chmod +x /usr/bin/yq
 
       # =======================================================
-      #  处理 REJECT 规则 (步骤 3, 4, 5)
+      #  处理 REJECT 规则
       # =======================================================
 
-      # 第 3 步：合并“黑名单” (REJECT)
       - name: 3. Build REJECT List
         run: |
           echo "Starting REJECT rule download and merge process..."
@@ -73,7 +58,6 @@ jobs:
           cat reject/reject.txt >> all_reject_rules.tmp
           echo "REJECT list merge complete."
 
-      # ★ 第 4 步：白名单过滤 (REJECT) - [已修复]
       - name: 4. Filter REJECT List
         run: |
           normalize_rules() {
@@ -85,7 +69,6 @@ jobs:
             | tr '[:upper:]' '[:lower:]'
           }
 
-          # 1. 规范化“排除列表” (exclude.txt)
           echo "Normalizing REJECT allowlist (reject/exclude.txt)..."
           cat reject/exclude.txt \
             | sed "s/'//g" \
@@ -95,22 +78,17 @@ jobs:
             | sort | uniq \
             > normalized_reject_allowlist.txt
 
-          # 2. 规范化“大列表” (all_reject_rules.tmp) 使用统一函数
           echo "Normalizing merged REJECT list (all_reject_rules.tmp)..."
           cat all_reject_rules.tmp | normalize_rules > normalized_reject_list.txt || true
 
-          # 3. 过滤
           echo "Filtering REJECT list against allowlist..."
           grep -F -v -x -f normalized_reject_allowlist.txt normalized_reject_list.txt > filtered_reject_list.txt || true
           echo "REJECT allowlist filtering complete."
-      # 第 5 步：格式化为 YAML (REJECT)
+
       - name: 5. Format REJECT List
         run: |
           echo "Sorting and deduplicating filtered REJECT list..."
-          cat filtered_reject_list.txt \
-            | sort \
-            | uniq \
-            > final_reject_domains.txt || true
+          cat filtered_reject_list.txt | sort | uniq > final_reject_domains.txt || true
           echo "Reformatting for REJECT YAML payload..."
           echo "#########################################" > final_reject.yaml
           echo "# 作者: ningcol" >> final_reject.yaml
@@ -123,10 +101,32 @@ jobs:
           echo "REJECT build complete. Final file is final_reject.yaml"
           
       # =======================================================
-      #  处理 PROXY 规则 (步骤 6, 7, 8)
+      #  处理 PROXY 规则
       # =======================================================
       
-      # 第 6 步：合并“代理名单” (PROXY)
+      - name: 6. Build PROXY List
+        run: |
+          echo "Starting PROXY rule download and merge process..."
+          touch all_proxy_rules.tmp
+          while IFS= read -r url || [[ -n "$url" ]]; do 
+            if [[ "$url" == \#* ]] || [[ -z "$url" ]]; then continue; fi
+            echo "  [PROXY] Processing URL: $url"
+            curl -s -L -o rule_content.tmp "$url"
+            if [ ! -s rule_content.tmp ]; then
+              echo "  -> WARNING: Failed to download or file is empty."
+              continue
+            fi
+            if cat rule_content.tmp | yq e '.payload[]' - >> all_proxy_rules.tmp 2>/dev/null; then
+              echo "  -> Parsed as YAML (raw merge)"
+            else
+              cat rule_content.tmp >> all_proxy_rules.tmp
+              echo "  -> Parsed as TXT (raw merge)"
+            fi
+          done < proxy/proxy_sources.list
+          rm -f rule_content.tmp
+          cat proxy/proxy.txt >> all_proxy_rules.tmp
+          echo "PROXY list merge complete."
+
       - name: 7. Filter PROXY List
         run: |
           normalize_rules() {
@@ -153,38 +153,11 @@ jobs:
           echo "Filtering PROXY list against allowlist..."
           grep -F -v -x -f normalized_proxy_allowlist.txt normalized_proxy_list.txt > filtered_proxy_list.txt || true
           echo "PROXY allowlist filtering complete."
-          done < proxy/proxy_sources.list
-          rm -f rule_content.tmp
-          cat proxy/proxy.txt >> all_proxy_rules.tmp
-          echo "PROXY list merge complete."
 
-      # ★ 第 7 步：白名单过滤 (PROXY) - [已修复]
-      - name: 7. Filter PROXY List
-        run: |
-          echo "Normalizing PROXY allowlist (proxy/exclude.txt)..."
-          cat proxy/exclude.txt \
-            | sed "s/'//g" \
-            | sed -E 's/^\s*#.*//' \
-            | sed -E '/^\s*$/d' \
-            | tr '[:upper:]' '[:lower:]' \
-            | sort | uniq \
-            > normalized_proxy_allowlist.txt
-
-          echo "Normalizing merged PROXY list (all_proxy_rules.tmp)..."
-          cat all_proxy_rules.tmp | bash -c "$NORMALIZE_RULES" > normalized_proxy_list.txt
-          echo "Filtering PROXY list against allowlist..."
-          # ★ 关键修复：添加 -F 标志
-          grep -F -v -x -f normalized_proxy_allowlist.txt normalized_proxy_list.txt > filtered_proxy_list.txt
-          echo "PROXY allowlist filtering complete."
-
-      # 第 8 步：格式化为 YAML (PROXY)
       - name: 8. Format PROXY List
         run: |
           echo "Sorting and deduplicating filtered PROXY list..."
-          cat filtered_proxy_list.txt \
-            | sort \
-            | uniq \
-            > final_proxy_domains.txt || true
+          cat filtered_proxy_list.txt | sort | uniq > final_proxy_domains.txt || true
           echo "Reformatting for PROXY YAML payload..."
           echo "#########################################" > final_proxy.yaml
           echo "# 作者: ningcol" >> final_proxy.yaml
@@ -197,10 +170,9 @@ jobs:
           echo "PROXY build complete. Final file is final_proxy.yaml"
 
       # =======================================================
-      #  处理 DIRECT 规则 (步骤 9, 10, 11)
+      #  处理 DIRECT 规则
       # =======================================================
 
-      # 第 9 步：合并“直连名单” (DIRECT)
       - name: 9. Build DIRECT List
         run: |
           echo "Starting DIRECT rule download and merge process..."
@@ -224,26 +196,6 @@ jobs:
           cat direct/direct.txt >> all_direct_rules.tmp
           echo "DIRECT list merge complete."
 
-      # ★ 第 10 步：白名单过滤 (DIRECT) - [已修复]
-      - name: 10. Filter DIRECT List
-        run: |
-          echo "Normalizing DIRECT allowlist (direct/exclude.txt)..."
-          cat direct/exclude.txt \
-            | sed "s/'//g" \
-            | sed -E 's/^\s*#.*//' \
-            | sed -E '/^\s*$/d' \
-            | tr '[:upper:]' '[:lower:]' \
-            | sort | uniq \
-            > normalized_direct_allowlist.txt
-
-          echo "Normalizing merged DIRECT list (all_direct_rules.tmp)..."
-          cat all_direct_rules.tmp | bash -c "$NORMALIZE_RULES" > normalized_direct_list.txt
-          echo "Filtering DIRECT list against allowlist..."
-          # ★ 关键修复：添加 -F 标志
-          grep -F -v -x -f normalized_direct_allowlist.txt normalized_direct_list.txt > filtered_direct_list.txt
-          echo "DIRECT allowlist filtering complete."
-
-      # 第 11 步：格式化为 YAML (DIRECT)
       - name: 10. Filter DIRECT List
         run: |
           normalize_rules() {
@@ -270,10 +222,27 @@ jobs:
           echo "Filtering DIRECT list against allowlist..."
           grep -F -v -x -f normalized_direct_allowlist.txt normalized_direct_list.txt > filtered_direct_list.txt || true
           echo "DIRECT allowlist filtering complete."
+
+      - name: 11. Format DIRECT List
+        run: |
+          echo "Sorting and deduplicating filtered DIRECT list..."
+          cat filtered_direct_list.txt | sort | uniq > final_direct_domains.txt || true
+          echo "Reformatting for DIRECT YAML payload..."
+          echo "#########################################" > final_direct.yaml
+          echo "# 作者: ningcol" >> final_direct.yaml
+          echo "# 项目地址: https://github.com/ningcol/clash-rules" >> final_direct.yaml
+          echo "# 更新时间: $(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> final_direct.yaml
+          echo "# 说明: 本文件为自动生成的 Clash DIRECT 规则，仅包含域名。" >> final_direct.yaml
+          echo "#########################################" >> final_direct.yaml
+          echo "payload:" >> final_direct.yaml
+          sed "s/^\(.*\)$/  - '\1'/" final_direct_domains.txt >> final_direct.yaml
+          echo "DIRECT build complete. Final file is final_direct.yaml"
+
       # =======================================================
-      #  处理 MICROSOFT 规则 (步骤 13, 14, 15)
+      #  处理 MICROSOFT 规则
       # =======================================================
-      - name: 13. Build MICROSOFT List
+
+      - name: 12. Build MICROSOFT List
         run: |
           echo "Starting MICROSOFT rule download and merge process..."
           touch all_microsoft_rules.tmp
@@ -296,7 +265,7 @@ jobs:
           cat microsoft/microsoft.txt >> all_microsoft_rules.tmp
           echo "MICROSOFT list merge complete."
 
-      - name: 14. Filter MICROSOFT List
+      - name: 13. Filter MICROSOFT List
         run: |
           normalize_rules() {
             sed "s/'//g" \
@@ -323,13 +292,10 @@ jobs:
           grep -F -v -x -f normalized_microsoft_allowlist.txt normalized_microsoft_list.txt > filtered_microsoft_list.txt || true
           echo "MICROSOFT allowlist filtering complete."
 
-      - name: 15. Format MICROSOFT List
+      - name: 14. Format MICROSOFT List
         run: |
           echo "Sorting and deduplicating filtered MICROSOFT list..."
-          cat filtered_microsoft_list.txt \
-            | sort \
-            | uniq \
-            > final_microsoft_domains.txt || true
+          cat filtered_microsoft_list.txt | sort | uniq > final_microsoft_domains.txt || true
           echo "Reformatting for MICROSOFT YAML payload..."
           echo "#########################################" > final_microsoft.yaml
           echo "# 作者: ningcol" >> final_microsoft.yaml
@@ -342,9 +308,10 @@ jobs:
           echo "MICROSOFT build complete. Final file is final_microsoft.yaml"
 
       # =======================================================
-      #  第 16 步：提交所有更改
+      #  提交所有更改
       # =======================================================
-      - name: 16. Commit and push changes
+      
+      - name: 15. Commit and push changes
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "chore: Auto-update REJECT, PROXY, DIRECT, and MICROSOFT rules"
