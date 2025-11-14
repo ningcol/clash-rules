@@ -102,7 +102,7 @@ jobs:
           cat filtered_reject_list.txt \
             | sort \
             | uniq \
-            > final_reject_domains.txt
+            > final_reject_domains.txt || true
           echo "Reformatting for REJECT YAML payload..."
           echo "#########################################" > final_reject.yaml
           echo "# 作者: ningcol" >> final_reject.yaml
@@ -168,7 +168,7 @@ jobs:
           cat filtered_proxy_list.txt \
             | sort \
             | uniq \
-            > final_proxy_domains.txt
+            > final_proxy_domains.txt || true
           echo "Reformatting for PROXY YAML payload..."
           echo "#########################################" > final_proxy.yaml
           echo "# 作者: ningcol" >> final_proxy.yaml
@@ -234,7 +234,7 @@ jobs:
           cat filtered_direct_list.txt \
             | sort \
             | uniq \
-            > final_direct_domains.txt
+            > final_direct_domains.txt || true
           echo "Reformatting for DIRECT YAML payload..."
           echo "#########################################" > final_direct.yaml
           echo "# 作者: ningcol" >> final_direct.yaml
@@ -296,7 +296,7 @@ jobs:
           cat filtered_microsoft_list.txt \
             | sort \
             | uniq \
-            > final_microsoft_domains.txt
+            > final_microsoft_domains.txt || true
           echo "Reformatting for MICROSOFT YAML payload..."
           echo "#########################################" > final_microsoft.yaml
           echo "# 作者: ningcol" >> final_microsoft.yaml
