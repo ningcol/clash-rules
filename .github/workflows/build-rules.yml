@@ -12,6 +12,7 @@ on:
       - 'reject/**'
       - 'proxy/**'
       - 'direct/**'
+      - 'microsoft/**'
 
   workflow_dispatch:
 
@@ -85,10 +86,9 @@ jobs:
             | sort | uniq \
             > normalized_reject_allowlist.txt
 
-            # 2. 规范化“大列表” (all_reject_rules.tmp) 使用统一函数
-            echo "Normalizing merged REJECT list (all_reject_rules.tmp)..."
-            cat all_reject_rules.tmp | bash -c "$NORMALIZE_RULES" > normalized_reject_list.txt
-            
+          # 2. 规范化“大列表” (all_reject_rules.tmp) 使用统一函数
+          echo "Normalizing merged REJECT list (all_reject_rules.tmp)..."
+          cat all_reject_rules.tmp | bash -c "$NORMALIZE_RULES" > normalized_reject_list.txt
           # 3. 过滤
           echo "Filtering REJECT list against allowlist..."
           # ★ 关键修复：添加 -F 标志
@@ -103,16 +103,16 @@ jobs:
             | sort \
             | uniq \
             > final_reject_domains.txt
-            echo "Reformatting for REJECT YAML payload..."
-            echo "#########################################" > final_reject.yaml
-            echo "# 作者: ningcol" >> final_reject.yaml
-            echo "# 项目地址: https://github.com/ningcol/clash-rules" >> final_reject.yaml
-            echo "# 更新时间: $(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> final_reject.yaml
-            echo "# 说明: 本文件为自动生成的 Clash REJECT 规则，仅包含域名。" >> final_reject.yaml
-            echo "#########################################" >> final_reject.yaml
-            echo "payload:" >> final_reject.yaml
-            sed "s/^\(.*\)$/  - '\1'/" final_reject_domains.txt >> final_reject.yaml
-            echo "REJECT build complete. Final file is final_reject.yaml"
+          echo "Reformatting for REJECT YAML payload..."
+          echo "#########################################" > final_reject.yaml
+          echo "# 作者: ningcol" >> final_reject.yaml
+          echo "# 项目地址: https://github.com/ningcol/clash-rules" >> final_reject.yaml
+          echo "# 更新时间: $(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> final_reject.yaml
+          echo "# 说明: 本文件为自动生成的 Clash REJECT 规则，仅包含域名。" >> final_reject.yaml
+          echo "#########################################" >> final_reject.yaml
+          echo "payload:" >> final_reject.yaml
+          sed "s/^\(.*\)$/  - '\1'/" final_reject_domains.txt >> final_reject.yaml
+          echo "REJECT build complete. Final file is final_reject.yaml"
           
       # =======================================================
       #  处理 PROXY 规则 (步骤 6, 7, 8)
@@ -154,9 +154,8 @@ jobs:
             | sort | uniq \
             > normalized_proxy_allowlist.txt
 
-            echo "Normalizing merged PROXY list (all_proxy_rules.tmp)..."
-            cat all_proxy_rules.tmp | bash -c "$NORMALIZE_RULES" > normalized_proxy_list.txt
-            
+          echo "Normalizing merged PROXY list (all_proxy_rules.tmp)..."
+          cat all_proxy_rules.tmp | bash -c "$NORMALIZE_RULES" > normalized_proxy_list.txt
           echo "Filtering PROXY list against allowlist..."
           # ★ 关键修复：添加 -F 标志
           grep -F -v -x -f normalized_proxy_allowlist.txt normalized_proxy_list.txt > filtered_proxy_list.txt
@@ -170,16 +169,16 @@ jobs:
             | sort \
             | uniq \
             > final_proxy_domains.txt
-            echo "Reformatting for PROXY YAML payload..."
-            echo "#########################################" > final_proxy.yaml
-            echo "# 作者: ningcol" >> final_proxy.yaml
-            echo "# 项目地址: https://github.com/ningcol/clash-rules" >> final_proxy.yaml
-            echo "# 更新时间: $(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> final_proxy.yaml
-            echo "# 说明: 本文件为自动生成的 Clash PROXY 规则，仅包含域名。" >> final_proxy.yaml
-            echo "#########################################" >> final_proxy.yaml
-            echo "payload:" >> final_proxy.yaml
-            sed "s/^\(.*\)$/  - '\1'/" final_proxy_domains.txt >> final_proxy.yaml
-            echo "PROXY build complete. Final file is final_proxy.yaml"
+          echo "Reformatting for PROXY YAML payload..."
+          echo "#########################################" > final_proxy.yaml
+          echo "# 作者: ningcol" >> final_proxy.yaml
+          echo "# 项目地址: https://github.com/ningcol/clash-rules" >> final_proxy.yaml
+          echo "# 更新时间: $(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> final_proxy.yaml
+          echo "# 说明: 本文件为自动生成的 Clash PROXY 规则，仅包含域名。" >> final_proxy.yaml
+          echo "#########################################" >> final_proxy.yaml
+          echo "payload:" >> final_proxy.yaml
+          sed "s/^\(.*\)$/  - '\1'/" final_proxy_domains.txt >> final_proxy.yaml
+          echo "PROXY build complete. Final file is final_proxy.yaml"
 
       # =======================================================
       #  处理 DIRECT 规则 (步骤 9, 10, 11)
@@ -221,9 +220,8 @@ jobs:
             | sort | uniq \
             > normalized_direct_allowlist.txt
 
-            echo "Normalizing merged DIRECT list (all_direct_rules.tmp)..."
-            cat all_direct_rules.tmp | bash -c "$NORMALIZE_RULES" > normalized_direct_list.txt
-            
+          echo "Normalizing merged DIRECT list (all_direct_rules.tmp)..."
+          cat all_direct_rules.tmp | bash -c "$NORMALIZE_RULES" > normalized_direct_list.txt
           echo "Filtering DIRECT list against allowlist..."
           # ★ 关键修复：添加 -F 标志
           grep -F -v -x -f normalized_direct_allowlist.txt normalized_direct_list.txt > filtered_direct_list.txt
@@ -237,16 +235,16 @@ jobs:
             | sort \
             | uniq \
             > final_direct_domains.txt
-            echo "Reformatting for DIRECT YAML payload..."
-            echo "#########################################" > final_direct.yaml
-            echo "# 作者: ningcol" >> final_direct.yaml
-            echo "# 项目地址: https://github.com/ningcol/clash-rules" >> final_direct.yaml
-            echo "# 更新时间: $(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> final_direct.yaml
-            echo "# 说明: 本文件为自动生成的 Clash DIRECT 规则，仅包含域名。" >> final_direct.yaml
-            echo "#########################################" >> final_direct.yaml
-            echo "payload:" >> final_direct.yaml
-            sed "s/^\(.*\)$/  - '\1'/" final_direct_domains.txt >> final_direct.yaml
-            echo "DIRECT build complete. Final file is final_direct.yaml"
+          echo "Reformatting for DIRECT YAML payload..."
+          echo "#########################################" > final_direct.yaml
+          echo "# 作者: ningcol" >> final_direct.yaml
+          echo "# 项目地址: https://github.com/ningcol/clash-rules" >> final_direct.yaml
+          echo "# 更新时间: $(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> final_direct.yaml
+          echo "# 说明: 本文件为自动生成的 Clash DIRECT 规则，仅包含域名。" >> final_direct.yaml
+          echo "#########################################" >> final_direct.yaml
+          echo "payload:" >> final_direct.yaml
+          sed "s/^\(.*\)$/  - '\1'/" final_direct_domains.txt >> final_direct.yaml
+          echo "DIRECT build complete. Final file is final_direct.yaml"
 
       # =======================================================
       #  处理 MICROSOFT 规则 (步骤 13, 14, 15)
@@ -285,12 +283,12 @@ jobs:
             | sort | uniq \
             > normalized_microsoft_allowlist.txt
 
-        echo "Normalizing merged MICROSOFT list (all_microsoft_rules.tmp)..."
-        cat all_microsoft_rules.tmp | bash -c "$NORMALIZE_RULES" > normalized_microsoft_list.txt
+          echo "Normalizing merged MICROSOFT list (all_microsoft_rules.tmp)..."
+          cat all_microsoft_rules.tmp | bash -c "$NORMALIZE_RULES" > normalized_microsoft_list.txt
 
-        echo "Filtering MICROSOFT list against allowlist..."
-        grep -F -v -x -f normalized_microsoft_allowlist.txt normalized_microsoft_list.txt > filtered_microsoft_list.txt
-        echo "MICROSOFT allowlist filtering complete."
+          echo "Filtering MICROSOFT list against allowlist..."
+          grep -F -v -x -f normalized_microsoft_allowlist.txt normalized_microsoft_list.txt > filtered_microsoft_list.txt
+          echo "MICROSOFT allowlist filtering complete."
 
       - name: 15. Format MICROSOFT List
         run: |
