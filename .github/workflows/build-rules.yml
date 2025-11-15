@@ -71,12 +71,22 @@ jobs:
       - name: 4. Filter REJECT List
         run: |
           normalize_rules() {
-            sed "s/'//g" \
-            | sed -E 's/^\s*#.*//' \
-            | sed -E '/^\s*$/d' \
-            | sed -E 's/^(DOMAIN|DOMAIN-SUFFIX|IP-CIDR|IP-CIDR6),([^,]+).*/\2/' \
-            | grep -v 'payload:' | grep -v '/' | grep -v ':' | grep -v '@' \
-            | tr '[:upper:]' '[:lower:]'
+            awk '
+            BEGIN{ IGNORECASE=0 }
+            {
+              gsub("'" , "")
+              if ($0 ~ /^[[:space:]]*#/ || $0 ~ /^[[:space:]]*$/) next
+              line=$0
+              # classical formats: keep the prefix (DOMAIN, DOMAIN-SUFFIX, IP-CIDR, IP-CIDR6)
+              if (match(line, /^(DOMAIN|DOMAIN-SUFFIX|IP-CIDR|IP-CIDR6)[[:space:]]*,[[:space:]]*([^,]+)/, m)) {
+                printf "%s,%s\n", tolower(m[1]), tolower(m[2])
+              } else {
+                # strip payload: and ignore URLs/lines with @ or / or :
+                sub(/^[[:space:]]*payload:[[:space:]]*/, "", line)
+                if (line ~ /\// || line ~ /:/ || line ~ /@/) next
+                print tolower(line)
+              }
+            }'
           }
 
           echo "Normalizing REJECT allowlist (reject/exclude.txt)..."
@@ -155,12 +165,20 @@ jobs:
       - name: 7. Filter PROXY List
         run: |
           normalize_rules() {
-            sed "s/'//g" \
-            | sed -E 's/^\s*#.*//' \
-            | sed -E '/^\s*$/d' \
-            | sed -E 's/^(DOMAIN|DOMAIN-SUFFIX|IP-CIDR|IP-CIDR6),([^,]+).*/\2/' \
-            | grep -v 'payload:' | grep -v '/' | grep -v ':' | grep -v '@' \
-            | tr '[:upper:]' '[:lower:]'
+            awk '
+            BEGIN{ IGNORECASE=0 }
+            {
+              gsub("'" , "")
+              if ($0 ~ /^[[:space:]]*#/ || $0 ~ /^[[:space:]]*$/) next
+              line=$0
+              if (match(line, /^(DOMAIN|DOMAIN-SUFFIX|IP-CIDR|IP-CIDR6)[[:space:]]*,[[:space:]]*([^,]+)/, m)) {
+                printf "%s,%s\n", tolower(m[1]), tolower(m[2])
+              } else {
+                sub(/^[[:space:]]*payload:[[:space:]]*/, "", line)
+                if (line ~ /\// || line ~ /:/ || line ~ /@/) next
+                print tolower(line)
+              }
+            }'
           }
 
           echo "Normalizing PROXY allowlist (proxy/exclude.txt)..."
@@ -239,12 +257,20 @@ jobs:
       - name: 10. Filter DIRECT List
         run: |
           normalize_rules() {
-            sed "s/'//g" \
-            | sed -E 's/^\s*#.*//' \
-            | sed -E '/^\s*$/d' \
-            | sed -E 's/^(DOMAIN|DOMAIN-SUFFIX|IP-CIDR|IP-CIDR6),([^,]+).*/\2/' \
-            | grep -v 'payload:' | grep -v '/' | grep -v ':' | grep -v '@' \
-            | tr '[:upper:]' '[:lower:]'
+            awk '
+            BEGIN{ IGNORECASE=0 }
+            {
+              gsub("'" , "")
+              if ($0 ~ /^[[:space:]]*#/ || $0 ~ /^[[:space:]]*$/) next
+              line=$0
+              if (match(line, /^(DOMAIN|DOMAIN-SUFFIX|IP-CIDR|IP-CIDR6)[[:space:]]*,[[:space:]]*([^,]+)/, m)) {
+                printf "%s,%s\n", tolower(m[1]), tolower(m[2])
+              } else {
+                sub(/^[[:space:]]*payload:[[:space:]]*/, "", line)
+                if (line ~ /\// || line ~ /:/ || line ~ /@/) next
+                print tolower(line)
+              }
+            }'
           }
 
           echo "Normalizing DIRECT allowlist (direct/exclude.txt)..."
@@ -323,12 +349,20 @@ jobs:
       - name: 13. Filter MICROSOFT List
         run: |
           normalize_rules() {
-            sed "s/'//g" \
-            | sed -E 's/^\s*#.*//' \
-            | sed -E '/^\s*$/d' \
-            | sed -E 's/^(DOMAIN|DOMAIN-SUFFIX|IP-CIDR|IP-CIDR6),([^,]+).*/\2/' \
-            | grep -v 'payload:' | grep -v '/' | grep -v ':' | grep -v '@' \
-            | tr '[:upper:]' '[:lower:]'
+            awk '
+            BEGIN{ IGNORECASE=0 }
+            {
+              gsub("'" , "")
+              if ($0 ~ /^[[:space:]]*#/ || $0 ~ /^[[:space:]]*$/) next
+              line=$0
+              if (match(line, /^(DOMAIN|DOMAIN-SUFFIX|IP-CIDR|IP-CIDR6)[[:space:]]*,[[:space:]]*([^,]+)/, m)) {
+                printf "%s,%s\n", tolower(m[1]), tolower(m[2])
+              } else {
+                sub(/^[[:space:]]*payload:[[:space:]]*/, "", line)
+                if (line ~ /\// || line ~ /:/ || line ~ /@/) next
+                print tolower(line)
+              }
+            }'
           }
 
           echo "Normalizing MICROSOFT allowlist (microsoft/exclude.txt)..."
