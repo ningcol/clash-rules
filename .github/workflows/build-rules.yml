@@ -7,11 +7,6 @@ on:
   push:
     branches:
       - main
-    paths:
-      - 'reject/**'
-      - 'proxy/**'
-      - 'direct/**'
-      - 'microsoft/**'
 
   workflow_dispatch:
 
