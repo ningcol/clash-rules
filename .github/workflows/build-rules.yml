@@ -47,9 +47,18 @@ jobs:
               echo "  -> WARNING: Failed to download or file is empty."
               continue
             fi
-            if grep -q "^payload:" rule_content.tmp; then
-              yq e '.payload[]' rule_content.tmp >> all_reject_rules.tmp
-              echo "  -> Parsed as YAML (raw merge)"
+            if grep -q -E '^[[:space:]]*payload:' rule_content.tmp; then
+              if command -v yq >/dev/null 2>&1; then
+                if yq e '.payload[]' rule_content.tmp >> all_reject_rules.tmp 2>/dev/null; then
+                  echo "  -> Parsed as YAML (raw merge)"
+                else
+                  echo "  -> WARNING: yq failed to parse as YAML, falling back to raw merge"
+                  cat rule_content.tmp >> all_reject_rules.tmp
+                fi
+              else
+                echo "  -> WARNING: yq not found, falling back to raw merge"
+                cat rule_content.tmp >> all_reject_rules.tmp
+              fi
             else
               cat rule_content.tmp >> all_reject_rules.tmp
               echo "  -> Parsed as TXT (raw merge)"
@@ -122,9 +131,18 @@ jobs:
               echo "  -> WARNING: Failed to download or file is empty."
               continue
             fi
-            if grep -q "^payload:" rule_content.tmp; then
-              yq e '.payload[]' rule_content.tmp >> all_proxy_rules.tmp
-              echo "  -> Parsed as YAML (raw merge)"
+            if grep -q -E '^[[:space:]]*payload:' rule_content.tmp; then
+              if command -v yq >/dev/null 2>&1; then
+                if yq e '.payload[]' rule_content.tmp >> all_proxy_rules.tmp 2>/dev/null; then
+                  echo "  -> Parsed as YAML (raw merge)"
+                else
+                  echo "  -> WARNING: yq failed to parse as YAML, falling back to raw merge"
+                  cat rule_content.tmp >> all_proxy_rules.tmp
+                fi
+              else
+                echo "  -> WARNING: yq not found, falling back to raw merge"
+                cat rule_content.tmp >> all_proxy_rules.tmp
+              fi
             else
               cat rule_content.tmp >> all_proxy_rules.tmp
               echo "  -> Parsed as TXT (raw merge)"
@@ -197,9 +215,18 @@ jobs:
               echo "  -> WARNING: Failed to download or file is empty."
               continue
             fi
-            if grep -q "^payload:" rule_content.tmp; then
-              yq e '.payload[]' rule_content.tmp >> all_direct_rules.tmp
-              echo "  -> Parsed as YAML (raw merge)"
+            if grep -q -E '^[[:space:]]*payload:' rule_content.tmp; then
+              if command -v yq >/dev/null 2>&1; then
+                if yq e '.payload[]' rule_content.tmp >> all_direct_rules.tmp 2>/dev/null; then
+                  echo "  -> Parsed as YAML (raw merge)"
+                else
+                  echo "  -> WARNING: yq failed to parse as YAML, falling back to raw merge"
+                  cat rule_content.tmp >> all_direct_rules.tmp
+                fi
+              else
+                echo "  -> WARNING: yq not found, falling back to raw merge"
+                cat rule_content.tmp >> all_direct_rules.tmp
+              fi
             else
               cat rule_content.tmp >> all_direct_rules.tmp
               echo "  -> Parsed as TXT (raw merge)"
@@ -272,9 +299,18 @@ jobs:
               echo "  -> WARNING: Failed to download or file is empty."
               continue
             fi
-            if grep -q "^payload:" rule_content.tmp; then
-              yq e '.payload[]' rule_content.tmp >> all_microsoft_rules.tmp
-              echo "  -> Parsed as YAML (raw merge)"
+            if grep -q -E '^[[:space:]]*payload:' rule_content.tmp; then
+              if command -v yq >/dev/null 2>&1; then
+                if yq e '.payload[]' rule_content.tmp >> all_microsoft_rules.tmp 2>/dev/null; then
+                  echo "  -> Parsed as YAML (raw merge)"
+                else
+                  echo "  -> WARNING: yq failed to parse as YAML, falling back to raw merge"
+                  cat rule_content.tmp >> all_microsoft_rules.tmp
+                fi
+              else
+                echo "  -> WARNING: yq not found, falling back to raw merge"
+                cat rule_content.tmp >> all_microsoft_rules.tmp
+              fi
             else
               cat rule_content.tmp >> all_microsoft_rules.tmp
               echo "  -> Parsed as TXT (raw merge)"
