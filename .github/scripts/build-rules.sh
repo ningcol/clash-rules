@@ -54,12 +54,15 @@ normalize_rules() {
             gsub(/^[ \t]+|[ \t]+$/, "", content)
             content = tolower(content)
             
-            # 判断是否为 IP-CIDR 格式
+            # 判断是否为 IP-CIDR 格式 (IPv4)
             if (content ~ /^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+\/[0-9]+$/) {
                 printf "ip-cidr,%s\n", content
-            } else if (content ~ /^[0-9a-f]+:[0-9a-f:]*\/[0-9]+$/) {
-                # IPv6 CIDR
+            } else if (content ~ /^[0-9a-f]+:[0-9a-f:]+\/[0-9]+$/) {
+                # IPv6 CIDR (要求至少有两段，更严格)
                 printf "ip-cidr6,%s\n", content
+            } else if (content ~ /^[Aa][Ss][0-9]+$/) {
+                # ASN 格式 (AS13335, as15169 等)
+                printf "ip-asn,%s\n", content
             } else if (content ~ /^\+\./) {
                 # +.domain.com 格式 (DOMAIN-SUFFIX)
                 sub(/^\+\./, "", content)
@@ -101,11 +104,15 @@ normalize_rules() {
         gsub(/^[ \t]+|[ \t]+$/, "", line)
         line = tolower(line)
         
-        # 判断是否为 IP
+        # 判断是否为 IP 或 ASN
         if (line ~ /^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+\/[0-9]+$/) {
             printf "ip-cidr,%s\n", line
-        } else if (line ~ /^[0-9a-f]+:[0-9a-f:]*\/[0-9]+$/) {
+        } else if (line ~ /^[0-9a-f]+:[0-9a-f:]+\/[0-9]+$/) {
+            # IPv6 CIDR (更严格的正则)
             printf "ip-cidr6,%s\n", line
+        } else if (line ~ /^[Aa][Ss][0-9]+$/) {
+            # ASN 格式
+            printf "ip-asn,%s\n", line
         } else if (index(line, ":") == 0 && index(line, "@") == 0 && line != "") {
             # 纯域名
             printf "domain,%s\n", line
@@ -204,21 +211,8 @@ download_and_merge_rules() {
         if grep -q -E '^[[:space:]]*payload:[[:space:]]*$' rule_content.tmp; then
             # 格式1: YAML格式 (payload: + - 'domain')
             echo "  -> Detected YAML format (payload:)"
-            
-            if command -v yq >/dev/null 2>&1; then
-                # 优先使用 yq 解析
-                if yq e '.payload[]' rule_content.tmp >> "$output_file" 2>/dev/null; then
-                    echo "  -> Parsed with yq successfully"
-                else
-                    # yq 解析失败，使用原始内容
-                    echo "  -> WARNING: yq parse failed, using raw content"
-                    cat rule_content.tmp >> "$output_file"
-                fi
-            else
-                # 没有 yq，直接使用原始内容（normalize_rules 会处理）
-                echo "  -> No yq found, will parse in normalize step"
-                cat rule_content.tmp >> "$output_file"
-            fi
+            # 统一使用 normalize_rules 处理，保留完整格式信息
+            cat rule_content.tmp >> "$output_file"
         elif grep -q -E '^[[:space:]]*(DOMAIN|DOMAIN-SUFFIX|DOMAIN-KEYWORD|IP-CIDR|IP-CIDR6|IP-ASN)' rule_content.tmp; then
             # 格式2: Clash 文本格式 (DOMAIN-SUFFIX,domain.com 或 IP-CIDR,1.1.1.0/24)
             echo "  -> Detected Clash TEXT format (DOMAIN/IP-CIDR)"
@@ -304,12 +298,13 @@ format_and_generate_yaml() {
         local before_count=$(wc -l < "$payload_before_exclude" | tr -d ' ')
         echo "     Converted: $before_count unique domains"
         
-        # 应用排除列表
+        # 应用排除列表（精确匹配）
         if [ -f "$exclude_file" ] && [ -s "$exclude_file" ]; then
             echo "     Applying exclude list..."
             cat "$exclude_file" | normalize_rules > "$normalized_allowlist" || true
             cat "$normalized_allowlist" | convert_to_domain_format | sort | uniq > temp_exclude_domains.txt || true
             
+            # 精确匹配：只排除列表中明确指定的规则
             grep -Fxv -f temp_exclude_domains.txt "$payload_before_exclude" > "$payload_file" || cp "$payload_before_exclude" "$payload_file"
             rm -f temp_exclude_domains.txt
             
