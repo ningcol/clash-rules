@@ -77,13 +77,16 @@ jobs:
               gsub(q , "")
               if ($0 ~ /^[[:space:]]*#/ || $0 ~ /^[[:space:]]*$/) next
               line=$0
-              # classical formats: keep the prefix (DOMAIN, DOMAIN-SUFFIX, IP-CIDR, IP-CIDR6)
-              if (match(line, /^(DOMAIN|DOMAIN-SUFFIX|IP-CIDR|IP-CIDR6)[[:space:]]*,[[:space:]]*([^,]+)/, m)) {
+              # classical formats: keep the prefix (DOMAIN, DOMAIN-SUFFIX, DOMAIN-KEYWORD, IP-CIDR, IP-CIDR6)
+              if (match(line, /^(DOMAIN|DOMAIN-SUFFIX|DOMAIN-KEYWORD|IP-CIDR|IP-CIDR6)[[:space:]]*,[[:space:]]*([^,]+)/, m)) {
+                if (tolower(m[1]) == "domain-keyword") next
                 printf "%s,%s\n", tolower(m[1]), tolower(m[2])
               } else {
                 # strip payload: and ignore URLs/lines with @ or / or :
                 sub(/^[[:space:]]*payload:[[:space:]]*/, "", line)
                 if (line ~ /\// || line ~ /:/ || line ~ /@/) next
+                # skip explicit DOMAIN-KEYWORD lines that didn't match the comma form
+                if (tolower(line) ~ /^domain-keyword[[:space:]]*,/) next
                 print tolower(line)
               }
             }'
@@ -193,11 +196,13 @@ jobs:
               gsub(q , "")
               if ($0 ~ /^[[:space:]]*#/ || $0 ~ /^[[:space:]]*$/) next
               line=$0
-              if (match(line, /^(DOMAIN|DOMAIN-SUFFIX|IP-CIDR|IP-CIDR6)[[:space:]]*,[[:space:]]*([^,]+)/, m)) {
+              if (match(line, /^(DOMAIN|DOMAIN-SUFFIX|DOMAIN-KEYWORD|IP-CIDR|IP-CIDR6)[[:space:]]*,[[:space:]]*([^,]+)/, m)) {
+                if (tolower(m[1]) == "domain-keyword") next
                 printf "%s,%s\n", tolower(m[1]), tolower(m[2])
               } else {
                 sub(/^[[:space:]]*payload:[[:space:]]*/, "", line)
                 if (line ~ /\// || line ~ /:/ || line ~ /@/) next
+                if (tolower(line) ~ /^domain-keyword[[:space:]]*,/) next
                 print tolower(line)
               }
             }'
@@ -322,11 +327,13 @@ jobs:
               gsub(q , "")
               if ($0 ~ /^[[:space:]]*#/ || $0 ~ /^[[:space:]]*$/) next
               line=$0
-              if (match(line, /^(DOMAIN|DOMAIN-SUFFIX|IP-CIDR|IP-CIDR6)[[:space:]]*,[[:space:]]*([^,]+)/, m)) {
+              if (match(line, /^(DOMAIN|DOMAIN-SUFFIX|DOMAIN-KEYWORD|IP-CIDR|IP-CIDR6)[[:space:]]*,[[:space:]]*([^,]+)/, m)) {
+                if (tolower(m[1]) == "domain-keyword") next
                 printf "%s,%s\n", tolower(m[1]), tolower(m[2])
               } else {
                 sub(/^[[:space:]]*payload:[[:space:]]*/, "", line)
                 if (line ~ /\// || line ~ /:/ || line ~ /@/) next
+                if (tolower(line) ~ /^domain-keyword[[:space:]]*,/) next
                 print tolower(line)
               }
             }'
@@ -434,11 +441,13 @@ jobs:
               gsub(q , "")
               if ($0 ~ /^[[:space:]]*#/ || $0 ~ /^[[:space:]]*$/) next
               line=$0
-              if (match(line, /^(DOMAIN|DOMAIN-SUFFIX|IP-CIDR|IP-CIDR6)[[:space:]]*,[[:space:]]*([^,]+)/, m)) {
+              if (match(line, /^(DOMAIN|DOMAIN-SUFFIX|DOMAIN-KEYWORD|IP-CIDR|IP-CIDR6)[[:space:]]*,[[:space:]]*([^,]+)/, m)) {
+                if (tolower(m[1]) == "domain-keyword") next
                 printf "%s,%s\n", tolower(m[1]), tolower(m[2])
               } else {
                 sub(/^[[:space:]]*payload:[[:space:]]*/, "", line)
                 if (line ~ /\// || line ~ /:/ || line ~ /@/) next
+                if (tolower(line) ~ /^domain-keyword[[:space:]]*,/) next
                 print tolower(line)
               }
             }'
