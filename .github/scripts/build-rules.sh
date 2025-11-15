@@ -241,45 +241,22 @@ filter_rules() {
     local category=$1
     local category_upper=$(echo "$category" | tr '[:lower:]' '[:upper:]')
     
-    echo "Filtering $category_upper rules..."
+    echo "Normalizing $category_upper rules..."
     
-    local exclude_file="$PROJECT_ROOT/$category/exclude.txt"
     local input_file="all_${category}_rules.tmp"
-    local normalized_allowlist="normalized_${category}_allowlist.txt"
     local normalized_list="normalized_${category}_list.txt"
     local filtered_list="filtered_${category}_list.txt"
-    
-    if [ -f "$exclude_file" ]; then
-        cat "$exclude_file" \
-            | sed "s/'//g" \
-            | sed -E 's/^\s*#.*//' \
-            | sed -E '/^\s*$/d' \
-            | tr '[:upper:]' '[:lower:]' \
-            | sort | uniq \
-            > "$normalized_allowlist"
-        echo "  -> Normalized allowlist ($(wc -l < "$normalized_allowlist") entries)"
-    else
-        touch "$normalized_allowlist"
-    fi
     
     cat "$input_file" | normalize_rules > "$normalized_list" || true
     echo "  -> Normalized rules ($(wc -l < "$normalized_list") entries)"
     
-    if [ -s "$normalized_allowlist" ]; then
-        grep -F -v -x -f "$normalized_allowlist" "$normalized_list" > "$filtered_list" || true
-        local removed=$(($(wc -l < "$normalized_list") - $(wc -l < "$filtered_list")))
-        echo "  -> Filtered out $removed entries"
-    else
-        cp "$normalized_list" "$filtered_list"
-        echo "  -> No allowlist, skipping filter"
-    fi
-    
-    echo "  ✓ Filtering complete"
+    cp "$normalized_list" "$filtered_list"
+    echo "  ✓ Normalization complete"
 }
 
 # ========================================
 # 函数: format_and_generate_yaml
-# 功能: 格式化规则并生成最终YAML文件
+# 功能: 格式化规则并生成最终YAML文件，支持 domain 和 ipcidr 分离
 # 参数: $1 - 规则类型
 # ========================================
 format_and_generate_yaml() {
@@ -289,28 +266,95 @@ format_and_generate_yaml() {
     echo "Formatting $category_upper rules..."
     
     local filtered_list="filtered_${category}_list.txt"
-    local domains_file="final_${category}_domains.txt"
-    local payload_file="final_${category}_payload.txt"
-    local yaml_file="$PROJECT_ROOT/final_${category}.yaml"
+    local exclude_file="$PROJECT_ROOT/$category/exclude.txt"
+    local normalized_allowlist="normalized_${category}_allowlist.txt"
     
-    cat "$filtered_list" | sort | uniq > "$domains_file" || true
-    echo "  -> Deduplicated ($(wc -l < "$domains_file") unique entries)"
+    # 分离 domain 和 IP 规则
+    local domain_rules="temp_${category}_domain.txt"
+    local ip_rules="temp_${category}_ip.txt"
     
-    cat "$domains_file" | convert_to_domain_format | sort | uniq > "$payload_file" || true
-    echo "  -> Converted to domain format ($(wc -l < "$payload_file") domains)"
+    grep -E '^(domain|domain-suffix),' "$filtered_list" > "$domain_rules" 2>/dev/null || touch "$domain_rules"
+    grep -E '^(ip-cidr|ip-cidr6|ip-asn),' "$filtered_list" > "$ip_rules" 2>/dev/null || touch "$ip_rules"
     
-    {
-        echo "#########################################"
-        echo "# 作者: ningcol"
-        echo "# 项目地址: https://github.com/ningcol/clash-rules"
-        echo "# 更新时间: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
-        echo "# 说明: 本文件为自动生成的 Clash $category_upper 规则（behavior: domain）。"
-        echo "#########################################"
-        echo "payload:"
-        awk '{printf("  - '\''%s'\''\n", $0)}' "$payload_file"
-    } > "$yaml_file"
+    local domain_count=$(wc -l < "$domain_rules" | tr -d ' ')
+    local ip_count=$(wc -l < "$ip_rules" | tr -d ' ')
     
-    echo "  ✓ Generated $yaml_file"
+    echo "  -> Separated: $domain_count domain rules, $ip_count IP rules"
+    
+    # 处理 Domain 规则
+    if [ "$domain_count" -gt 0 ]; then
+        echo "  -> Processing domain rules..."
+        
+        local domains_file="final_${category}_domains.txt"
+        local payload_file="final_${category}_payload.txt"
+        local payload_before_exclude="final_${category}_payload_before_exclude.txt"
+        local yaml_file="$PROJECT_ROOT/final_${category}.yaml"
+        
+        cat "$domain_rules" | sort | uniq > "$domains_file" || true
+        echo "     Deduplicated: $(wc -l < "$domains_file") unique domain entries"
+        
+        cat "$domains_file" | convert_to_domain_format | sort | uniq > "$payload_before_exclude" || true
+        echo "     Converted to domain format: $(wc -l < "$payload_before_exclude") domains"
+        
+        # 应用排除列表
+        if [ -f "$exclude_file" ]; then
+            cat "$exclude_file" \
+                | sed "s/'//g" \
+                | sed -E 's/^\s*#.*//' \
+                | sed -E '/^\s*$/d' \
+                | tr '[:upper:]' '[:lower:]' \
+                | sort | uniq \
+                > "$normalized_allowlist"
+            echo "     Normalized allowlist: $(wc -l < "$normalized_allowlist") entries"
+            
+            grep -F -v -x -f "$normalized_allowlist" "$payload_before_exclude" > "$payload_file" 2>/dev/null || touch "$payload_file"
+            local removed=$(($(wc -l < "$payload_before_exclude") - $(wc -l < "$payload_file")))
+            echo "     Filtered out: $removed entries"
+        else
+            cp "$payload_before_exclude" "$payload_file"
+        fi
+        
+        # 生成 domain 类型的 YAML
+        {
+            echo "#########################################"
+            echo "# 作者: ningcol"
+            echo "# 项目地址: https://github.com/ningcol/clash-rules"
+            echo "# 更新时间: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+            echo "# 说明: 本文件为自动生成的 Clash $category_upper 规则（behavior: domain）。"
+            echo "#########################################"
+            echo "payload:"
+            awk '{printf("  - '\''%s'\''\n", $0)}' "$payload_file"
+        } > "$yaml_file"
+        
+        echo "  ✓ Generated $yaml_file ($(wc -l < "$payload_file") domains)"
+    fi
+    
+    # 处理 IP 规则
+    if [ "$ip_count" -gt 0 ]; then
+        echo "  -> Processing IP rules..."
+        
+        local ip_payload_file="final_${category}_ip_payload.txt"
+        local yaml_ip_file="$PROJECT_ROOT/final_${category}_ipcidr.yaml"
+        
+        # 提取 IP 地址（去掉类型前缀）
+        awk -F',' '{print $2}' "$ip_rules" | sort | uniq > "$ip_payload_file" || true
+        echo "     Deduplicated: $(wc -l < "$ip_payload_file") unique IP entries"
+        
+        # 生成 ipcidr 类型的 YAML
+        {
+            echo "#########################################"
+            echo "# 作者: ningcol"
+            echo "# 项目地址: https://github.com/ningcol/clash-rules"
+            echo "# 更新时间: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+            echo "# 说明: 本文件为自动生成的 Clash $category_upper IP规则（behavior: ipcidr）。"
+            echo "#########################################"
+            echo "payload:"
+            awk '{printf("  - '\''%s'\''\n", $0)}' "$ip_payload_file"
+        } > "$yaml_ip_file"
+        
+        echo "  ✓ Generated $yaml_ip_file ($(wc -l < "$ip_payload_file") IPs)"
+    fi
+    
     echo ""
 }
 
@@ -325,6 +369,10 @@ cleanup_temp_files() {
     rm -f ./filtered_*.txt
     rm -f ./final_*_domains.txt
     rm -f ./final_*_payload.txt
+    rm -f ./final_*_payload_before_exclude.txt
+    rm -f ./temp_*_domain.txt
+    rm -f ./temp_*_ip.txt
+    rm -f ./final_*_ip_payload.txt
     echo "  ✓ Cleanup complete"
 }
 
@@ -357,10 +405,18 @@ main() {
     echo "Generated files:"
     for category in "${RULE_CATEGORIES[@]}"; do
         yaml_file="final_${category}.yaml"
+        yaml_ip_file="final_${category}_ipcidr.yaml"
+        
         if [ -f "$yaml_file" ]; then
             local line_count=$(wc -l < "$yaml_file")
             local domain_count=$((line_count - 7))
             echo "  - $yaml_file ($domain_count domains)"
+        fi
+        
+        if [ -f "$yaml_ip_file" ]; then
+            local line_count=$(wc -l < "$yaml_ip_file")
+            local ip_count=$((line_count - 7))
+            echo "  - $yaml_ip_file ($ip_count IPs)"
         fi
     done
 }
