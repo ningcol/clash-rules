@@ -47,15 +47,17 @@ normalize_rules() {
         line = $0
         
         # 处理格式1: YAML数组格式 (- '+.domain.com' 或 - '1.1.1.0/24')
-        if (match(line, /^[[:space:]]*-[[:space:]]+(.+)$/, m)) {
-            content = m[1]
+        if (line ~ /^[[:space:]]*-[[:space:]]+/) {
+            # 提取 - 后面的内容
+            sub(/^[[:space:]]*-[[:space:]]+/, "", line)
+            content = line
             gsub(/^[ \t]+|[ \t]+$/, "", content)
             content = tolower(content)
             
             # 判断是否为 IP-CIDR 格式
             if (content ~ /^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+\/[0-9]+$/) {
                 printf "ip-cidr,%s\n", content
-            } else if (content ~ /^[0-9a-f:]+:[0-9a-f:]*\/[0-9]+$/i) {
+            } else if (content ~ /^[0-9a-f]+:[0-9a-f:]*\/[0-9]+$/) {
                 # IPv6 CIDR
                 printf "ip-cidr6,%s\n", content
             } else if (content ~ /^\+\./) {
@@ -69,8 +71,8 @@ normalize_rules() {
                 sub(/^\./, "", content)
                 printf "domain-suffix,%s\n", content
             } else {
-                # 纯域名格式
-                if (content !~ /:/ && content !~ /@/) {
+                # 纯域名格式（跳过包含冒号或@的行）
+                if (index(content, ":") == 0 && index(content, "@") == 0 && content != "") {
                     printf "domain,%s\n", content
                 }
             }
@@ -78,14 +80,20 @@ normalize_rules() {
         }
         
         # 处理格式2: 文本格式 (DOMAIN-SUFFIX,domain.com 或 IP-CIDR,1.1.1.0/24)
-        if (match(line, /^(DOMAIN|DOMAIN-SUFFIX|DOMAIN-KEYWORD|IP-CIDR|IP-CIDR6|IP-ASN)[[:space:]]*,[[:space:]]*([^,]+)/, m)) {
-            rule_type = tolower(m[1])
-            rule_value = tolower(m[2])
-            
-            # 跳过 KEYWORD 规则
-            if (rule_type == "domain-keyword") next
-            
-            printf "%s,%s\n", rule_type, rule_value
+        if (line ~ /^(DOMAIN|DOMAIN-SUFFIX|DOMAIN-KEYWORD|IP-CIDR|IP-CIDR6|IP-ASN)[[:space:]]*,/) {
+            # 分离类型和值
+            n = split(line, parts, /,/)
+            if (n >= 2) {
+                rule_type = tolower(parts[1])
+                gsub(/^[ \t]+|[ \t]+$/, "", rule_type)
+                rule_value = tolower(parts[2])
+                gsub(/^[ \t]+|[ \t]+$/, "", rule_value)
+                
+                # 跳过 KEYWORD 规则
+                if (rule_type == "domain-keyword") next
+                
+                printf "%s,%s\n", rule_type, rule_value
+            }
             next
         }
         
@@ -96,9 +104,9 @@ normalize_rules() {
         # 判断是否为 IP
         if (line ~ /^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+\/[0-9]+$/) {
             printf "ip-cidr,%s\n", line
-        } else if (line ~ /^[0-9a-f:]+:[0-9a-f:]*\/[0-9]+$/i) {
+        } else if (line ~ /^[0-9a-f]+:[0-9a-f:]*\/[0-9]+$/) {
             printf "ip-cidr6,%s\n", line
-        } else if (line !~ /:/ && line !~ /@/ && line != "") {
+        } else if (index(line, ":") == 0 && index(line, "@") == 0 && line != "") {
             # 纯域名
             printf "domain,%s\n", line
         }
