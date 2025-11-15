@@ -82,7 +82,12 @@ jobs:
           cat all_reject_rules.tmp | normalize_rules > normalized_reject_list.txt || true
 
           echo "Filtering REJECT list against allowlist..."
-          grep -F -v -x -f normalized_reject_allowlist.txt normalized_reject_list.txt > filtered_reject_list.txt || true
+          if [ -s normalized_reject_allowlist.txt ]; then
+            grep -F -v -x -f normalized_reject_allowlist.txt normalized_reject_list.txt > filtered_reject_list.txt || true
+          else
+            echo "Allowlist is empty, skipping filter step..."
+            cp normalized_reject_list.txt filtered_reject_list.txt
+          fi
           echo "REJECT allowlist filtering complete."
 
       - name: 5. Format REJECT List
@@ -151,7 +156,12 @@ jobs:
           cat all_proxy_rules.tmp | normalize_rules > normalized_proxy_list.txt || true
 
           echo "Filtering PROXY list against allowlist..."
-          grep -F -v -x -f normalized_proxy_allowlist.txt normalized_proxy_list.txt > filtered_proxy_list.txt || true
+          if [ -s normalized_proxy_allowlist.txt ]; then
+            grep -F -v -x -f normalized_proxy_allowlist.txt normalized_proxy_list.txt > filtered_proxy_list.txt || true
+          else
+            echo "Allowlist is empty, skipping filter step..."
+            cp normalized_proxy_list.txt filtered_proxy_list.txt
+          fi
           echo "PROXY allowlist filtering complete."
 
       - name: 8. Format PROXY List
@@ -220,7 +230,12 @@ jobs:
           cat all_direct_rules.tmp | normalize_rules > normalized_direct_list.txt || true
 
           echo "Filtering DIRECT list against allowlist..."
-          grep -F -v -x -f normalized_direct_allowlist.txt normalized_direct_list.txt > filtered_direct_list.txt || true
+          if [ -s normalized_direct_allowlist.txt ]; then
+            grep -F -v -x -f normalized_direct_allowlist.txt normalized_direct_list.txt > filtered_direct_list.txt || true
+          else
+            echo "Allowlist is empty, skipping filter step..."
+            cp normalized_direct_list.txt filtered_direct_list.txt
+          fi
           echo "DIRECT allowlist filtering complete."
 
       - name: 11. Format DIRECT List
@@ -289,7 +304,12 @@ jobs:
           cat all_microsoft_rules.tmp | normalize_rules > normalized_microsoft_list.txt || true
 
           echo "Filtering MICROSOFT list against allowlist..."
-          grep -F -v -x -f normalized_microsoft_allowlist.txt normalized_microsoft_list.txt > filtered_microsoft_list.txt || true
+          if [ -s normalized_microsoft_allowlist.txt ]; then
+            grep -F -v -x -f normalized_microsoft_allowlist.txt normalized_microsoft_list.txt > filtered_microsoft_list.txt || true
+          else
+            echo "Allowlist is empty, skipping filter step..."
+            cp normalized_microsoft_list.txt filtered_microsoft_list.txt
+          fi
           echo "MICROSOFT allowlist filtering complete."
 
       - name: 14. Format MICROSOFT List
