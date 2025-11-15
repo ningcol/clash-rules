@@ -4,6 +4,18 @@ set -e
 # ========================================
 # Clash Rules Builder - Modular Version
 # Author: ningcol
+# 
+# 处理流程:
+# 1. download_and_merge_rules: 下载源文件，支持两种格式
+#    - YAML格式: payload: 开头 + - '+.domain.com' 或 - 'domain.com'
+#    - 文本格式: DOMAIN-SUFFIX,domain.com 或 DOMAIN,domain.com
+# 
+# 2. filter_rules: 标准化规则
+#    - 统一转换为: domain,example.com 或 domain-suffix,example.com
+# 
+# 3. format_and_generate_yaml: 格式化并生成最终文件
+#    - 去重 → 转换为最终格式 → 应用排除列表 → 生成YAML
+#    - 最终格式: example.com 或 +.example.com
 # ========================================
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
