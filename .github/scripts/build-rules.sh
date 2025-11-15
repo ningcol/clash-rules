@@ -273,9 +273,7 @@ format_and_generate_yaml() {
     local domain_rules="temp_${category}_domain.txt"
     local ip_rules="temp_${category}_ip.txt"
     
-    # 从标准化的规则中分离域名和IP规则
-    # YAML格式的源文件只会产生域名规则，不会有IP规则
-    # 文本格式的源文件可能同时包含域名和IP规则
+    # 从标准化的规则中分离（移除 domain-keyword）
     grep -E '^(domain|domain-suffix),' "$filtered_list" > "$domain_rules" 2>/dev/null || echo -n > "$domain_rules"
     grep -E '^(ip-cidr|ip-cidr6|ip-asn),' "$filtered_list" > "$ip_rules" 2>/dev/null || echo -n > "$ip_rules"
     
@@ -288,34 +286,34 @@ format_and_generate_yaml() {
     if [ "$domain_count" -gt 0 ]; then
         echo "  -> Processing domain rules..."
         
-        local domains_file="final_${category}_domains.txt"
         local payload_file="final_${category}_payload.txt"
         local payload_before_exclude="final_${category}_payload_before_exclude.txt"
         local yaml_file="$PROJECT_ROOT/final_${category}.yaml"
         
-        cat "$domain_rules" | sort | uniq > "$domains_file" || true
-        echo "     Deduplicated: $(wc -l < "$domains_file") unique domain entries"
+        # 转换为 Clash domain 格式
+        cat "$domain_rules" | convert_to_domain_format | sort | uniq > "$payload_before_exclude" || true
         
-        cat "$domains_file" | convert_to_domain_format | sort | uniq > "$payload_before_exclude" || true
-        echo "     Converted to domain format: $(wc -l < "$payload_before_exclude") domains"
+        local before_count=$(wc -l < "$payload_before_exclude" | tr -d ' ')
+        echo "     Converted: $before_count unique domains"
         
         # 应用排除列表
-        if [ -f "$exclude_file" ]; then
-            cat "$exclude_file" \
-                | sed "s/'//g" \
-                | sed -E 's/^\s*#.*//' \
-                | sed -E '/^\s*$/d' \
-                | tr '[:upper:]' '[:lower:]' \
-                | sort | uniq \
-                > "$normalized_allowlist"
-            echo "     Normalized allowlist: $(wc -l < "$normalized_allowlist") entries"
+        if [ -f "$exclude_file" ] && [ -s "$exclude_file" ]; then
+            echo "     Applying exclude list..."
+            cat "$exclude_file" | normalize_rules > "$normalized_allowlist" || true
+            cat "$normalized_allowlist" | convert_to_domain_format | sort | uniq > temp_exclude_domains.txt || true
             
-            grep -F -v -x -f "$normalized_allowlist" "$payload_before_exclude" > "$payload_file" 2>/dev/null || touch "$payload_file"
-            local removed=$(($(wc -l < "$payload_before_exclude") - $(wc -l < "$payload_file")))
-            echo "     Filtered out: $removed entries"
+            grep -Fxv -f temp_exclude_domains.txt "$payload_before_exclude" > "$payload_file" || cp "$payload_before_exclude" "$payload_file"
+            rm -f temp_exclude_domains.txt
+            
+            local after_count=$(wc -l < "$payload_file" | tr -d ' ')
+            local excluded_count=$((before_count - after_count))
+            echo "     Excluded: $excluded_count domains"
         else
             cp "$payload_before_exclude" "$payload_file"
         fi
+        
+        local final_count=$(wc -l < "$payload_file" | tr -d ' ')
+        echo "     Final: $final_count unique domains"
         
         # 生成 domain 类型的 YAML
         {
@@ -329,10 +327,12 @@ format_and_generate_yaml() {
             awk '{printf("  - '\''%s'\''\n", $0)}' "$payload_file"
         } > "$yaml_file"
         
-        echo "  ✓ Generated $yaml_file ($(wc -l < "$payload_file") domains)"
+        echo "  ✓ Generated $yaml_file ($final_count domains)"
+    else
+        echo "  ⚠️  No domain rules found"
     fi
     
-    # 处理 IP 规则
+    # 处理 IP 规则（仅当文本格式源产生 IP 规则时才生成）
     if [ "$ip_count" -gt 0 ]; then
         echo "  -> Processing IP rules..."
         
@@ -341,7 +341,9 @@ format_and_generate_yaml() {
         
         # 提取 IP 地址（去掉类型前缀）
         awk -F',' '{print $2}' "$ip_rules" | sort | uniq > "$ip_payload_file" || true
-        echo "     Deduplicated: $(wc -l < "$ip_payload_file") unique IP entries"
+        
+        local actual_ip_count=$(wc -l < "$ip_payload_file" | tr -d ' ')
+        echo "     Deduplicated: $actual_ip_count unique IP entries"
         
         # 生成 ipcidr 类型的 YAML
         {
@@ -355,7 +357,15 @@ format_and_generate_yaml() {
             awk '{printf("  - '\''%s'\''\n", $0)}' "$ip_payload_file"
         } > "$yaml_ip_file"
         
-        echo "  ✓ Generated $yaml_ip_file ($(wc -l < "$ip_payload_file") IPs)"
+        echo "  ✓ Generated $yaml_ip_file ($actual_ip_count IPs)"
+    else
+        echo "  -> No IP rules from text sources, skipping IP-CIDR file"
+        # 删除可能存在的旧 IP-CIDR 文件
+        local yaml_ip_file="$PROJECT_ROOT/final_${category}_ipcidr.yaml"
+        if [ -f "$yaml_ip_file" ]; then
+            rm "$yaml_ip_file"
+            echo "  ✓ Removed obsolete $yaml_ip_file"
+        fi
     fi
     
     echo ""
@@ -376,6 +386,7 @@ cleanup_temp_files() {
     rm -f ./temp_*_domain.txt
     rm -f ./temp_*_ip.txt
     rm -f ./final_*_ip_payload.txt
+    rm -f ./temp_exclude_domains.txt
     echo "  ✓ Cleanup complete"
 }
 
