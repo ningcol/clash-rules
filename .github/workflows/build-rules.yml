@@ -134,7 +134,7 @@ jobs:
           }' final_reject_domains.txt | sort | uniq > final_reject_payload.txt || true
 
           echo "Reformatting for REJECT YAML payload (behavior: domain)..."
-          echo "#########################################" >> final_reject.yaml
+          echo "#########################################" > final_reject.yaml
           echo "# 作者: ningcol" >> final_reject.yaml
           echo "# 项目地址: https://github.com/ningcol/clash-rules" >> final_reject.yaml
           echo "# 更新时间: $(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> final_reject.yaml
@@ -244,33 +244,17 @@ jobs:
             } else {
               print v
             }
-          }' final_proxy_domains.txt | sort | uniq \
-            | awk '{printf("  - '\''%s'\''\n", $0)}' >> final_proxy.yaml || true
+          }' final_proxy_domains.txt | sort | uniq > final_proxy_payload.txt || true
 
           echo "Reformatting for PROXY YAML payload..."
-          echo "#########################################" >> final_proxy.yaml
+          echo "#########################################" > final_proxy.yaml
           echo "# 作者: ningcol" >> final_proxy.yaml
           echo "# 项目地址: https://github.com/ningcol/clash-rules" >> final_proxy.yaml
           echo "# 更新时间: $(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> final_proxy.yaml
           echo "# 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。" >> final_proxy.yaml
           echo "#########################################" >> final_proxy.yaml
           echo "payload:" >> final_proxy.yaml
-          awk -F',' '
-          {
-            type="domain"; val=$0
-            if (NF>1) { type=tolower($1); val=$2 }
-            gsub(/^[ \t]+|[ \t]+$/, "", val)
-            v=tolower(val)
-            if (type=="ip-cidr" || type=="ip-cidr6") next
-            if (type=="domain-suffix") {
-              sub(/^\+\./, "", v)
-              sub(/^\*\./, "", v)
-              sub(/^\./, "", v)
-              print "+." v
-            } else {
-              print v
-            }
-          }' final_proxy_domains.txt | sort | uniq | awk '{printf("  - '\''%s'\''\n", $0)}' >> final_proxy.yaml || true
+          awk '{printf("  - '\''%s'\''\n", $0)}' final_proxy_payload.txt >> final_proxy.yaml
           echo "PROXY build complete. Final file is final_proxy.yaml"
 
       # =======================================================
@@ -376,7 +360,7 @@ jobs:
           }' final_direct_domains.txt | sort | uniq > final_direct_payload.txt || true
 
           echo "Reformatting for DIRECT YAML payload (behavior: domain)..."
-          echo "#########################################" >> final_direct.yaml
+          echo "#########################################" > final_direct.yaml
           echo "# 作者: ningcol" >> final_direct.yaml
           echo "# 项目地址: https://github.com/ningcol/clash-rules" >> final_direct.yaml
           echo "# 更新时间: $(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> final_direct.yaml
@@ -489,7 +473,7 @@ jobs:
           }' final_microsoft_domains.txt | sort | uniq > final_microsoft_payload.txt || true
 
           echo "Reformatting for MICROSOFT YAML payload (behavior: domain)..."
-          echo "#########################################" >> final_microsoft.yaml
+          echo "#########################################" > final_microsoft.yaml
           echo "# 作者: ningcol" >> final_microsoft.yaml
           echo "# 项目地址: https://github.com/ningcol/clash-rules" >> final_microsoft.yaml
           echo "# 更新时间: $(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> final_microsoft.yaml
