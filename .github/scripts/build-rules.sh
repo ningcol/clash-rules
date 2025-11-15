@@ -273,8 +273,11 @@ format_and_generate_yaml() {
     local domain_rules="temp_${category}_domain.txt"
     local ip_rules="temp_${category}_ip.txt"
     
-    grep -E '^(domain|domain-suffix),' "$filtered_list" > "$domain_rules" 2>/dev/null || touch "$domain_rules"
-    grep -E '^(ip-cidr|ip-cidr6|ip-asn),' "$filtered_list" > "$ip_rules" 2>/dev/null || touch "$ip_rules"
+    # 从标准化的规则中分离域名和IP规则
+    # YAML格式的源文件只会产生域名规则，不会有IP规则
+    # 文本格式的源文件可能同时包含域名和IP规则
+    grep -E '^(domain|domain-suffix),' "$filtered_list" > "$domain_rules" 2>/dev/null || echo -n > "$domain_rules"
+    grep -E '^(ip-cidr|ip-cidr6|ip-asn),' "$filtered_list" > "$ip_rules" 2>/dev/null || echo -n > "$ip_rules"
     
     local domain_count=$(wc -l < "$domain_rules" | tr -d ' ')
     local ip_count=$(wc -l < "$ip_rules" | tr -d ' ')
