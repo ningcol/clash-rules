@@ -188,21 +188,37 @@ download_and_merge_rules() {
             continue
         fi
         
-        if grep -q -E '^[[:space:]]*payload:' rule_content.tmp; then
+        # 检测文件格式：优先级顺序检测
+        # 1. 检测 YAML 格式 (有独立的 payload: 行)
+        # 2. 检测文本格式 (以 DOMAIN/IP-CIDR 等关键字开头)
+        # 3. 其他格式作为纯域名列表处理
+        
+        if grep -q -E '^[[:space:]]*payload:[[:space:]]*$' rule_content.tmp; then
+            # 格式1: YAML格式 (payload: + - 'domain')
+            echo "  -> Detected YAML format (payload:)"
+            
             if command -v yq >/dev/null 2>&1; then
+                # 优先使用 yq 解析
                 if yq e '.payload[]' rule_content.tmp >> "$output_file" 2>/dev/null; then
-                    echo "  -> Parsed as YAML"
+                    echo "  -> Parsed with yq successfully"
                 else
-                    echo "  -> WARNING: yq parse failed, using raw merge"
+                    # yq 解析失败，使用原始内容
+                    echo "  -> WARNING: yq parse failed, using raw content"
                     cat rule_content.tmp >> "$output_file"
                 fi
             else
-                echo "  -> No yq found, using raw merge"
+                # 没有 yq，直接使用原始内容（normalize_rules 会处理）
+                echo "  -> No yq found, will parse in normalize step"
                 cat rule_content.tmp >> "$output_file"
             fi
-        else
+        elif grep -q -E '^[[:space:]]*(DOMAIN|DOMAIN-SUFFIX|DOMAIN-KEYWORD|IP-CIDR|IP-CIDR6|IP-ASN)' rule_content.tmp; then
+            # 格式2: Clash 文本格式 (DOMAIN-SUFFIX,domain.com 或 IP-CIDR,1.1.1.0/24)
+            echo "  -> Detected Clash TEXT format (DOMAIN/IP-CIDR)"
             cat rule_content.tmp >> "$output_file"
-            echo "  -> Parsed as TXT"
+        else
+            # 格式3: 纯域名/IP列表或其他格式
+            echo "  -> Detected plain list format"
+            cat rule_content.tmp >> "$output_file"
         fi
     done < "$sources_file"
     
