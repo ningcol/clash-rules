@@ -114,15 +114,37 @@ jobs:
         run: |
           echo "Sorting and deduplicating filtered REJECT list..."
           cat filtered_reject_list.txt | sort | uniq > final_reject_domains.txt || true
-          echo "Reformatting for REJECT YAML payload..."
+          echo "Converting classical entries to domain format and removing IPs..."
+          awk -F',' '
+          {
+            # normalize fields: if line contains a comma the first field is the type
+            type="domain"; val=$0
+            if (NF>1) { type=tolower($1); val=$2 }
+            gsub(/^[ \t]+|[ \t]+$/, "", val)
+            v=tolower(val)
+            if (type=="ip-cidr" || type=="ip-cidr6") next
+            if (type=="domain-suffix") {
+              # normalize leading markers and emit +.domain (Clash scheme B)
+              sub(/^\+\./, "", v)
+              sub(/^\*\./, "", v)
+              sub(/^\./, "", v)
+              print "+." v
+            } else {
+              # domain or plain entries; DOMAIN-KEYWORD intentionally not emitted
+              print v
+            }
+          }' final_reject_domains.txt | sort | uniq > final_reject_payload.txt || true
+
+          echo "Reformatting for REJECT YAML payload (behavior: domain)..."
           echo "#########################################" > final_reject.yaml
           echo "# 作者: ningcol" >> final_reject.yaml
           echo "# 项目地址: https://github.com/ningcol/clash-rules" >> final_reject.yaml
           echo "# 更新时间: $(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> final_reject.yaml
-          echo "# 说明: 本文件为自动生成的 Clash REJECT 规则，仅包含域名。" >> final_reject.yaml
+          echo "# 说明: 本文件为自动生成的 Clash REJECT 规则（behavior: domain）。" >> final_reject.yaml
           echo "#########################################" >> final_reject.yaml
+          echo "behavior: domain" >> final_reject.yaml
           echo "payload:" >> final_reject.yaml
-          sed "s/^\(.*\)$/  - '\1'/" final_reject_domains.txt >> final_reject.yaml
+          awk '{printf("  - '\''%s'\''\n", $0)}' final_reject_payload.txt >> final_reject.yaml
           echo "REJECT build complete. Final file is final_reject.yaml"
           
       # =======================================================
@@ -206,15 +228,52 @@ jobs:
         run: |
           echo "Sorting and deduplicating filtered PROXY list..."
           cat filtered_proxy_list.txt | sort | uniq > final_proxy_domains.txt || true
+          echo "Converting classical entries to domain format and removing IPs..."
+          awk -F',' '
+          {
+            type="domain"; val=$0
+            if (NF>1) { type=tolower($1); val=$2 }
+            gsub(/^[ \t]+|[ \t]+$/, "", val)
+            v=tolower(val)
+            if (type=="ip-cidr" || type=="ip-cidr6") next
+            if (type=="domain-suffix") {
+              sub(/^\+\./, "", v)
+              sub(/^\*\./, "", v)
+              sub(/^\./, "", v)
+              print "+." v
+            } else {
+              # domain or plain entries; DOMAIN-KEYWORD intentionally not emitted
+              print v
+            }
+          }' final_proxy_domains.txt | sort | uniq \
+            | awk '{printf("  - '\''%s'\''\n", $0)}' >> final_proxy.yaml || true
+
           echo "Reformatting for PROXY YAML payload..."
           echo "#########################################" > final_proxy.yaml
           echo "# 作者: ningcol" >> final_proxy.yaml
           echo "# 项目地址: https://github.com/ningcol/clash-rules" >> final_proxy.yaml
           echo "# 更新时间: $(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> final_proxy.yaml
-          echo "# 说明: 本文件为自动生成的 Clash PROXY 规则，仅包含域名。" >> final_proxy.yaml
+          echo "# 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。" >> final_proxy.yaml
           echo "#########################################" >> final_proxy.yaml
+          echo "behavior: domain" >> final_proxy.yaml
           echo "payload:" >> final_proxy.yaml
-          sed "s/^\(.*\)$/  - '\1'/" final_proxy_domains.txt >> final_proxy.yaml
+          # regenerate payload lines directly from normalized domains
+          awk -F',' '
+          {
+            type="domain"; val=$0
+            if (NF>1) { type=tolower($1); val=$2 }
+            gsub(/^[ \t]+|[ \t]+$/, "", val)
+            v=tolower(val)
+            if (type=="ip-cidr" || type=="ip-cidr6") next
+            if (type=="domain-suffix") {
+              sub(/^\+\./, "", v)
+              sub(/^\*\./, "", v)
+              sub(/^\./, "", v)
+              print "+." v
+            } else {
+              print v
+            }
+          }' final_proxy_domains.txt | sort | uniq | awk '{printf("  - '\''%s'\''\n", $0)}' >> final_proxy.yaml || true
           echo "PROXY build complete. Final file is final_proxy.yaml"
 
       # =======================================================
@@ -298,15 +357,35 @@ jobs:
         run: |
           echo "Sorting and deduplicating filtered DIRECT list..."
           cat filtered_direct_list.txt | sort | uniq > final_direct_domains.txt || true
-          echo "Reformatting for DIRECT YAML payload..."
+          echo "Converting classical entries to domain format and removing IPs..."
+          awk -F',' '
+          {
+            type="domain"; val=$0
+            if (NF>1) { type=tolower($1); val=$2 }
+            gsub(/^[ \t]+|[ \t]+$/, "", val)
+            v=tolower(val)
+            if (type=="ip-cidr" || type=="ip-cidr6") next
+            if (type=="domain-suffix") {
+              # normalize leading markers and emit +.domain (Clash scheme B)
+              sub(/^\+\./, "", v)
+              sub(/^\*\./, "", v)
+              sub(/^\./, "", v)
+              print "+." v
+            } else {
+              print v
+            }
+          }' final_direct_domains.txt | sort | uniq > final_direct_payload.txt || true
+
+          echo "Reformatting for DIRECT YAML payload (behavior: domain)..."
           echo "#########################################" > final_direct.yaml
           echo "# 作者: ningcol" >> final_direct.yaml
           echo "# 项目地址: https://github.com/ningcol/clash-rules" >> final_direct.yaml
           echo "# 更新时间: $(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> final_direct.yaml
-          echo "# 说明: 本文件为自动生成的 Clash DIRECT 规则，仅包含域名。" >> final_direct.yaml
+          echo "# 说明: 本文件为自动生成的 Clash DIRECT 规则（behavior: domain）。" >> final_direct.yaml
           echo "#########################################" >> final_direct.yaml
+          echo "behavior: domain" >> final_direct.yaml
           echo "payload:" >> final_direct.yaml
-          sed "s/^\(.*\)$/  - '\1'/" final_direct_domains.txt >> final_direct.yaml
+          awk '{printf("  - '\''%s'\''\n", $0)}' final_direct_payload.txt >> final_direct.yaml
           echo "DIRECT build complete. Final file is final_direct.yaml"
 
       # =======================================================
@@ -390,15 +469,35 @@ jobs:
         run: |
           echo "Sorting and deduplicating filtered MICROSOFT list..."
           cat filtered_microsoft_list.txt | sort | uniq > final_microsoft_domains.txt || true
-          echo "Reformatting for MICROSOFT YAML payload..."
+          echo "Converting classical entries to domain format and removing IPs..."
+          awk -F',' '
+          {
+            type="domain"; val=$0
+            if (NF>1) { type=tolower($1); val=$2 }
+            gsub(/^[ \t]+|[ \t]+$/, "", val)
+            v=tolower(val)
+            if (type=="ip-cidr" || type=="ip-cidr6") next
+            if (type=="domain-suffix") {
+              # normalize leading markers and emit +.domain (Clash scheme B)
+              sub(/^\+\./, "", v)
+              sub(/^\*\./, "", v)
+              sub(/^\./, "", v)
+              print "+." v
+            } else {
+              print v
+            }
+          }' final_microsoft_domains.txt | sort | uniq > final_microsoft_payload.txt || true
+
+          echo "Reformatting for MICROSOFT YAML payload (behavior: domain)..."
           echo "#########################################" > final_microsoft.yaml
           echo "# 作者: ningcol" >> final_microsoft.yaml
           echo "# 项目地址: https://github.com/ningcol/clash-rules" >> final_microsoft.yaml
           echo "# 更新时间: $(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> final_microsoft.yaml
-          echo "# 说明: 本文件为自动生成的 Clash MICROSOFT 规则，仅包含域名。" >> final_microsoft.yaml
+          echo "# 说明: 本文件为自动生成的 Clash MICROSOFT 规则（behavior: domain）。" >> final_microsoft.yaml
           echo "#########################################" >> final_microsoft.yaml
+          echo "behavior: domain" >> final_microsoft.yaml
           echo "payload:" >> final_microsoft.yaml
-          sed "s/^\(.*\)$/  - '\1'/" final_microsoft_domains.txt >> final_microsoft.yaml
+          awk '{printf("  - '\''%s'\''\n", $0)}' final_microsoft_payload.txt >> final_microsoft.yaml
           echo "MICROSOFT build complete. Final file is final_microsoft.yaml"
 
       # =======================================================
