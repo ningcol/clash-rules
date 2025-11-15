@@ -126,6 +126,7 @@ jobs:
             gsub(/^[ \t]+|[ \t]+$/, "", val)
             v=tolower(val)
             if (type=="ip-cidr" || type=="ip-cidr6") next
+            if (type=="domain-keyword") next
             if (type=="domain-suffix") {
               # normalize leading markers and emit +.domain (Clash scheme B)
               sub(/^\+\./, "", v)
@@ -241,6 +242,7 @@ jobs:
             gsub(/^[ \t]+|[ \t]+$/, "", val)
             v=tolower(val)
             if (type=="ip-cidr" || type=="ip-cidr6") next
+            if (type=="domain-keyword") next
             if (type=="domain-suffix") {
               sub(/^\+\./, "", v)
               sub(/^\*\./, "", v)
@@ -372,6 +374,7 @@ jobs:
             gsub(/^[ \t]+|[ \t]+$/, "", val)
             v=tolower(val)
             if (type=="ip-cidr" || type=="ip-cidr6") next
+            if (type=="domain-keyword") next
             if (type=="domain-suffix") {
               # normalize leading markers and emit +.domain (Clash scheme B)
               sub(/^\+\./, "", v)
@@ -486,6 +489,7 @@ jobs:
             gsub(/^[ \t]+|[ \t]+$/, "", val)
             v=tolower(val)
             if (type=="ip-cidr" || type=="ip-cidr6") next
+            if (type=="domain-keyword") next
             if (type=="domain-suffix") {
               # normalize leading markers and emit +.domain (Clash scheme B)
               sub(/^\+\./, "", v)
