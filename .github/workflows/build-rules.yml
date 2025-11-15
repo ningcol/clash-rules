@@ -428,10 +428,10 @@ jobs:
       - name: 13. Filter MICROSOFT List
         run: |
           normalize_rules() {
-            awk '
+            awk -v q="'" '
             BEGIN{ IGNORECASE=0 }
             {
-              gsub("'" , "")
+              gsub(q , "")
               if ($0 ~ /^[[:space:]]*#/ || $0 ~ /^[[:space:]]*$/) next
               line=$0
               if (match(line, /^(DOMAIN|DOMAIN-SUFFIX|IP-CIDR|IP-CIDR6)[[:space:]]*,[[:space:]]*([^,]+)/, m)) {
