@@ -77,15 +77,12 @@ jobs:
               gsub(q , "")
               if ($0 ~ /^[[:space:]]*#/ || $0 ~ /^[[:space:]]*$/) next
               line=$0
-              # classical formats: keep the prefix (DOMAIN, DOMAIN-SUFFIX, DOMAIN-KEYWORD, IP-CIDR, IP-CIDR6)
               if (match(line, /^(DOMAIN|DOMAIN-SUFFIX|DOMAIN-KEYWORD|IP-CIDR|IP-CIDR6)[[:space:]]*,[[:space:]]*([^,]+)/, m)) {
                 if (tolower(m[1]) == "domain-keyword") next
                 printf "%s,%s\n", tolower(m[1]), tolower(m[2])
               } else {
-                # strip payload: and ignore URLs/lines with @ or / or :
                 sub(/^[[:space:]]*payload:[[:space:]]*/, "", line)
                 if (line ~ /\// || line ~ /:/ || line ~ /@/) next
-                # skip explicit DOMAIN-KEYWORD lines that didn't match the comma form
                 if (tolower(line) ~ /^domain-keyword[[:space:]]*,/) next
                 print tolower(line)
               }
@@ -120,7 +117,6 @@ jobs:
           echo "Converting classical entries to domain format and removing IPs..."
           awk -F',' '
           {
-            # normalize fields: if line contains a comma the first field is the type
             type="domain"; val=$0
             if (NF>1) { type=tolower($1); val=$2 }
             gsub(/^[ \t]+|[ \t]+$/, "", val)
@@ -128,13 +124,11 @@ jobs:
             if (type=="ip-cidr" || type=="ip-cidr6") next
             if (type=="domain-keyword") next
             if (type=="domain-suffix") {
-              # normalize leading markers and emit +.domain (Clash scheme B)
               sub(/^\+\./, "", v)
               sub(/^\*\./, "", v)
               sub(/^\./, "", v)
               print "+." v
             } else {
-              # domain or plain entries; DOMAIN-KEYWORD intentionally not emitted
               print v
             }
           }' final_reject_domains.txt | sort | uniq > final_reject_payload.txt || true
@@ -248,7 +242,6 @@ jobs:
               sub(/^\./, "", v)
               print "+." v
             } else {
-              # domain or plain entries; DOMAIN-KEYWORD intentionally not emitted
               print v
             }
           }' final_proxy_domains.txt | sort | uniq \
@@ -262,7 +255,6 @@ jobs:
           echo "# 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。" >> final_proxy.yaml
           echo "#########################################" >> final_proxy.yaml
           echo "payload:" >> final_proxy.yaml
-          # regenerate payload lines directly from normalized domains
           awk -F',' '
           {
             type="domain"; val=$0
@@ -374,7 +366,6 @@ jobs:
             if (type=="ip-cidr" || type=="ip-cidr6") next
             if (type=="domain-keyword") next
             if (type=="domain-suffix") {
-              # normalize leading markers and emit +.domain (Clash scheme B)
               sub(/^\+\./, "", v)
               sub(/^\*\./, "", v)
               sub(/^\./, "", v)
@@ -488,7 +479,6 @@ jobs:
             if (type=="ip-cidr" || type=="ip-cidr6") next
             if (type=="domain-keyword") next
             if (type=="domain-suffix") {
-              # normalize leading markers and emit +.domain (Clash scheme B)
               sub(/^\+\./, "", v)
               sub(/^\*\./, "", v)
               sub(/^\./, "", v)
