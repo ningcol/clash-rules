@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2025-11-15T06:17:00Z
+# 更新时间: 2025-11-15T06:40:06Z
 # 说明: 本文件为自动生成的 Clash MICROSOFT 规则（behavior: domain）。
 #########################################
 payload:
@@ -84,4 +84,3 @@ payload:
   - '+.xboxservices.com'
   - '+.yammer.com'
   - '+.yammerusercontent.com'
-  - '7h1s_rul35et_i5_mad3_by_5ukk4w-ruleset.skk.moe'
