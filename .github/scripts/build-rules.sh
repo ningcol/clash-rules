@@ -26,55 +26,133 @@ declare -a RULE_CATEGORIES=("reject" "proxy" "direct" "microsoft")
 
 # ========================================
 # 函数: normalize_rules
-# 功能: 标准化规则格式
+# 功能: 标准化规则格式，处理多种源格式
+# 格式1 (YAML): payload: 后跟 - '+.domain.com' 或 - 'domain.com' 或 - '1.1.1.0/24'
+# 格式2 (文本): DOMAIN-SUFFIX,domain.com 或 IP-CIDR,1.1.1.0/24
+# 输出: domain,example.com | domain-suffix,example.com | ip-cidr,1.1.1.0/24 等
 # ========================================
 normalize_rules() {
     awk -v q="'" '
     BEGIN{ IGNORECASE=0 }
     {
+        # 移除所有单引号
         gsub(q, "")
+        
+        # 跳过注释和空行
         if ($0 ~ /^[[:space:]]*#/ || $0 ~ /^[[:space:]]*$/) next
-        line=$0
-        if (match(line, /^(DOMAIN|DOMAIN-SUFFIX|DOMAIN-KEYWORD|IP-CIDR|IP-CIDR6)[[:space:]]*,[[:space:]]*([^,]+)/, m)) {
-            if (tolower(m[1]) == "domain-keyword") next
-            printf "%s,%s\n", tolower(m[1]), tolower(m[2])
-        } else {
-            sub(/^[[:space:]]*payload:[[:space:]]*/, "", line)
-            if (line ~ /\// || line ~ /:/ || line ~ /@/) next
-            if (tolower(line) ~ /^domain-keyword[[:space:]]*,/) next
-            print tolower(line)
+        
+        # 跳过 payload: 标记行
+        if ($0 ~ /^[[:space:]]*payload:[[:space:]]*$/) next
+        
+        line = $0
+        
+        # 处理格式1: YAML数组格式 (- '+.domain.com' 或 - '1.1.1.0/24')
+        if (match(line, /^[[:space:]]*-[[:space:]]+(.+)$/, m)) {
+            content = m[1]
+            gsub(/^[ \t]+|[ \t]+$/, "", content)
+            content = tolower(content)
+            
+            # 判断是否为 IP-CIDR 格式
+            if (content ~ /^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+\/[0-9]+$/) {
+                printf "ip-cidr,%s\n", content
+            } else if (content ~ /^[0-9a-f:]+:[0-9a-f:]*\/[0-9]+$/i) {
+                # IPv6 CIDR
+                printf "ip-cidr6,%s\n", content
+            } else if (content ~ /^\+\./) {
+                # +.domain.com 格式 (DOMAIN-SUFFIX)
+                sub(/^\+\./, "", content)
+                printf "domain-suffix,%s\n", content
+            } else if (content ~ /^\*\./) {
+                sub(/^\*\./, "", content)
+                printf "domain-suffix,%s\n", content
+            } else if (content ~ /^\./) {
+                sub(/^\./, "", content)
+                printf "domain-suffix,%s\n", content
+            } else {
+                # 纯域名格式
+                if (content !~ /:/ && content !~ /@/) {
+                    printf "domain,%s\n", content
+                }
+            }
+            next
+        }
+        
+        # 处理格式2: 文本格式 (DOMAIN-SUFFIX,domain.com 或 IP-CIDR,1.1.1.0/24)
+        if (match(line, /^(DOMAIN|DOMAIN-SUFFIX|DOMAIN-KEYWORD|IP-CIDR|IP-CIDR6|IP-ASN)[[:space:]]*,[[:space:]]*([^,]+)/, m)) {
+            rule_type = tolower(m[1])
+            rule_value = tolower(m[2])
+            
+            # 跳过 KEYWORD 规则
+            if (rule_type == "domain-keyword") next
+            
+            printf "%s,%s\n", rule_type, rule_value
+            next
+        }
+        
+        # 处理格式3: 纯域名或纯IP行（兜底）
+        gsub(/^[ \t]+|[ \t]+$/, "", line)
+        line = tolower(line)
+        
+        # 判断是否为 IP
+        if (line ~ /^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+\/[0-9]+$/) {
+            printf "ip-cidr,%s\n", line
+        } else if (line ~ /^[0-9a-f:]+:[0-9a-f:]*\/[0-9]+$/i) {
+            printf "ip-cidr6,%s\n", line
+        } else if (line !~ /:/ && line !~ /@/ && line != "") {
+            # 纯域名
+            printf "domain,%s\n", line
         }
     }'
 }
 
 # ========================================
 # 函数: convert_to_domain_format
-# 功能: 将规则转换为域名格式
+# 功能: 将标准化规则转换为 Clash domain 格式
+# 输入: domain,example.com 或 domain-suffix,example.com
+# 输出: example.com 或 +.example.com
 # ========================================
 convert_to_domain_format() {
     awk -F',' '
     {
-        type="domain"; val=$0
-        if (NF>1) { type=tolower($1); val=$2 }
+        # 默认为 domain 类型
+        type = "domain"
+        val = $0
+        
+        # 如果有逗号分隔，提取类型和值
+        if (NF > 1) {
+            type = tolower($1)
+            val = $2
+        }
+        
+        # 去除首尾空格
         gsub(/^[ \t]+|[ \t]+$/, "", val)
-        v=tolower(val)
-        if (type=="ip-cidr" || type=="ip-cidr6") next
-        if (type=="domain-keyword") next
-        if (type=="domain-suffix") {
-            sub(/^\+\./, "", v)
-            sub(/^\*\./, "", v)
-            sub(/^\./, "", v)
-            print "+." v
+        val = tolower(val)
+        
+        # 跳过 IP 和 KEYWORD 规则
+        if (type == "ip-cidr" || type == "ip-cidr6" || type == "domain-keyword") next
+        
+        # 处理 domain-suffix 类型
+        if (type == "domain-suffix") {
+            # 移除可能已存在的前缀
+            sub(/^\+\./, "", val)
+            sub(/^\*\./, "", val)
+            sub(/^\./, "", val)
+            # 添加 +. 前缀
+            printf "+.%s\n", val
         } else {
-            print v
+            # domain 类型，直接输出域名
+            print val
         }
     }'
 }
 
 # ========================================
 # 函数: download_and_merge_rules
-# 功能: 下载并合并规则文件
+# 功能: 下载并合并规则文件，智能识别格式
 # 参数: $1 - 规则类型（如 reject, proxy 等）
+# 支持格式:
+#   1. YAML格式: payload: 开头，包含 - 'domain' 数组
+#   2. 文本格式: 纯文本规则列表
 # ========================================
 download_and_merge_rules() {
     local category=$1
