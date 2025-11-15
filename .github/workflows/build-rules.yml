@@ -47,7 +47,8 @@ jobs:
               echo "  -> WARNING: Failed to download or file is empty."
               continue
             fi
-            if cat rule_content.tmp | yq e '.payload[]' - >> all_reject_rules.tmp 2>/dev/null; then
+            if grep -q "^payload:" rule_content.tmp; then
+              yq e '.payload[]' rule_content.tmp >> all_reject_rules.tmp
               echo "  -> Parsed as YAML (raw merge)"
             else
               cat rule_content.tmp >> all_reject_rules.tmp
@@ -121,7 +122,8 @@ jobs:
               echo "  -> WARNING: Failed to download or file is empty."
               continue
             fi
-            if cat rule_content.tmp | yq e '.payload[]' - >> all_proxy_rules.tmp 2>/dev/null; then
+            if grep -q "^payload:" rule_content.tmp; then
+              yq e '.payload[]' rule_content.tmp >> all_proxy_rules.tmp
               echo "  -> Parsed as YAML (raw merge)"
             else
               cat rule_content.tmp >> all_proxy_rules.tmp
@@ -195,7 +197,8 @@ jobs:
               echo "  -> WARNING: Failed to download or file is empty."
               continue
             fi
-            if cat rule_content.tmp | yq e '.payload[]' - >> all_direct_rules.tmp 2>/dev/null; then
+            if grep -q "^payload:" rule_content.tmp; then
+              yq e '.payload[]' rule_content.tmp >> all_direct_rules.tmp
               echo "  -> Parsed as YAML (raw merge)"
             else
               cat rule_content.tmp >> all_direct_rules.tmp
@@ -269,7 +272,8 @@ jobs:
               echo "  -> WARNING: Failed to download or file is empty."
               continue
             fi
-            if cat rule_content.tmp | yq e '.payload[]' - >> all_microsoft_rules.tmp 2>/dev/null; then
+            if grep -q "^payload:" rule_content.tmp; then
+              yq e '.payload[]' rule_content.tmp >> all_microsoft_rules.tmp
               echo "  -> Parsed as YAML (raw merge)"
             else
               cat rule_content.tmp >> all_microsoft_rules.tmp
