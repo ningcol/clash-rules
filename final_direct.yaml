@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2025-11-17T03:44:09Z
+# 更新时间: 2025-11-17T08:52:12Z
 # 说明: 本文件为自动生成的 Clash DIRECT 规则（behavior: domain）。
 #########################################
 payload:
@@ -46437,6 +46437,7 @@ payload:
   - '+.hikerfans.com'
   - '+.hikihj.com'
   - '+.hikinginternational.com'
+  - '+.hikiot.com.net'
   - '+.hiklife.com'
   - '+.hikmall.com'
   - '+.hikoon.com'
@@ -116358,6 +116359,7 @@ payload:
   - 'certs-lb.apple.com.akadns.net'
   - 'certs.apple.com'
   - 'checkin.gstatic.com'
+  - 'cibn-tos-5g.tvapp.eu.org'
   - 'cl1-cdn.origin-apple.com.akadns.net'
   - 'cl1.apple.com'
   - 'cl2-cdn.origin-apple.com.akadns.net'
@@ -116539,6 +116541,10 @@ payload:
   - 'images-cn.ssl-images-amazon.com'
   - 'images.apple.com.edgekey.net.globalredir.akadns.net'
   - 'imasdk.googleapis.com'
+  - 'img.bfzypic.com'
+  - 'img.ffzy888.com'
+  - 'img.lzzyimg.com'
+  - 'img.picbf.com'
   - 'inappcheck-cn.itunes-apple.com.akadns.net'
   - 'inappcheck-lb.itunes-apple.com.akadns.net'
   - 'inappcheck.itunes.apple.com'
@@ -116836,8 +116842,11 @@ payload:
   - 'updates.cdn-apple.com'
   - 'uplaypc-s-ubisoft.cdn.ubi.com'
   - 'upp.itunes.apple.com'
+  - 'v.fengbao8.com'
   - 'valid.apple.com'
   - 'valid.origin-apple.com.akadns.net'
+  - 'vip.vipuuvip.com'
+  - 'viptulz.com'
   - 'vscode.download.prss.microsoft.com'
   - 'vz.download.prss.microsoft.com'
   - 'wear.googleapis.com'
@@ -116846,6 +116855,7 @@ payload:
   - 'weather-map.apple.com'
   - 'weather-map2.apple.com'
   - 'weatherkit.apple.com'
+  - 'wim.ycblhs.com'
   - 'wscont1.apps.microsoft.com'
   - 'wscont2.apps.microsoft.com'
   - 'www-csb.dell.com'
