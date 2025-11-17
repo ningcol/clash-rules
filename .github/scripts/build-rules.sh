@@ -22,11 +22,33 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
 # 规则配置列表 - 添加新规则只需在这里添加一行
-declare -a RULE_CATEGORIES=("reject" "proxy" "direct" "microsoft")
+declare -a RULE_CATEGORIES=("reject" "proxy" "direct" "microsoft" "apple")
+
+# 优先级规则配置：定义哪些规则集需要从其他规则集中自动排除
+# 格式: ["规则集名称"]="需要排除它的规则集列表(逗号分隔)"
+# 排除机制：
+#   1. 如果 microsoft/ 目录存在于 RULE_CATEGORIES，会先生成 final_microsoft.yaml
+#   2. 处理 proxy/direct 时，自动读取 final_microsoft.yaml 并排除其中的域名
+#   3. 如果 final_microsoft.yaml 不存在，跳过排除（不影响构建）
+declare -A PRIORITY_RULES=(
+    ["microsoft"]="proxy,direct"
+    ["apple"]="proxy,direct"
+    # 未来可以添加更多，例如:
+    # ["google"]="proxy,direct"
+    # ["cn"]="proxy"
+)
 
 # ========================================
 # 函数: normalize_rules
 # 功能: 标准化规则格式，处理多种源格式
+# 说明:
+#  - 该函数将各种输入格式统一输出为内置的规范格式，便于后续处理。
+#  - 支持三类输入：YAML payload 列表、Clash 文本规则、纯域名/纯 IP 列表。
+#  - 输出格式示例：
+#      domain,example.com
+#      domain-suffix,example.com
+#      ip-cidr,1.1.1.0/24
+#  - 会自动忽略注释、空行和 DOMAIN-KEYWORD 类型
 # 格式1 (YAML): payload: 后跟 - '+.domain.com' 或 - 'domain.com' 或 - '1.1.1.0/24'
 # 格式2 (文本): DOMAIN-SUFFIX,domain.com 或 IP-CIDR,1.1.1.0/24
 # 输出: domain,example.com | domain-suffix,example.com | ip-cidr,1.1.1.0/24 等
@@ -123,6 +145,12 @@ normalize_rules() {
 # ========================================
 # 函数: convert_to_domain_format
 # 功能: 将标准化规则转换为 Clash domain 格式
+# 说明:
+#  - 接收 normalize_rules 的输出（如 "domain,example.com" 或 "domain-suffix,example.com"）
+#  - 输出符合 Clash `behavior: domain` 的表示：
+#      - 完整域名: example.com
+#      - 后缀匹配: +.example.com
+#  - 会跳过 IP 及 DOMAIN-KEYWORD 类型
 # 输入: domain,example.com 或 domain-suffix,example.com
 # 输出: example.com 或 +.example.com
 # ========================================
@@ -235,8 +263,70 @@ download_and_merge_rules() {
 }
 
 # ========================================
+# 函数: get_priority_exclude_rules
+# 功能: 从 final_xxx.yaml 文件读取域名规则用于排除
+# 说明:
+#  - 优先级规则在 Step 1 已生成 final_<priority>.yaml
+#  - 本函数解析该 YAML 并输出 normalize_rules 可识别的规范格式，便于合并到排除列表
+# 参数: $1 - 优先级规则类型
+# 输出: 规范化格式的域名规则（domain,xxx 或 domain-suffix,xxx）
+# ========================================
+get_priority_exclude_rules() {
+    local priority_category=$1
+    local final_yaml="$PROJECT_ROOT/final_${priority_category}.yaml"
+    
+    # 检查 final_xxx.yaml 是否存在
+    if [ ! -f "$final_yaml" ]; then
+        return 1
+    fi
+    
+    # 从 YAML 提取域名并转换为规范格式
+    awk '
+        /^[[:space:]]*-[[:space:]]+/ {
+            gsub(/^[[:space:]]*-[[:space:]]+'\''?/, "")
+            gsub(/'\''?[[:space:]]*$/, "")
+            if ($0 ~ /^\+\./) {
+                # +.domain.com -> domain-suffix,domain.com
+                sub(/^\+\./, "")
+                print "domain-suffix," $0
+            } else if ($0 !~ /^#/ && $0 != "" && $0 != "payload:") {
+                # domain.com -> domain,domain.com
+                print "domain," $0
+            }
+        }
+    ' "$final_yaml"
+}
+
+# ========================================
+# 函数: should_exclude_from
+# 功能: 判断当前规则集是否需要排除某个优先级规则集
+# 参数: $1 - 当前规则类型, $2 - 优先级规则类型
+# 返回: 0 表示需要排除, 1 表示不需要
+# ========================================
+should_exclude_from() {
+    local current_category=$1
+    local priority_category=$2
+    
+    local exclude_list="${PRIORITY_RULES[$priority_category]}"
+    if [ -z "$exclude_list" ]; then
+        return 1
+    fi
+    
+    # 检查当前规则是否在排除列表中
+    if [[ ",$exclude_list," == *",$current_category,"* ]]; then
+        return 0
+    fi
+    
+    return 1
+}
+
+# ========================================
 # 函数: filter_rules
-# 功能: 使用排除列表过滤规则
+# 功能: 标准化并生成中间过滤文件
+# 说明:
+#  - 从 all_<category>_rules.tmp 中读取原始合并内容，调用 normalize_rules
+#  - 结果写入 normalized_<category>_list.txt，并复制为 filtered_<category>_list.txt
+#  - `filtered_<category>_list.txt` 是后续 format_and_generate_yaml 的输入
 # 参数: $1 - 规则类型
 # ========================================
 filter_rules() {
@@ -298,11 +388,35 @@ format_and_generate_yaml() {
         local before_count=$(wc -l < "$payload_before_exclude" | tr -d ' ')
         echo "     Converted: $before_count unique domains"
         
-        # 应用排除列表（精确匹配）
+        # 创建合并的排除列表
+        local combined_exclude="temp_${category}_combined_exclude.txt"
+        touch "$combined_exclude"
+        
+        # 1. 添加本类别的 exclude.txt
         if [ -f "$exclude_file" ] && [ -s "$exclude_file" ]; then
-            echo "     Applying exclude list..."
-            cat "$exclude_file" | normalize_rules > "$normalized_allowlist" || true
-            cat "$normalized_allowlist" | convert_to_domain_format | sort | uniq > temp_exclude_domains.txt || true
+            echo "     Adding exclude.txt to exclusion list..."
+            cat "$exclude_file" | normalize_rules >> "$combined_exclude" || true
+        fi
+        
+        # 2. 自动添加优先级规则集的排除
+        local excluded_priority_rules=()
+        for priority_category in "${!PRIORITY_RULES[@]}"; do
+            if should_exclude_from "$category" "$priority_category"; then
+                echo "     Auto-excluding $priority_category rules..."
+                
+                # 使用新函数获取排除规则（支持多种来源）
+                if get_priority_exclude_rules "$priority_category" >> "$combined_exclude"; then
+                    excluded_priority_rules+=("$priority_category")
+                else
+                    echo "     Warning: No exclude rules found for $priority_category" >&2
+                fi
+            fi
+        done
+        
+        # 应用合并后的排除列表
+        if [ -s "$combined_exclude" ]; then
+            echo "     Applying combined exclude list..."
+            cat "$combined_exclude" | convert_to_domain_format | sort | uniq > temp_exclude_domains.txt || true
             
             # 精确匹配：只排除列表中明确指定的规则
             grep -Fxv -f temp_exclude_domains.txt "$payload_before_exclude" > "$payload_file" || cp "$payload_before_exclude" "$payload_file"
@@ -310,10 +424,18 @@ format_and_generate_yaml() {
             
             local after_count=$(wc -l < "$payload_file" | tr -d ' ')
             local excluded_count=$((before_count - after_count))
-            echo "     Excluded: $excluded_count domains"
+            
+            if [ "$excluded_count" -gt 0 ]; then
+                echo "     Excluded: $excluded_count domains"
+                if [ ${#excluded_priority_rules[@]} -gt 0 ]; then
+                    echo "       (from priority rules: ${excluded_priority_rules[*]})"
+                fi
+            fi
         else
             cp "$payload_before_exclude" "$payload_file"
         fi
+        
+        rm -f "$combined_exclude"
         
         local final_count=$(wc -l < "$payload_file" | tr -d ' ')
         echo "     Final: $final_count unique domains"
@@ -377,6 +499,7 @@ format_and_generate_yaml() {
 # ========================================
 # 函数: cleanup_temp_files
 # 功能: 清理临时文件
+# 说明: 删除脚本运行过程中创建的临时文件，保持工作目录整洁
 # ========================================
 cleanup_temp_files() {
     echo "Cleaning up temporary files..."
@@ -405,7 +528,26 @@ main() {
     
     cd "$PROJECT_ROOT"
     
+    # 第一步：先处理所有优先级规则集
+    echo "Step 1: Processing priority rules first..."
+    for priority_category in "${!PRIORITY_RULES[@]}"; do
+        if [[ " ${RULE_CATEGORIES[@]} " =~ " $priority_category " ]]; then
+            echo "  -> Processing priority rule: $priority_category"
+            download_and_merge_rules "$priority_category"
+            filter_rules "$priority_category"
+            format_and_generate_yaml "$priority_category"
+        fi
+    done
+    echo ""
+    
+    # 第二步：处理其他规则集
+    echo "Step 2: Processing remaining rules..."
     for category in "${RULE_CATEGORIES[@]}"; do
+        # 跳过已处理的优先级规则
+        if [[ -n "${PRIORITY_RULES[$category]}" ]]; then
+            continue
+        fi
+        
         download_and_merge_rules "$category"
         filter_rules "$category"
         format_and_generate_yaml "$category"
@@ -435,6 +577,14 @@ main() {
             local ip_count=$((line_count - 7))
             echo "  - $yaml_ip_file ($ip_count IPs)"
         fi
+    done
+    
+    # 显示优先级规则配置摘要
+    echo ""
+    echo "Priority rules configuration:"
+    for priority_category in "${!PRIORITY_RULES[@]}"; do
+        local exclude_list="${PRIORITY_RULES[$priority_category]}"
+        echo "  - $priority_category → auto-excluded from: $exclude_list"
     done
 }
 
