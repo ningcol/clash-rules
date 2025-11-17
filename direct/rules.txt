@@ -12,5 +12,16 @@
 # 微软
 +.azure.com
 cdn.jsdelivr.net
+# 
 +.jsdelivr.net
-
+# www.mtq.app 直连域名
++.hikiot.com.net
+img.ffzy888.com
+viptulz.com
+img.picbf.com
+img.bfzypic.com
+img.lzzyimg.com
+vip.vipuuvip.com
+v.fengbao8.com
+cibn-tos-5g.tvapp.eu.org
+wim.ycblhs.com
