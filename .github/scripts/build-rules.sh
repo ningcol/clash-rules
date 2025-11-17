@@ -22,7 +22,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
 # 规则配置列表 - 添加新规则只需在这里添加一行
-declare -a RULE_CATEGORIES=("reject" "proxy" "direct" "microsoft" "apple")
+declare -a RULE_CATEGORIES=("reject" "proxy" "direct" "microsoft" "apple" "icloud")
 
 # 优先级规则配置：定义哪些规则集需要从其他规则集中自动排除
 # 格式: ["规则集名称"]="需要排除它的规则集列表(逗号分隔)"
@@ -33,6 +33,7 @@ declare -a RULE_CATEGORIES=("reject" "proxy" "direct" "microsoft" "apple")
 declare -A PRIORITY_RULES=(
     ["microsoft"]="proxy,direct"
     ["apple"]="proxy,direct"
+    ["icloud"]="proxy,direct"
     # 未来可以添加更多，例如:
     # ["google"]="proxy,direct"
     # ["cn"]="proxy"
