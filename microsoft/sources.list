@@ -1,1 +1,6 @@
+# https://github.com/SukkaW/Surge
 https://ruleset.skk.moe/Clash/non_ip/microsoft.txt
+# 
+https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/refs/heads/master/Clash/Microsoft.list
+# bing
+https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/refs/heads/master/Clash/Bing.list
