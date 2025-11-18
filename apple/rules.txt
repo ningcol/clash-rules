@@ -185,3 +185,10 @@ gspe11-2-cn-ssl.ls.apple.com
 gspe12-cn-ssl.ls.apple.com
 gspe85-cn-ssl.ls.apple.com
 +.apple.com
+time.apple.com
+time.asia.apple.com
+time.euro.apple.com
+uts-api.itunes.apple.com
+apple-tv-plus-press.apple.com
+np-edge.itunes.apple.com
+play-edge.itunes.apple.com

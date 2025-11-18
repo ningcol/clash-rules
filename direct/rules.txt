@@ -12,9 +12,12 @@
 
 cdn.jsdelivr.net
 +.jsdelivr.net
++.gstatic-cn.com
++.gstatic.com
+
++.hikiot.com.net
 
 # www.mtq.app 直连域名
-+.hikiot.com.net
 img.ffzy888.com
 viptulz.com
 img.picbf.com
@@ -24,6 +27,9 @@ vip.vipuuvip.com
 v.fengbao8.com
 cibn-tos-5g.tvapp.eu.org
 wim.ycblhs.com
-
-+.gstatic-cn.com
-+.gstatic.com
++.1ljx.com
+img.qwapp.top
+pic3.yzzyimg.online
+img.bwcgee.cn
+img.liangzipic.com
+api.nbyjson.top
