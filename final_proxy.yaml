@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2025-11-18T03:40:31Z
+# 更新时间: 2025-11-18T12:15:35Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -25509,7 +25509,6 @@ payload:
   - 'api-p.videomarket.jp'
   - 'api.viu.now.com'
   - 'apl-hamivideo.cdn.hinet.net'
-  - 'apple-tv-plus-press.apple.com'
   - 'apple.com.akadns.net'
   - 'appleworldwidedeveloper.hb-api.omtrdc.net'
   - 'appleworldwidedeveloper.sc.omtrdc.net'
@@ -25715,7 +25714,6 @@ payload:
   - 'notary-submissions-prod.s3-accelerate.amazonaws.com'
   - 'notary-submissions-prod.s3.us-west-2.amazonaws.com'
   - 'notify.ppy.sh'
-  - 'np-edge.itunes.apple.com'
   - 'ntp-b.nist.gov'
   - 'ntp-c.colorado.edu'
   - 'ntp-d.nist.gov'
@@ -25746,7 +25744,6 @@ payload:
   - 'paper-attachments.s3.amazonaws.com'
   - 'pchomeonline.com.tw'
   - 'pki.google.com'
-  - 'play-edge.itunes.apple.com'
   - 'poshtestgallery.cloudapp.net'
   - 'pplx-res.cloudinary.com'
   - 'practivate.adobe'
@@ -25907,11 +25904,8 @@ payload:
   - 'time-e-b.nist.gov'
   - 'time-e-g.nist.gov'
   - 'time-e-wwv.nist.gov'
-  - 'time.apple.com'
-  - 'time.asia.apple.com'
   - 'time.aws.com'
   - 'time.cloudflare.com'
-  - 'time.euro.apple.com'
   - 'time.facebook.com'
   - 'time.google.com'
   - 'time.nist.gov'
@@ -25938,7 +25932,6 @@ payload:
   - 'utcnist.colorado.edu'
   - 'utcnist2.colorado.edu'
   - 'utcnist3.colorado.edu'
-  - 'uts-api.itunes.apple.com'
   - 've-dash-uk-live.akamaized.net'
   - 've-uhd-push-uk-live.akamaized.net'
   - 'venmo.s3.amazonaws.com'

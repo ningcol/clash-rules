@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2025-11-18T03:40:32Z
+# 更新时间: 2025-11-18T12:15:36Z
 # 说明: 本文件为自动生成的 Clash DIRECT 规则（behavior: domain）。
 #########################################
 payload:
@@ -2488,6 +2488,7 @@ payload:
   - '+.1lan.tv'
   - '+.1law.vip'
   - '+.1liantu.com'
+  - '+.1ljx.com'
   - '+.1look.tv'
   - '+.1lou.com'
   - '+.1lx.co'
@@ -116293,6 +116294,7 @@ payload:
   - 'alibaba.cdn.steampipe.steamcontent.com'
   - 'amp-api-edge-lb-cn.itunes-apple.com.akadns.net'
   - 'amp-api-edge-lb.itunes-apple.com.akadns.net'
+  - 'api.nbyjson.top'
   - 'app-analytics-services.com'
   - 'app-measurement-cn.com'
   - 'app-measurement.com'
@@ -116444,9 +116446,12 @@ payload:
   - 'images-cn.ssl-images-amazon.com'
   - 'imasdk.googleapis.com'
   - 'img.bfzypic.com'
+  - 'img.bwcgee.cn'
   - 'img.ffzy888.com'
+  - 'img.liangzipic.com'
   - 'img.lzzyimg.com'
   - 'img.picbf.com'
+  - 'img.qwapp.top'
   - 'inappcheck-cn.itunes-apple.com.akadns.net'
   - 'inappcheck-lb.itunes-apple.com.akadns.net'
   - 'inappcheck.itunes.apple.com'
@@ -116497,7 +116502,6 @@ payload:
   - 'myapp.itunes.apple.com'
   - 'myvs.download.prss.microsoft.com'
   - 'nexus.dell.com'
-  - 'np-edge.itunes.apple.com'
   - 'ntp.aliyun.com'
   - 'ntp.tencent.com'
   - 'ntp1.aliyun.com'
@@ -116553,6 +116557,7 @@ payload:
   - 'pd-nk.itunes.apple.com'
   - 'pd.itunes.apple.com'
   - 'performanceparameters.googleapis.com'
+  - 'pic3.yzzyimg.online'
   - 'pki-goog.l.google.com'
   - 'play.itunes.apple.com'
   - 'play.music.apple.com'
