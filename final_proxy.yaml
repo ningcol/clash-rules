@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2025-11-17T13:11:53Z
+# 更新时间: 2025-11-18T03:40:31Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -15141,6 +15141,7 @@ payload:
   - '+.miyazakibank.co.jp'
   - '+.mizuhobank.co.jp'
   - '+.mizzmona.com'
+  - '+.mjj.rip'
   - '+.mjlsh.usc.cuhk.edu.hk'
   - '+.mjv-art.org'
   - '+.mk.shrimpia.network'
