@@ -16,6 +16,7 @@ cdn.jsdelivr.net
 +.gstatic.com
 
 +.hikiot.com.net
++.hikiot.com
 
 # www.mtq.app 直连域名
 img.ffzy888.com
