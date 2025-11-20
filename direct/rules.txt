@@ -14,7 +14,9 @@ cdn.jsdelivr.net
 +.jsdelivr.net
 +.gstatic-cn.com
 +.gstatic.com
++.amazonaws.com
 
+i.ys7.com
 +.hikiot.com.net
 +.hikiot.com
 
@@ -34,3 +36,4 @@ pic3.yzzyimg.online
 img.bwcgee.cn
 img.liangzipic.com
 api.nbyjson.top
+
