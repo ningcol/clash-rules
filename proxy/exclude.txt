@@ -16,8 +16,7 @@ cdn.jsdelivr.net
 i.ys7.com
 +.hikiot.com.net
 
-# www.mtq.app 直连域名
-img.ffzy888.com
+# www.mtq.app 直连域名img.ffzy888.com
 viptulz.com
 img.picbf.com
 img.bfzypic.com
