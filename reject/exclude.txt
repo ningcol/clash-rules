@@ -2,3 +2,4 @@ google-analytics.com
 firebasedynamiclinks.googleapis.com
 firebaseinstallations.googleapis.com
 firebaseremoteconfig.googleapis.com
+i.ys7.com
