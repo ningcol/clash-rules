@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2025-11-22T21:08:47Z
+# 更新时间: 2025-11-23T21:09:09Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -772,6 +772,7 @@ payload:
   - '+.addyoutube.com'
   - '+.adelaidebbs.com'
   - '+.adelaidenow.com.au'
+  - '+.adfox.ru'
   - '+.adgoogle.net'
   - '+.adguard-dns.com'
   - '+.adguard-dns.io'
@@ -806,6 +807,7 @@ payload:
   - '+.adidas.se'
   - '+.adinst.com'
   - '+.admeld.com'
+  - '+.admetrica.ru'
   - '+.admob-cn.com'
   - '+.admob.com'
   - '+.adobe-aemassets-value.com'
@@ -10787,6 +10789,7 @@ payload:
   - '+.heyzo.com'
   - '+.hf-iphone.com'
   - '+.hf.co'
+  - '+.hf.space'
   - '+.hg.cool'
   - '+.hgamer.pro'
   - '+.hgseav.com'
@@ -13331,6 +13334,7 @@ payload:
   - '+.kinmen.org.tw'
   - '+.kinmen.travel'
   - '+.kinokuniya.com'
+  - '+.kinopoisk-ru.clstorage.net'
   - '+.kinopoisk.ru'
   - '+.kir.jp'
   - '+.kir2kos.net'
@@ -15824,6 +15828,7 @@ payload:
   - '+.namethatpornad.com'
   - '+.namgyal.org'
   - '+.namgyalmonastery.org'
+  - '+.namu.wiki'
   - '+.nan-net.com'
   - '+.nanopool.org'
   - '+.nantobank.co.jp'
@@ -17629,6 +17634,7 @@ payload:
   - '+.picpost.com'
   - '+.pics.ee'
   - '+.pics.vc'
+  - '+.picsart.com'
   - '+.picsee.co'
   - '+.picsee.pro'
   - '+.pictoa.com'
@@ -23681,6 +23687,8 @@ payload:
   - '+.webtoons.com'
   - '+.webtoonscorp.com'
   - '+.webtype.com'
+  - '+.webvisor.com'
+  - '+.webvisor.org'
   - '+.webwarper.net'
   - '+.webworkerdaily.com'
   - '+.wechatlawsuit.com'
@@ -24667,6 +24675,7 @@ payload:
   - '+.yaddal.tv'
   - '+.yadi.sk'
   - '+.yadori.club'
+  - '+.yads.tech'
   - '+.yaeby.info'
   - '+.yaeby.pro'
   - '+.yahoo'
@@ -24839,6 +24848,7 @@ payload:
   - '+.yandex'
   - '+.yandex-bank.net'
   - '+.yandex-images.clstorage.net'
+  - '+.yandex-team.ru'
   - '+.yandex.aero'
   - '+.yandex.az'
   - '+.yandex.by'
@@ -24874,6 +24884,7 @@ payload:
   - '+.yandexadexchange.net'
   - '+.yandexcloud.net'
   - '+.yandexcom.net'
+  - '+.yandexmetrica.com'
   - '+.yandexwebcache.org'
   - '+.yanghengjun.com'
   - '+.yangzhi.org'
@@ -24889,6 +24900,7 @@ payload:
   - '+.yarnpkg.com'
   - '+.yasarang.net'
   - '+.yasni.co.uk'
+  - '+.yastat.net'
   - '+.yastatic.net'
   - '+.yasukuni.or.jp'
   - '+.yavtube.com'
