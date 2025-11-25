@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2025-11-25T11:32:41Z
+# 更新时间: 2025-11-25T14:39:36Z
 # 说明: 本文件为自动生成的 Clash DIRECT 规则（behavior: domain）。
 #########################################
 payload:
@@ -28655,6 +28655,7 @@ payload:
   - '+.devtang.com'
   - '+.devui.design'
   - '+.devzeng.com'
+  - '+.dewatermark.ai'
   - '+.deweier.com'
   - '+.deweisi.net'
   - '+.dewmobile.net'
@@ -116509,7 +116510,6 @@ payload:
   - 'dds.dell.com'
   - 'devblogs.microsoft.com'
   - 'developer.microsoft.com'
-  - 'dewatermark.ai'
   - 'dg-meta.video.google.com'
   - 'dl.dell.com'
   - 'dl.google.com'
