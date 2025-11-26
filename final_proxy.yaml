@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2025-11-25T21:10:18Z
+# 更新时间: 2025-11-26T21:09:50Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -3463,7 +3463,6 @@ payload:
   - '+.binancezh.top'
   - '+.bing'
   - '+.bing123.com'
-  - '+.bingads.com'
   - '+.bingagencyawards.com'
   - '+.bingapistatistics.com'
   - '+.bingoporno.com'
@@ -8093,7 +8092,6 @@ payload:
   - '+.facebook30.net'
   - '+.facebook30.org'
   - '+.facebook4business.com'
-  - '+.facebookads.com'
   - '+.facebookadvertisingsecrets.com'
   - '+.facebookappcenter.info'
   - '+.facebookappcenter.net'
@@ -14697,7 +14695,6 @@ payload:
   - '+.microsoft365.com'
   - '+.microsoftaccountguard.com'
   - '+.microsoftadc.com'
-  - '+.microsoftads.com'
   - '+.microsoftadvertising.com'
   - '+.microsoftadvertisingregionalawards.com'
   - '+.microsoftaffiliates.com'
@@ -15447,7 +15444,6 @@ payload:
   - '+.ms365surfaceoffer.com'
   - '+.ms4dre.com'
   - '+.msa-it.org'
-  - '+.msads.net'
   - '+.mschallenge2018.com'
   - '+.msdn.com'
   - '+.msft.info'
@@ -19538,6 +19534,7 @@ payload:
   - '+.sensualgirls.org'
   - '+.sensualmothers.com'
   - '+.sensueel.net'
+  - '+.sentry-cdn.com'
   - '+.sentry.io'
   - '+.senzuritv.net'
   - '+.seqing.one'
