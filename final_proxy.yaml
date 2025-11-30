@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2025-11-29T21:09:03Z
+# 更新时间: 2025-11-30T21:09:14Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -16834,6 +16834,8 @@ payload:
   - '+.okinawabank.co.jp'
   - '+.okk.tw'
   - '+.okkisokuho.com'
+  - '+.okko.sport'
+  - '+.okko.tv'
   - '+.okpool.me'
   - '+.okx-dns.com'
   - '+.okx-dns1.com'
@@ -17797,6 +17799,7 @@ payload:
   - '+.playerjs.io'
   - '+.playfab.com'
   - '+.playfabapi.com'
+  - '+.playfamily.ru'
   - '+.playforceone.com'
   - '+.playhearthstone.com'
   - '+.playmation.com'
