@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2025-11-30T21:09:14Z
+# 更新时间: 2025-12-01T21:09:12Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -13801,6 +13801,7 @@ payload:
   - '+.lizol.co.in'
   - '+.lkcn.net'
   - '+.ll82y2ifdd.top'
+  - '+.llama.com'
   - '+.llbd10.shop'
   - '+.llcaoxm-avi.sbs'
   - '+.lldns.net'
@@ -22145,6 +22146,7 @@ payload:
   - '+.turbobit.net'
   - '+.turbogvideos.com'
   - '+.turbohide.com'
+  - '+.turbopages.org'
   - '+.turborepo.org'
   - '+.turbotax.com'
   - '+.turkeyblocks.org'
@@ -25305,6 +25307,7 @@ payload:
   - '+.zaobao.com'
   - '+.zaobao.com.sg'
   - '+.zaobao.sg'
+  - '+.zaochenbao.com'
   - '+.zapper.fi'
   - '+.zappos'
   - '+.zapto.org'
