@@ -4,3 +4,4 @@ firebaseinstallations.googleapis.com
 firebaseremoteconfig.googleapis.com
 i.ys7.com
 +.analytics.meituan.net
+analytics.meituan.net
