@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2025-12-06T21:08:54Z
+# 更新时间: 2025-12-07T21:08:30Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -2141,6 +2141,7 @@ payload:
   - '+.archivx.to'
   - '+.archlinux.org'
   - '+.archlinuxarm.org'
+  - '+.arcraiders.com'
   - '+.arctosia.com'
   - '+.area120.com'
   - '+.area51.to'
@@ -7589,6 +7590,8 @@ payload:
   - '+.emaga.com'
   - '+.emagic.de'
   - '+.emanna.com'
+  - '+.embark-studios.com'
+  - '+.embark.games'
   - '+.embase.com'
   - '+.embed-cdn.com'
   - '+.embed.ly'
@@ -8232,6 +8235,8 @@ payload:
   - '+.faceid99.com'
   - '+.faceid99.net'
   - '+.faceidglobal.com'
+  - '+.faceit-cdn.net'
+  - '+.faceit.com'
   - '+.faceless.me'
   - '+.faceobk.com'
   - '+.faceobok.com'
@@ -18862,6 +18867,7 @@ payload:
   - '+.rea.tech'
   - '+.reabble.com'
   - '+.reachporn.com'
+  - '+.reachthefinals.com'
   - '+.reachtheworldonfacebook.com'
   - '+.react.com'
   - '+.reactjs.com'
