@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2025-12-07T21:08:30Z
+# 更新时间: 2025-12-08T21:10:11Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -11902,6 +11902,7 @@ payload:
   - '+.imagebam.com'
   - '+.imagecurl.com'
   - '+.imagecurl.org'
+  - '+.imagedelivery.net'
   - '+.imagefap.com'
   - '+.imageflea.com'
   - '+.imageglass.org'
