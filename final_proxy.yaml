@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2025-12-08T21:10:11Z
+# 更新时间: 2025-12-09T21:09:33Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -18741,6 +18741,7 @@ payload:
   - '+.r18av.com'
   - '+.r18lu-avi.shop'
   - '+.r18lu.com'
+  - '+.r2.dev'
   - '+.r34porn.net'
   - '+.rabbitscams.com'
   - '+.rabbitscams.sex'
