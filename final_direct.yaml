@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2025-12-09T21:09:34Z
+# 更新时间: 2025-12-10T21:12:19Z
 # 说明: 本文件为自动生成的 Clash DIRECT 规则（behavior: domain）。
 #########################################
 payload:
@@ -7349,7 +7349,6 @@ payload:
   - '+.75ll.com'
   - '+.75n474.com'
   - '+.75pk.com'
-  - '+.75team.com'
   - '+.75ww.com'
   - '+.75xn.com'
   - '+.76065.com'
