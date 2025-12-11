@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2025-12-10T21:12:18Z
+# 更新时间: 2025-12-11T07:37:29Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -17881,7 +17881,10 @@ payload:
   - '+.poecdn.net'
   - '+.pogo.com'
   - '+.pogobeta.com'
+  - '+.poi.icu'
   - '+.poi.moe'
+  - '+.poi6.net'
+  - '+.poihub.com'
   - '+.points-media.com'
   - '+.poisontube.com'
   - '+.pojapp.cfd'
@@ -18435,6 +18438,7 @@ payload:
   - '+.product.co.jp'
   - '+.profilemaster.com'
   - '+.profreeporno.com'
+  - '+.project-poi.com'
   - '+.project-syndicate.org'
   - '+.projectapex.com'
   - '+.projectara.com'
