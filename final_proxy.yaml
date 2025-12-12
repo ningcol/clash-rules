@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2025-12-11T21:12:28Z
+# 更新时间: 2025-12-12T21:10:19Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -4593,6 +4593,7 @@ payload:
   - '+.bypasscensorship.org'
   - '+.byrut.org'
   - '+.byspotify.com'
+  - '+.bytedapm.com'
   - '+.byteglb.com'
   - '+.byteoversea.com'
   - '+.byteoversea.net'
@@ -16165,6 +16166,7 @@ payload:
   - '+.nextwork.hk'
   - '+.nextwork.tw'
   - '+.nexus'
+  - '+.nexus-cdn.com'
   - '+.nexusmods.com'
   - '+.nf.id.au'
   - '+.nfjtyd.com'
@@ -21766,6 +21768,7 @@ payload:
   - '+.tig-ol-bitties.live'
   - '+.tigervpn.com'
   - '+.tik-tokapi.com'
+  - '+.tiktok-minis.com'
   - '+.tiktok-row.net'
   - '+.tiktok.com'
   - '+.tiktokcdn-eu.com'
@@ -25871,6 +25874,10 @@ payload:
   - 'roblox-load-generator-configuration.s3.us-east-2.amazonaws.com'
   - 'roblox-poc.global.ssl.fastly.net'
   - 'robloxcorp.s.llnwi.net'
+  - 'roovza-launches.appsflyersdk.com'
+  - 'roovza.inapps.appsflyersdk.com'
+  - 'roovza.launches.appsflyersdk.com'
+  - 'roovza.skadsdk.appsflyersdk.com'
   - 'rss.4040940.xyz'
   - 'rss.datuan.dev'
   - 'rss.littlebaby.life'

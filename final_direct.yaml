@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2025-12-11T21:12:30Z
+# 更新时间: 2025-12-12T21:10:20Z
 # 说明: 本文件为自动生成的 Clash DIRECT 规则（behavior: domain）。
 #########################################
 payload:
@@ -18005,7 +18005,6 @@ payload:
   - '+.bytedanceapi.com'
   - '+.bytedancehermestest.com'
   - '+.bytedancevod.com'
-  - '+.bytedapm.com'
   - '+.bytedcdn.com'
   - '+.bytedeliver.com'
   - '+.bytedgames.com'
