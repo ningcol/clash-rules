@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2025-12-13T21:08:48Z
+# 更新时间: 2025-12-14T21:09:57Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -1658,6 +1658,7 @@ payload:
   - '+.antiwave.net'
   - '+.antpool.com'
   - '+.anudetube.com'
+  - '+.anuneko.com'
   - '+.anxiangxing.com'
   - '+.anybunny.org'
   - '+.anybunny.tv'
@@ -12952,6 +12953,7 @@ payload:
   - '+.jfrog.org'
   - '+.jgg18.xyz'
   - '+.jgoodies.com'
+  - '+.jhelab.org'
   - '+.jhxl.org'
   - '+.jhzyw.xyz'
   - '+.jiangweiping.com'
@@ -13388,6 +13390,7 @@ payload:
   - '+.kir2kos.net'
   - '+.kirbysepicyarn.com'
   - '+.kirbysuperstarultra.com'
+  - '+.kiro.dev'
   - '+.kismia.com'
   - '+.kissbbao.cn'
   - '+.kisscos.net'
@@ -17913,6 +17916,7 @@ payload:
   - '+.podbean.com'
   - '+.podcast.co'
   - '+.podictionary.com'
+  - '+.podwise.ai'
   - '+.poe.com'
   - '+.poecdn.net'
   - '+.pogo.com'
@@ -18796,10 +18800,12 @@ payload:
   - '+.radiko.jp'
   - '+.radio-canada.ca'
   - '+.radio-en-ligne.fr'
+  - '+.radio.co'
   - '+.radio.garden'
   - '+.radioaustralia.net.au'
   - '+.radiofarda.com'
   - '+.radiohilight.net'
+  - '+.radiojar.com'
   - '+.radioline.co'
   - '+.radiomango.fm'
   - '+.radiomarsho.com'
