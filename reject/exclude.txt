@@ -7,3 +7,4 @@ i.ys7.com
 analytics.meituan.net
 pgy.xiaohongshu.com
 ad.xiaohongshu.com
+wxa.wxs.qq.com
