@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2025-12-18T21:10:40Z
+# 更新时间: 2025-12-19T21:10:31Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -2621,6 +2621,7 @@ payload:
   - '+.aws'
   - '+.aws-iot-hackathon.com'
   - '+.aws.com'
+  - '+.aws.dev'
   - '+.awsapprunner.com'
   - '+.awsapps.com'
   - '+.awsautopilot.com'
