@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2025-12-19T21:10:31Z
+# 更新时间: 2025-12-20T06:34:31Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -17368,6 +17368,7 @@ payload:
   - '+.parstream.net'
   - '+.parstream.org'
   - '+.partmaker.com'
+  - '+.partnerstack.xyz'
   - '+.partycasino.com'
   - '+.partylikeits1986.org'
   - '+.partypoker.com'
@@ -25922,7 +25923,13 @@ payload:
   - 'notary-submissions-prod.s3-accelerate.amazonaws.com'
   - 'notary-submissions-prod.s3.us-west-2.amazonaws.com'
   - 'notify.ppy.sh'
+  - 'ntdfreemobile-tgc.cdn.hinet.net'
+  - 'ntdfreepc-tgc.cdn.hinet.net'
+  - 'ntdfreetv-tgc.cdn.hinet.net'
+  - 'ntdfreevcpc-tgc.cdn.hinet.net'
+  - 'ntdofifreemobile-tgc.cdn.hinet.net'
   - 'ntdofifreepc-tgc.cdn.hinet.net'
+  - 'ntdofifreetv-tgc.cdn.hinet.net'
   - 'ntdofifreevcpc-tgc.cdn.hinet.net'
   - 'ntp-b.nist.gov'
   - 'ntp-c.colorado.edu'
