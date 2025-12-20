@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2025-12-20T06:34:31Z
+# 更新时间: 2025-12-20T14:40:10Z
 # 说明: 本文件为自动生成的 Clash REJECT 规则（behavior: domain）。
 #########################################
 payload:
@@ -108724,7 +108724,6 @@ payload:
   - '+.tongdaitruyenhinhcap24h.online'
   - '+.tongersenile.qpon'
   - '+.tongj.xilu.com'
-  - '+.tongjiniao.com'
   - '+.tongmancheerly.help'
   - '+.tongqing2015.com'
   - '+.tongueq2.top'
