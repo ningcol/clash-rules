@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2025-12-20T21:08:45Z
+# 更新时间: 2025-12-21T21:09:51Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -6806,6 +6806,8 @@ payload:
   - '+.dmed.technology'
   - '+.dmgmediaprivacy.co.uk'
   - '+.dmhy.org'
+  - '+.dmit.io'
+  - '+.dmit.sh'
   - '+.dml-lang.org'
   - '+.dmm-extension.com'
   - '+.dmm.co.jp'
@@ -7244,6 +7246,7 @@ payload:
   - '+.dynu.net'
   - '+.dynupdate.no-ip.com'
   - '+.dysfz.cc'
+  - '+.dzcdn.net'
   - '+.dzen.ru'
   - '+.dzeninfra.ru'
   - '+.dzze.com'
@@ -7724,6 +7727,7 @@ payload:
   - '+.entrust.com'
   - '+.entrust.net'
   - '+.entrustdatacard.com'
+  - '+.eotarchive.org'
   - '+.epac.to'
   - '+.epicbrowser.com'
   - '+.epicgames.com'
@@ -9741,6 +9745,7 @@ payload:
   - '+.ghcr.io'
   - '+.ghettotube.com'
   - '+.ghidra-sre.org'
+  - '+.ghostarchive.org'
   - '+.ghostgames.com'
   - '+.ghostpath.com'
   - '+.ghut.org'
@@ -14673,6 +14678,7 @@ payload:
   - '+.meme111.com'
   - '+.memealerts.com'
   - '+.memehk.com'
+  - '+.mementoweb.org'
   - '+.memes.tw'
   - '+.memri.org'
   - '+.memrijttm.org'
@@ -17680,6 +17686,7 @@ payload:
   - '+.perfecttitspics.com'
   - '+.periscope.tv'
   - '+.perl.org'
+  - '+.perma.cc'
   - '+.perplexity.ai'
   - '+.perplexity.com'
   - '+.persagg.com'
@@ -23827,6 +23834,7 @@ payload:
   - '+.webcammedellin.co'
   - '+.webcams.tv'
   - '+.webcamtubexxx.com'
+  - '+.webcitation.org'
   - '+.webevader.org'
   - '+.webex.ca'
   - '+.webex.co.in'
