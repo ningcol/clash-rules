@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2025-12-21T21:09:52Z
+# 更新时间: 2025-12-22T21:10:04Z
 # 说明: 本文件为自动生成的 Clash DIRECT 规则（behavior: domain）。
 #########################################
 payload:
@@ -1644,7 +1644,6 @@ payload:
   - '+.148com.com'
   - '+.148la.com'
   - '+.14944.net'
-  - '+.1495c8.com'
   - '+.14hj.com'
   - '+.14play.net'
   - '+.14xd.com'
@@ -6684,7 +6683,6 @@ payload:
   - '+.62669.com'
   - '+.626x.com'
   - '+.628.com'
-  - '+.628536nyv.com'
   - '+.62923.vip'
   - '+.629973.com'
   - '+.62dns.com'
@@ -11864,7 +11862,6 @@ payload:
   - '+.antvr.com'
   - '+.antwork.link'
   - '+.antzk.com'
-  - '+.anviettek.com'
   - '+.anw.red'
   - '+.anweilan.com'
   - '+.anweishi.com'
@@ -53757,6 +53754,7 @@ payload:
   - '+.jamalube.net'
   - '+.jamcz.com'
   - '+.jamidol.com'
+  - '+.jamms.org'
   - '+.jammyfm.com'
   - '+.jampotgames.com'
   - '+.janbao.net'
@@ -56983,7 +56981,6 @@ payload:
   - '+.js96008.com'
   - '+.js96777.com'
   - '+.jsadkg.com'
-  - '+.jsadt.com'
   - '+.jsaeit.com'
   - '+.jsaes.com'
   - '+.jsafc.net'
