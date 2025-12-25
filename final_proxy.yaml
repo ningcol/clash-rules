@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2025-12-24T21:10:10Z
+# 更新时间: 2025-12-25T21:10:15Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -16069,6 +16069,7 @@ payload:
   - '+.neovim.io'
   - '+.neow.in'
   - '+.neowin.net'
+  - '+.nephobox.com'
   - '+.nerdnudes.com'
   - '+.nervanasys.com'
   - '+.nesaporn.com'
