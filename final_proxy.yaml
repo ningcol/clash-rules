@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2025-12-26T21:09:54Z
+# 更新时间: 2025-12-27T21:08:57Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -14004,6 +14004,7 @@ payload:
   - '+.lotcrap.com'
   - '+.lotsawahouse.org'
   - '+.lotuslight.org.tw'
+  - '+.lovart.ai'
   - '+.love-sextoys.co.uk'
   - '+.love4porn.com'
   - '+.love6.tv'

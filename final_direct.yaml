@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2025-12-26T21:09:55Z
+# 更新时间: 2025-12-27T21:08:58Z
 # 说明: 本文件为自动生成的 Clash DIRECT 规则（behavior: domain）。
 #########################################
 payload:
@@ -21542,6 +21542,7 @@ payload:
   - '+.chinaorff.org'
   - '+.chinaorganicchem.com'
   - '+.chinaorientgroup.com'
+  - '+.chinaott.com'
   - '+.chinaott.net'
   - '+.chinapag.com'
   - '+.chinapandi.com'
@@ -46021,6 +46022,7 @@ payload:
   - '+.hijin.vip'
   - '+.hijoys.com'
   - '+.hik-cloud.com'
+  - '+.hik-express.com'
   - '+.hik-park.com'
   - '+.hikailink.com'
   - '+.hikari-ch.com'
