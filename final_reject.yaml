@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2025-12-28T03:13:59Z
+# 更新时间: 2025-12-28T08:42:46Z
 # 说明: 本文件为自动生成的 Clash REJECT 规则（behavior: domain）。
 #########################################
 payload:
@@ -51416,7 +51416,6 @@ payload:
   - '+.hlyraq.lastikpabuc.com'
   - '+.hlyrecomemum.info'
   - '+.hlzncxmu.icu'
-  - '+.hm.baidu.com'
   - '+.hm2wjuuus3.execute-api.ap-northeast-1.amazonaws.com'
   - '+.hmaehyejkqijb.site'
   - '+.hmbcfccmdpcmg.space'
@@ -133533,7 +133532,6 @@ payload:
   - 'analytics.163.com'
   - 'analytics.95516.com'
   - 'analytics.adjust.cn'
-  - 'analytics.google.com'
   - 'analytics.libertymutual.com.edgekey.net'
   - 'analytics.map.qq.com'
   - 'analytics.oceanengine.com'
@@ -138273,7 +138271,6 @@ payload:
   - 'hlryzsqo.icu'
   - 'hlw.longlingsc.art'
   - 'hlzyb.cn'
-  - 'hm.baidu.com'
   - 'hm.l.qq.com'
   - 'hmcubp.top'
   - 'hmjhnkas.com'
