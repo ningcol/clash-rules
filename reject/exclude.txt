@@ -11,3 +11,7 @@ wxa.wxs.qq.com
 open.douyin.com
 +.tongjiniao.com
 +.cloudflareinsights.com
++.hm.baidu.com
+hm.baidu.com
+analytics.google.com
++.analytics.google.com
