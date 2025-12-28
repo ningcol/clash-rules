@@ -10,3 +10,4 @@ ad.xiaohongshu.com
 wxa.wxs.qq.com
 open.douyin.com
 +.tongjiniao.com
++.cloudflareinsights.com
