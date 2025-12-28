@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2025-12-27T21:08:57Z
+# 更新时间: 2025-12-28T03:14:00Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -6405,7 +6405,6 @@ payload:
   - '+.dengekionline.com'
   - '+.dengiamerika.com'
   - '+.deno.com'
-  - '+.deno.dev'
   - '+.deno.land'
   - '+.dentalhypotheses.com'
   - '+.dependabot.com'
@@ -9727,6 +9726,7 @@ payload:
   - '+.gfw.press'
   - '+.gfw.report'
   - '+.gfwatch.org'
+  - '+.gfwbao.com'
   - '+.gfycat.com'
   - '+.gfysex.com'
   - '+.ggdiao.com'
@@ -20919,6 +20919,7 @@ payload:
   - '+.steamdb.info'
   - '+.steamdeck.com'
   - '+.steamgames.com'
+  - '+.steamladder.com'
   - '+.steamofporn.com'
   - '+.steampowered.com'
   - '+.steamserver.net'
