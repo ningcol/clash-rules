@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2025-12-28T21:10:05Z
+# 更新时间: 2025-12-29T21:10:06Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -2147,6 +2147,7 @@ payload:
   - '+.archivx.to'
   - '+.archlinux.org'
   - '+.archlinuxarm.org'
+  - '+.archlinuxcn.org'
   - '+.arcraiders.com'
   - '+.arctosia.com'
   - '+.area120.com'
@@ -9908,6 +9909,7 @@ payload:
   - '+.gockhuatviet.com'
   - '+.godaddy'
   - '+.godaddy.com'
+  - '+.godbolt.org'
   - '+.godfootsteps.org'
   - '+.godoc.org'
   - '+.godsdirectcontact.co.uk'
