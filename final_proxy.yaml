@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2025-12-31T21:10:03Z
+# 更新时间: 2026-01-01T21:10:33Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -2697,6 +2697,7 @@ payload:
   - '+.azuresmartspaces.net'
   - '+.azurestackvalidation.com'
   - '+.azurewebsites.net'
+  - '+.b-cdn.net'
   - '+.b-eroland.net'
   - '+.b-ok.africa'
   - '+.b-ok.asia'
@@ -4497,6 +4498,8 @@ payload:
   - '+.bumptunes.com'
   - '+.bunbunhk.com'
   - '+.bunka.go.jp'
+  - '+.bunny.net'
+  - '+.bunnycdn.com'
   - '+.bunnylust.com'
   - '+.burningcamel.com'
   - '+.burstly.net'
