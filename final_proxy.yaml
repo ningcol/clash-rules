@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-01-05T21:11:33Z
+# 更新时间: 2026-01-06T21:11:20Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -1077,6 +1077,7 @@ payload:
   - '+.ai-sdk.dev'
   - '+.ai.binwang.me'
   - '+.ai.dev'
+  - '+.ai.studio'
   - '+.ai7995.site'
   - '+.ai91porn.cc'
   - '+.aiaa.org'
@@ -17223,6 +17224,7 @@ payload:
   - '+.onxxxtube.com'
   - '+.onxxxvideo.com'
   - '+.oojj.de'
+  - '+.ooni.io'
   - '+.ooni.org'
   - '+.ootbstudio.co.kr'
   - '+.op.gg'
@@ -19520,13 +19522,13 @@ payload:
   - '+.rustup.rs'
   - '+.rusvpn.com'
   - '+.ruten.com.tw'
+  - '+.rutor.info'
   - '+.rutracker.cc'
   - '+.rutracker.cr'
   - '+.rutracker.me'
   - '+.rutracker.net'
   - '+.rutracker.nl'
   - '+.rutracker.org'
-  - '+.rutrecker.net'
   - '+.rutrk.org'
   - '+.rutube.ru'
   - '+.rutubelist.ru'
@@ -24550,6 +24552,7 @@ payload:
   - '+.xcafe.com'
   - '+.xcafe.in'
   - '+.xcams.com'
+  - '+.xcancel.com'
   - '+.xcg123.com'
   - '+.xchina.co'
   - '+.xchina.fun'
