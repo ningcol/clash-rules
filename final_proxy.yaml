@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-01-07T21:11:24Z
+# 更新时间: 2026-01-08T21:12:01Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -21471,6 +21471,7 @@ payload:
   - '+.talkonly.net'
   - '+.talksport.com'
   - '+.tamilsexvideos.cc'
+  - '+.tamtam.chat'
   - '+.tanc.org'
   - '+.tandberg-china.com'
   - '+.tandberg.com'
