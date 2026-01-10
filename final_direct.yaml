@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-01-09T21:11:56Z
+# 更新时间: 2026-01-10T21:09:53Z
 # 说明: 本文件为自动生成的 Clash DIRECT 规则（behavior: domain）。
 #########################################
 payload:
@@ -31234,6 +31234,7 @@ payload:
   - '+.easytite.com'
   - '+.easytocn.com'
   - '+.easytogophuket.com'
+  - '+.easytomessage.com'
   - '+.easytouch-manager.com'
   - '+.easytouch.com'
   - '+.easytrip.com'
@@ -80455,6 +80456,7 @@ payload:
   - '+.school888.com'
   - '+.schoolinweb.com'
   - '+.schoolpi.net'
+  - '+.schoopia.com'
   - '+.schstv.com'
   - '+.scht.cc'
   - '+.schwarzeni.com'
@@ -91267,6 +91269,7 @@ payload:
   - '+.tongxue.com'
   - '+.tongxue365.com'
   - '+.tongxue8.com'
+  - '+.tongxuepie.com'
   - '+.tongyangship.com'
   - '+.tongyaoplay.com'
   - '+.tongyavisa.com'
