@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-01-10T21:09:53Z
+# 更新时间: 2026-01-11T21:09:49Z
 # 说明: 本文件为自动生成的 Clash DIRECT 规则（behavior: domain）。
 #########################################
 payload:
@@ -67375,6 +67375,7 @@ payload:
   - '+.mobotap.com'
   - '+.mobring.co'
   - '+.mobrtb.com'
+  - '+.mobsdks.com'
   - '+.mobsurl.com'
   - '+.mobtou.com'
   - '+.mobvoi.com'
