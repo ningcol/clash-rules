@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-01-13T21:11:49Z
+# 更新时间: 2026-01-14T21:11:45Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -6670,6 +6670,7 @@ payload:
   - '+.digitaltrends.com'
   - '+.diigo.com'
   - '+.dilcdn.com'
+  - '+.dinopoloclub.com'
   - '+.dinotube.com'
   - '+.dipity.com'
   - '+.dirctv.com'
@@ -15467,6 +15468,7 @@ payload:
   - '+.mobileview.page'
   - '+.mobilevrxxx.com'
   - '+.mobileways.de'
+  - '+.mobimon.com.tw'
   - '+.mobmyanmar.com'
   - '+.moby.to'
   - '+.mobypicture.com'
@@ -16789,6 +16791,7 @@ payload:
   - '+.nownews.com'
   - '+.nowtorrents.com'
   - '+.noxinfluencer.com'
+  - '+.noxygames.com'
   - '+.nozomi.la'
   - '+.npa.go.jp'
   - '+.npm.community'
@@ -19114,6 +19117,8 @@ payload:
   - '+.raw.githack.com'
   - '+.rawgit.com'
   - '+.rawgithub.com'
+  - '+.rayark.download'
+  - '+.rayark.net'
   - '+.razer.com'
   - '+.razerofficial.com'
   - '+.razersupport.com'
@@ -25944,6 +25949,8 @@ payload:
   - 'android.googlesource.com'
   - 'angle.com.tw'
   - 'anime-rule34-world.b-cdn.net'
+  - 'antigravity-pa.googleapis.com'
+  - 'antigravity.googleapis.com'
   - 'aod-pod-uk-live.akamaized.net'
   - 'api-p.videomarket.jp'
   - 'api.viu.now.com'
@@ -25992,6 +25999,8 @@ payload:
   - 'ciscolivehls-i.akamaihd.net'
   - 'client-teamviewer-com.trafficmanager.net'
   - 'clients1.google.com'
+  - 'cloudaicompanion.googleapis.com'
+  - 'cloudcode-pa.googleapis.com'
   - 'cloudsync-prod.s3.amazonaws.com'
   - 'community.oneplus.com'
   - 'configuration-lb.ls-apple.com.akadns.net'
@@ -26027,6 +26036,7 @@ payload:
   - 'd3vd9lfkzbru3h.cloudfront.net'
   - 'd6d4ismr40iw.cloudfront.net'
   - 'd6tizftlrpuof.cloudfront.net'
+  - 'daily-cloudcode-pa.googleapis.com'
   - 'databank.worldbank.org'
   - 'database.asahi.com'
   - 'datarouter.apps.netherrealm.com'
@@ -26153,6 +26163,8 @@ payload:
   - 'netflix.com.edgesuite.net'
   - 'notary-submissions-prod.s3-accelerate.amazonaws.com'
   - 'notary-submissions-prod.s3.us-west-2.amazonaws.com'
+  - 'notebooklm-pa.googleapis.com'
+  - 'notebooklm.googleapis.com'
   - 'notify.ppy.sh'
   - 'ntdfreemobile-tgc.cdn.hinet.net'
   - 'ntdfreepc-tgc.cdn.hinet.net'
