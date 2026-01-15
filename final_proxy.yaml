@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-01-14T21:11:45Z
+# 更新时间: 2026-01-15T21:12:09Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -20363,6 +20363,8 @@ payload:
   - '+.signalusers.org'
   - '+.sigops.org'
   - '+.sigopt.com'
+  - '+.sih-db.com'
+  - '+.sih.app'
   - '+.sijihuisuo.club'
   - '+.sijihuisuo.com'
   - '+.sikiswap.com'
@@ -21116,6 +21118,7 @@ payload:
   - '+.steamdb.info'
   - '+.steamdeck.com'
   - '+.steamgames.com'
+  - '+.steaminventoryhelper.com'
   - '+.steamladder.com'
   - '+.steamofporn.com'
   - '+.steampowered.com'
