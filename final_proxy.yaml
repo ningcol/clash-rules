@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-01-15T21:12:09Z
+# 更新时间: 2026-01-16T21:11:28Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -24903,6 +24903,7 @@ payload:
   - '+.xuehua.us'
   - '+.xuite.net'
   - '+.xujan.com'
+  - '+.xv-ru.com'
   - '+.xv1.monster'
   - '+.xvbelink.com'
   - '+.xvds.tv'
@@ -24916,8 +24917,10 @@ payload:
   - '+.xvideo1.org'
   - '+.xvideo2.org'
   - '+.xvideoporno.tv'
+  - '+.xvideos-ar.com'
   - '+.xvideos-cdn.com'
   - '+.xvideos-dl.top'
+  - '+.xvideos-india.com'
   - '+.xvideos-porn-video.com'
   - '+.xvideos-xxxx.com'
   - '+.xvideos.blog'
