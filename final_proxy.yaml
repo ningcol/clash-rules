@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-01-16T21:11:28Z
+# 更新时间: 2026-01-17T21:09:42Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -16825,15 +16825,19 @@ payload:
   - '+.ntdimg.com'
   - '+.ntdtv-dc.com'
   - '+.ntdtv.ca'
+  - '+.ntdtv.co.il'
   - '+.ntdtv.co.kr'
   - '+.ntdtv.com'
   - '+.ntdtv.com.tw'
   - '+.ntdtv.cz'
+  - '+.ntdtv.fr'
   - '+.ntdtv.jp'
   - '+.ntdtv.kr'
   - '+.ntdtv.org'
   - '+.ntdtv.ru'
+  - '+.ntdtv.se'
   - '+.ntdtvla.com'
+  - '+.ntdvideo.tw'
   - '+.ntdvn.com'
   - '+.ntnews.com.au'
   - '+.ntp-os01.ocn.ad.jp'
