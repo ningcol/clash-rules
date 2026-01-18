@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-01-17T21:09:42Z
+# 更新时间: 2026-01-18T21:09:46Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -1694,7 +1694,10 @@ payload:
   - '+.ankarazirvesi2018.com'
   - '+.anm.co.uk'
   - '+.annamilk.com'
+  - '+.annas-archive.in'
+  - '+.annas-archive.li'
   - '+.annas-archive.org'
+  - '+.annas-archive.pm'
   - '+.annas-archive.se'
   - '+.annatam.com'
   - '+.annstores.net'
@@ -13664,6 +13667,7 @@ payload:
   - '+.kpkuang.org'
   - '+.kpptoto.info'
   - '+.kqes.net'
+  - '+.kraftonde.com'
   - '+.kraken.com'
   - '+.kraken.onl'
   - '+.krakenjs.com'
@@ -18100,6 +18104,7 @@ payload:
   - '+.playapex.com'
   - '+.playartifact.com'
   - '+.playbar.biz'
+  - '+.playbattlegrounds.com'
   - '+.playboy.com'
   - '+.playboy.com.uk'
   - '+.playboyplus.com'
@@ -18808,6 +18813,7 @@ payload:
   - '+.ptzwx.com'
   - '+.pu82.vip'
   - '+.pub.dev'
+  - '+.pubg.com'
   - '+.public-sex-porn.com'
   - '+.publicagentxxx.com'
   - '+.publicpornvideo.com'
@@ -26227,6 +26233,7 @@ payload:
   - 'production-openaicom-storage.azureedge.net'
   - 'psg-int-centralus.cloudapp.net'
   - 'psg-int-eastus.cloudapp.net'
+  - 'pubg1.battleye.com'
   - 'public-us-pingsx.api.clonoth.com'
   - 'publicca.googleapis.com'
   - 'push-apple.com.akadns.net'
