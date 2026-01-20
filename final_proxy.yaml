@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-01-19T21:10:34Z
+# 更新时间: 2026-01-20T21:12:42Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -4978,6 +4978,7 @@ payload:
   - '+.castbox.fm'
   - '+.castingcouch-x.com'
   - '+.castro.fm'
+  - '+.cataboom.com'
   - '+.catalina.hk'
   - '+.catalinacruz.com'
   - '+.catbox.moe'
@@ -5811,6 +5812,7 @@ payload:
   - '+.conquerwithcharacter.com'
   - '+.conscrypt.com'
   - '+.conscrypt.org'
+  - '+.consentpro.com'
   - '+.constructware.com'
   - '+.consul.io'
   - '+.contactmagazine.net'
@@ -17377,6 +17379,7 @@ payload:
   - '+.orthopaedic-cadcam.com'
   - '+.orthotics-cadcam.com'
   - '+.osakamotion.net'
+  - '+.osano.com'
   - '+.osapublishing.org'
   - '+.osdn.net'
   - '+.osfoora.com'
@@ -22915,6 +22918,7 @@ payload:
   - '+.usenix.org'
   - '+.useplannr.com'
   - '+.userapi.com'
+  - '+.usercentrics.eu'
   - '+.usercontent.dev'
   - '+.userpxt.io'
   - '+.users.skynet.be'
