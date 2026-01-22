@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-01-21T21:19:30Z
+# 更新时间: 2026-01-22T21:13:41Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -9631,6 +9631,7 @@ payload:
   - '+.geocities.com'
   - '+.geocities.jp'
   - '+.geodesummit.com'
+  - '+.geogebra.org'
   - '+.geolytics.com'
   - '+.geoport.com'
   - '+.geospatialimaging.com'
@@ -24024,6 +24025,7 @@ payload:
   - '+.wikaba.com'
   - '+.wikawika.xyz'
   - '+.wiki.gamerp.jp'
+  - '+.wiki.gg'
   - '+.wiki.keso.cn'
   - '+.wiki.oauth.net'
   - '+.wiki.phonegap.com'
@@ -24153,6 +24155,7 @@ payload:
   - '+.wolfatbestbuy.com'
   - '+.wolfatbestbuy.net'
   - '+.wolfax.com'
+  - '+.wolframalpha.com'
   - '+.wolfsex-me.sbs'
   - '+.wolterskluwer.com'
   - '+.wombo.ai'

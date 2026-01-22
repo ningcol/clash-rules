@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-01-21T21:19:31Z
+# 更新时间: 2026-01-22T21:13:42Z
 # 说明: 本文件为自动生成的 Clash DIRECT 规则（behavior: domain）。
 #########################################
 payload:
@@ -13298,6 +13298,7 @@ payload:
   - '+.baimda.com'
   - '+.baimei.com'
   - '+.baimeidashu.com'
+  - '+.baimiao.tech'
   - '+.baimiaoapp.com'
   - '+.baimin.com'
   - '+.baina.com'
@@ -82488,6 +82489,7 @@ payload:
   - '+.shineoptics.com'
   - '+.shineray-motors.com'
   - '+.shinerayad.com'
+  - '+.shinescan.tech'
   - '+.shinetsu.shop'
   - '+.shineu.com'
   - '+.shineway.com'
