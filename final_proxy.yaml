@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-01-22T21:13:41Z
+# 更新时间: 2026-01-23T21:11:25Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -7674,6 +7674,8 @@ payload:
   - '+.encryptedsni.com'
   - '+.encuentroscasualesoecuador.com'
   - '+.encyclopedia.com'
+  - '+.eneba.com'
+  - '+.eneba.games'
   - '+.enema-porn.com'
   - '+.enema-videos.com'
   - '+.enemabasics.com'
@@ -16946,6 +16948,7 @@ payload:
   - '+.okx-dns.com'
   - '+.okx-dns1.com'
   - '+.okx-dns2.com'
+  - '+.okx.cab'
   - '+.okx.com'
   - '+.old.honeynet.org'
   - '+.older-women-movies.com'
