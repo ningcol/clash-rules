@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-01-27T21:09:48Z
+# 更新时间: 2026-01-28T21:20:09Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -25,6 +25,7 @@ payload:
   - '+.101boyvideos.com'
   - '+.101tubeporn.com'
   - '+.101xxx.xyz'
+  - '+.1024terabox.com'
   - '+.10beasts.net'
   - '+.10bet.com'
   - '+.10c10qoo.one'
@@ -3288,6 +3289,7 @@ payload:
   - '+.bestbuytradein.com'
   - '+.bestbuyus.com'
   - '+.bestcamsites.net'
+  - '+.bestclouddrive.com'
   - '+.besterpornos.com'
   - '+.bestescortgirls.nl'
   - '+.bestfreecams.club'
@@ -9218,6 +9220,7 @@ payload:
   - '+.freessh.us'
   - '+.freessl.com'
   - '+.freetcp.com'
+  - '+.freeterabox.com'
   - '+.freetibet.net'
   - '+.freetibet.org'
   - '+.freetibetanheroes.org'
@@ -17192,6 +17195,7 @@ payload:
   - '+.osmfoundation.org'
   - '+.ospray.net'
   - '+.ospray.org'
+  - '+.ospserver.net'
   - '+.otaku-168.com'
   - '+.otaku18a.info'
   - '+.otaku55.xyz'
@@ -21459,6 +21463,7 @@ payload:
   - '+.tensorflow.org'
   - '+.tenzinpalmo.com'
   - '+.terabox.com'
+  - '+.terabox1024.com'
   - '+.teraboxcdn.com'
   - '+.terapeack.com'
   - '+.terapeak.ca'
