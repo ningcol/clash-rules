@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-01-28T21:20:11Z
+# 更新时间: 2026-01-29T08:53:00Z
 # 说明: 本文件为自动生成的 Clash DIRECT 规则（behavior: domain）。
 #########################################
 payload:
@@ -61026,7 +61026,6 @@ payload:
   - '+.larkofficepkg.com'
   - '+.larkofficepre.com'
   - '+.larkroad.com'
-  - '+.larksuite.com'
   - '+.larksuiteimg-boe.com'
   - '+.larksuiteimg-pre.com'
   - '+.larkworld.com'
@@ -114544,6 +114543,7 @@ payload:
   - 'alibaba.cdn.steampipe.steamcontent.com'
   - 'amp-api-edge-lb-cn.itunes-apple.com.akadns.net'
   - 'amp-api-edge-lb.itunes-apple.com.akadns.net'
+  - 'aod-ssl.itunes.apple.com'
   - 'api.nbyjson.top'
   - 'app-analytics-services.com'
   - 'app-measurement-cn.com'
