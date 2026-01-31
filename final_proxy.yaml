@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-01-30T21:18:17Z
+# 更新时间: 2026-01-31T21:11:43Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -20188,6 +20188,7 @@ payload:
   - '+.simcity.com'
   - '+.simg.jp'
   - '+.simgbb.com'
+  - '+.simianx.ai'
   - '+.similar-porn.fun'
   - '+.simility.com'
   - '+.simonsgirls.com'
