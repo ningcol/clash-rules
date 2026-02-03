@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-02-01T21:13:43Z
+# 更新时间: 2026-02-03T21:23:40Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -1786,6 +1786,7 @@ payload:
   - '+.appbridge.ca'
   - '+.appbridge.io'
   - '+.appbridge.it'
+  - '+.appcenter.ms'
   - '+.appcloud.com'
   - '+.appdomain.cloud'
   - '+.appdownloader.net'
@@ -2176,6 +2177,7 @@ payload:
   - '+.areyoucreditwise.com'
   - '+.argo-bdp.com'
   - '+.argotunnel.com'
+  - '+.aria.ms'
   - '+.ark.to'
   - '+.arlingtoncemetery.mil'
   - '+.arma3.com'
@@ -2271,6 +2273,7 @@ payload:
   - '+.asn-online.org'
   - '+.asobostudio.com'
   - '+.asp-cc.com'
+  - '+.asp.net'
   - '+.aspbjournals.org'
   - '+.aspenpublishing.com'
   - '+.aspi.org.au'
@@ -4459,6 +4462,7 @@ payload:
   - '+.brutaltgp.com'
   - '+.bs-adreview.com'
   - '+.bs-awh.ne.jp'
+  - '+.bsappapi.com'
   - '+.bsi.ir'
   - '+.bsky.app'
   - '+.bsky.network'
@@ -6869,6 +6873,7 @@ payload:
   - '+.dockerstatus.com'
   - '+.docleradn.com'
   - '+.doclercdn.com'
+  - '+.docs.com'
   - '+.docs.new'
   - '+.docs.rs'
   - '+.doctor-videos.com'
@@ -17891,6 +17896,7 @@ payload:
   - '+.pjbyj.top'
   - '+.pjful-app.lol'
   - '+.pjgirls.com'
+  - '+.pjsekai.sega.jp'
   - '+.pk.com'
   - '+.pki-post.ch'
   - '+.pki-posta.ch'
@@ -19451,6 +19457,7 @@ payload:
   - '+.salebeatslasteststyle4you.com'
   - '+.saleblackfridaydrebeats.com'
   - '+.salecheaphandbags.com'
+  - '+.salesforce-setup.com'
   - '+.salesforce.com'
   - '+.salesforce.org'
   - '+.salesforceiq.com'
@@ -21283,6 +21290,7 @@ payload:
   - '+.taiav.com'
   - '+.tail-f.com'
   - '+.tailf.com'
+  - '+.tails.net'
   - '+.tailscale.com'
   - '+.tailscale.io'
   - '+.tailwindtraders.com'
@@ -24404,6 +24412,7 @@ payload:
   - '+.xbooru.com'
   - '+.xbox'
   - '+.xbox.co'
+  - '+.xbox.com'
   - '+.xbox.eu'
   - '+.xbox.org'
   - '+.xbox360.co'
@@ -24413,10 +24422,12 @@ payload:
   - '+.xboxab.com'
   - '+.xboxgamepass.com'
   - '+.xboxgamestudios.com'
+  - '+.xboxlive.com'
   - '+.xboxone.co'
   - '+.xboxone.com'
   - '+.xboxone.eu'
   - '+.xboxplayanywhere.com'
+  - '+.xboxservices.com'
   - '+.xboxstudios.com'
   - '+.xboyvids.com'
   - '+.xbrasilporno.com'
@@ -26014,6 +26025,7 @@ payload:
   - 'osu.ppy.sh'
   - 'p-events-delivery.akamaized.net'
   - 'p16-tiktokcdn-com.akamaized.net'
+  - 'packages.microsoft.com'
   - 'paper-attachments.s3.amazonaws.com'
   - 'pchomeonline.com.tw'
   - 'pki.google.com'

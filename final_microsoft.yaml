@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-02-01T21:13:41Z
+# 更新时间: 2026-02-03T21:23:37Z
 # 说明: 本文件为自动生成的 Clash MICROSOFT 规则（behavior: domain）。
 #########################################
 payload:
@@ -84,9 +84,6 @@ payload:
   - '+.acompli.net'
   - '+.aka.ms'
   - '+.akadns.net'
-  - '+.appcenter.ms'
-  - '+.aria.ms'
-  - '+.asp.net'
   - '+.aspnetcdn.com'
   - '+.assets-yammer.com'
   - '+.azure.com'
@@ -97,12 +94,10 @@ payload:
   - '+.bing.com'
   - '+.bing.net'
   - '+.bingapis.com'
-  - '+.clarity.ms'
   - '+.cloudapp.net'
   - '+.cloudappsecurity.com'
   - '+.copilot.cloud.microsoft'
   - '+.copilot.microsoft.com# source: https://docs.microsoft.com/en-us/office365/enterprise/urls-and-ip-address-ranges'
-  - '+.docs.com'
   - '+.edgesuite.net'
   - '+.gfx.ms'
   - '+.hotmail.com'
@@ -161,11 +156,7 @@ payload:
   - '+.windowsazure.com'
   - '+.windowsupdate.com'
   - '+.wunderlist.com'
-  - '+.xbox.com'
-  - '+.xboxlive.com'
-  - '+.xboxservices.com'
   - '+.yammer.com'
-  - '+.yammerusercontent.com'
   - '+.yammerusercontent.com# bing'
   - 'account.activedirectory.windowsazure.com'
   - 'account.live.com'
