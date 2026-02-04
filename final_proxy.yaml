@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-02-03T21:23:40Z
+# 更新时间: 2026-02-04T21:23:35Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -1786,7 +1786,6 @@ payload:
   - '+.appbridge.ca'
   - '+.appbridge.io'
   - '+.appbridge.it'
-  - '+.appcenter.ms'
   - '+.appcloud.com'
   - '+.appdomain.cloud'
   - '+.appdownloader.net'
@@ -2177,7 +2176,6 @@ payload:
   - '+.areyoucreditwise.com'
   - '+.argo-bdp.com'
   - '+.argotunnel.com'
-  - '+.aria.ms'
   - '+.ark.to'
   - '+.arlingtoncemetery.mil'
   - '+.arma3.com'
@@ -2273,7 +2271,6 @@ payload:
   - '+.asn-online.org'
   - '+.asobostudio.com'
   - '+.asp-cc.com'
-  - '+.asp.net'
   - '+.aspbjournals.org'
   - '+.aspenpublishing.com'
   - '+.aspi.org.au'
@@ -6873,7 +6870,6 @@ payload:
   - '+.dockerstatus.com'
   - '+.docleradn.com'
   - '+.doclercdn.com'
-  - '+.docs.com'
   - '+.docs.new'
   - '+.docs.rs'
   - '+.doctor-videos.com'
@@ -24412,7 +24408,6 @@ payload:
   - '+.xbooru.com'
   - '+.xbox'
   - '+.xbox.co'
-  - '+.xbox.com'
   - '+.xbox.eu'
   - '+.xbox.org'
   - '+.xbox360.co'
@@ -24422,12 +24417,10 @@ payload:
   - '+.xboxab.com'
   - '+.xboxgamepass.com'
   - '+.xboxgamestudios.com'
-  - '+.xboxlive.com'
   - '+.xboxone.co'
   - '+.xboxone.com'
   - '+.xboxone.eu'
   - '+.xboxplayanywhere.com'
-  - '+.xboxservices.com'
   - '+.xboxstudios.com'
   - '+.xboyvids.com'
   - '+.xbrasilporno.com'
