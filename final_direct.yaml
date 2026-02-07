@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-02-06T21:21:38Z
+# 更新时间: 2026-02-07T02:41:14Z
 # 说明: 本文件为自动生成的 Clash DIRECT 规则（behavior: domain）。
 #########################################
 payload:
@@ -79636,6 +79636,7 @@ payload:
   - '+.rergdfh.com'
   - '+.reseetech.com'
   - '+.resemi.com'
+  - '+.resend.com'
   - '+.reservehemu.com'
   - '+.resheji.com'
   - '+.resistor.today'
@@ -116250,6 +116251,7 @@ payload:
   - 'refresh-bkg.activation-v2.kaspersky.com'
   - 'res-1.cdn.office.net'
   - 'res.cdn.office.net'
+  - 'resend.com'
   - 's00.upd.kaspersky.com'
   - 's01.upd.kaspersky.com'
   - 's02.upd.kaspersky.com'

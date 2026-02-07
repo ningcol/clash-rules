@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-02-06T21:21:36Z
+# 更新时间: 2026-02-07T02:41:12Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -3565,6 +3565,7 @@ payload:
   - '+.bitstamp.net'
   - '+.bitstream.com'
   - '+.bitterwinter.org'
+  - '+.bittorrent.com'
   - '+.bittrex.com'
   - '+.bitvise.com'
   - '+.bitwarden.com'
@@ -10712,6 +10713,7 @@ payload:
   - '+.helpeachpeople.com'
   - '+.helpster.de'
   - '+.helpzhuling.org'
+  - '+.hembed.com'
   - '+.hentai-ani.me'
   - '+.hentai-archive.com'
   - '+.hentai-books.com'
@@ -14318,6 +14320,8 @@ payload:
   - '+.mantan-web.jp'
   - '+.mantochichi.com'
   - '+.manurefetish.com'
+  - '+.manus.im'
+  - '+.manuscdn.com'
   - '+.manytoon.com'
   - '+.manyvids.com'
   - '+.manyvoices.news'
@@ -20284,6 +20288,7 @@ payload:
   - '+.sketchbooknews.com'
   - '+.sketchbookpro.com'
   - '+.sketchfab.com'
+  - '+.skills.sh'
   - '+.skillshare.com'
   - '+.skimtube.com'
   - '+.skinstrip.net'
@@ -22781,6 +22786,7 @@ payload:
   - '+.v-has.com'
   - '+.v.gd'
   - '+.v2.help'
+  - '+.v2.hysteria.network'
   - '+.v2ex.com'
   - '+.v2fly.org'
   - '+.v2ph.com'
