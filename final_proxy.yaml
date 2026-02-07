@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-02-05T21:18:58Z
+# 更新时间: 2026-02-06T21:21:36Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -10373,6 +10373,7 @@ payload:
   - '+.gridaware.app'
   - '+.grindr.com'
   - '+.grok.com'
+  - '+.grokipedia.com'
   - '+.grooby.com'
   - '+.groq.com'
   - '+.ground.news'
@@ -18868,6 +18869,7 @@ payload:
   - '+.radgametools.com'
   - '+.radian6.com'
   - '+.radicalparty.org'
+  - '+.radiko-cf.com'
   - '+.radiko.jp'
   - '+.radio-canada.ca'
   - '+.radio-en-ligne.fr'
@@ -20372,6 +20374,7 @@ payload:
   - '+.smartonerobotics.com'
   - '+.smartonesolutions.com.hk'
   - '+.smartonesolutions.hk'
+  - '+.smartstream.ne.jp'
   - '+.smashed.xxx'
   - '+.smbc.co.jp'
   - '+.smbctb.co.jp'
