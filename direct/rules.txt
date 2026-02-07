@@ -39,3 +39,6 @@ api.nbyjson.top
 v.cdnlz30.com
 
 +.dewatermark.ai
+
+resend.com
++.resend.com
