@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-02-07T21:15:28Z
+# 更新时间: 2026-02-08T21:16:04Z
 # 说明: 本文件为自动生成的 Clash DIRECT 规则（behavior: domain）。
 #########################################
 payload:
@@ -1793,7 +1793,6 @@ payload:
   - '+.125yan.com'
   - '+.126.com'
   - '+.126.fm'
-  - '+.126.link'
   - '+.126.net'
   - '+.126blog.com'
   - '+.126disk.com'
@@ -2071,7 +2070,6 @@ payload:
   - '+.163hubei.com'
   - '+.163hunan.com'
   - '+.163img.com'
-  - '+.163industry.com'
   - '+.163jiasu.com'
   - '+.163k.cc'
   - '+.163k.com'
