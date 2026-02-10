@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-02-09T21:29:24Z
+# 更新时间: 2026-02-10T21:33:22Z
 # 说明: 本文件为自动生成的 Clash DIRECT 规则（behavior: domain）。
 #########################################
 payload:
@@ -28261,6 +28261,7 @@ payload:
   - '+.ddcdn.com'
   - '+.ddcheshi.com'
   - '+.ddcits.com'
+  - '+.ddcorp.net'
   - '+.ddcsjw.com'
   - '+.ddcwl.com'
   - '+.ddd-china.com'
@@ -28277,6 +28278,7 @@ payload:
   - '+.ddedush.com'
   - '+.ddfans.com'
   - '+.ddfchina.com'
+  - '+.ddfresh.net'
   - '+.ddfzb.com'
   - '+.ddgjjj.com'
   - '+.ddguanhuai.com'
@@ -28300,7 +28302,9 @@ payload:
   - '+.ddky.com'
   - '+.ddle.cc'
   - '+.ddlequ.com'
+  - '+.ddmaicai.net'
   - '+.ddmap.com'
+  - '+.ddmc.mobi'
   - '+.ddmer.com'
   - '+.ddmogo.com'
   - '+.ddnddn.com'
@@ -51989,6 +51993,7 @@ payload:
   - '+.imags-google.com'
   - '+.imahui.com'
   - '+.imaibo.net'
+  - '+.imaicai.mobi'
   - '+.imaijia.com'
   - '+.imaitu.com'
   - '+.imalljoy.com'
