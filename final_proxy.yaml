@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-02-14T21:13:59Z
+# 更新时间: 2026-02-15T21:14:38Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -20722,6 +20722,7 @@ payload:
   - '+.tomonews.net'
   - '+.tomp3.cc'
   - '+.tomsguide.com'
+  - '+.ton.org'
   - '+.tonec.com'
   - '+.tonicmovies.com'
   - '+.toolforge.org'
@@ -22334,6 +22335,7 @@ payload:
   - '+.wallmama.com'
   - '+.wallpapercasa.com'
   - '+.wallsttv.com'
+  - '+.wallzhihu.com'
   - '+.walmart'
   - '+.walmart-content.com'
   - '+.walmart.com'
