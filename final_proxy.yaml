@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-02-21T21:12:31Z
+# 更新时间: 2026-02-22T21:14:18Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -1260,6 +1260,7 @@ payload:
   - '+.akiba-online.com'
   - '+.akiba-souken.com'
   - '+.akiba-web.com'
+  - '+.akile.io'
   - '+.akinator.com'
   - '+.akita-bank.co.jp'
   - '+.akow.org'
@@ -2282,6 +2283,7 @@ payload:
   - '+.assembla.com'
   - '+.assemblesystems.com'
   - '+.assesphoto.com'
+  - '+.assets.nxtrace.org'
   - '+.assetsadobe.com'
   - '+.assimp.org'
   - '+.assistirhentai.com'
@@ -13943,6 +13945,7 @@ payload:
   - '+.medium.systems'
   - '+.medow.ru'
   - '+.medrxiv.org'
+  - '+.meee.com.tw'
   - '+.meendo.com'
   - '+.meet.new'
   - '+.meetandfuck.games'
@@ -16269,6 +16272,7 @@ payload:
   - '+.opencas.io'
   - '+.opencollective.com'
   - '+.opencreate.org'
+  - '+.opencritic.com'
   - '+.opendemocracy.net'
   - '+.opendns.com'
   - '+.opendroneid.org'
@@ -22970,6 +22974,7 @@ payload:
   - '+.www.ajsands.com'
   - '+.www.antd.org'
   - '+.www.aolnews.com'
+  - '+.www.clashverge.dev'
   - '+.www.cmoinc.org'
   - '+.www.destinationurl.com'
   - '+.www.eastturkistan.net'
