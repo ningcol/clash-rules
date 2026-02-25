@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-02-24T21:24:06Z
+# 更新时间: 2026-02-25T21:25:35Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -8806,6 +8806,7 @@ payload:
   - '+.freechinaweibo.com'
   - '+.freecodecamp.org'
   - '+.freedirecttvspecial.com'
+  - '+.freedom.gov'
   - '+.freedomhouse.org'
   - '+.freedomplatform.tv'
   - '+.freedomsherald.org'
@@ -14552,7 +14553,9 @@ payload:
   - '+.miuipolska.pl'
   - '+.mixasiansex.com'
   - '+.mixero.com'
+  - '+.mixi.co.jp'
   - '+.mixi.jp'
+  - '+.mixi.net'
   - '+.mixmaturesex.com'
   - '+.mixvintagesex.com'
   - '+.mixx.com'
@@ -16433,6 +16436,7 @@ payload:
   - '+.paaypal.com'
   - '+.pachosting.com'
   - '+.pacifickitchenandhome.com'
+  - '+.packagecloud.io'
   - '+.packaging-cadcam.com'
   - '+.packagingcadcam.com'
   - '+.packagist.org'
