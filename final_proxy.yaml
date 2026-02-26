@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-02-25T21:25:35Z
+# 更新时间: 2026-02-26T21:23:39Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -646,6 +646,7 @@ payload:
   - '+.aboutamazon.it'
   - '+.aboutamazon.jp'
   - '+.aboutamazon.pl'
+  - '+.aboutamazon.sg'
   - '+.aboutfacebook.com'
   - '+.aboutmcdonalds.com'
   - '+.aboutporno.net'
@@ -1514,23 +1515,34 @@ payload:
   - '+.amazon-launchpad.com'
   - '+.amazon.ae'
   - '+.amazon.ca'
+  - '+.amazon.cl'
   - '+.amazon.co.jp'
   - '+.amazon.co.uk'
+  - '+.amazon.co.za'
   - '+.amazon.com'
   - '+.amazon.com.au'
+  - '+.amazon.com.be'
   - '+.amazon.com.br'
+  - '+.amazon.com.co'
   - '+.amazon.com.mx'
+  - '+.amazon.com.ng'
   - '+.amazon.com.tr'
   - '+.amazon.de'
   - '+.amazon.dev'
+  - '+.amazon.eg'
   - '+.amazon.es'
   - '+.amazon.fr'
+  - '+.amazon.ie'
   - '+.amazon.in'
   - '+.amazon.it'
   - '+.amazon.jobs'
   - '+.amazon.jp'
+  - '+.amazon.lu'
   - '+.amazon.nl'
+  - '+.amazon.pl'
   - '+.amazon.red'
+  - '+.amazon.sa'
+  - '+.amazon.se'
   - '+.amazon.sg'
   - '+.amazonalexavoxcon.com'
   - '+.amazonauthorinsights.com'
@@ -2653,6 +2665,7 @@ payload:
   - '+.awsthinkbox.com'
   - '+.awstrack.me'
   - '+.awstrust.com'
+  - '+.awswaf.com'
   - '+.awwcn.buzz'
   - '+.awwcn.xyz'
   - '+.awxcdn.com'
@@ -18697,6 +18710,7 @@ payload:
   - '+.searx.me'
   - '+.seasidestory.tokyo'
   - '+.seattlefdc.com'
+  - '+.seattlespheres.com'
   - '+.secom.co.jp'
   - '+.secomtrust.net'
   - '+.second-ns.com'
