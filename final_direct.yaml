@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-02-27T21:18:30Z
+# 更新时间: 2026-02-28T21:11:45Z
 # 说明: 本文件为自动生成的 Clash DIRECT 规则（behavior: domain）。
 #########################################
 payload:
@@ -116947,6 +116947,7 @@ payload:
   - 'alibaba.cdn.steampipe.steamcontent.com'
   - 'amp-api-edge-lb-cn.itunes-apple.com.akadns.net'
   - 'amp-api-edge-lb.itunes-apple.com.akadns.net'
+  - 'amp-api-edge.music.apple.com'
   - 'aod-ssl.itunes.apple.com'
   - 'api.nbyjson.top'
   - 'app-analytics-services.com'
@@ -117151,6 +117152,8 @@ payload:
   - 'misc-assets.itunes.apple.com'
   - 'monitoring.qpdp1.net'
   - 'moocs.unipus.cn'
+  - 'musicstatus.music.apple.com'
+  - 'mvod.itunes.apple.com'
   - 'myapp.itunes.apple.com'
   - 'myvs.download.prss.microsoft.com'
   - 'nexus.dell.com'
@@ -117285,6 +117288,7 @@ payload:
   - 'snpi.dell.com'
   - 'software.download.prss.microsoft.com'
   - 'sp.itunes.apple.com'
+  - 'speedysub.music.apple.com'
   - 'ss.bjmu.edu.cn'
   - 'ssl-google-analytics.l.google.com'
   - 'ssl.gstatic.com'

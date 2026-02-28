@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-02-27T21:18:29Z
+# 更新时间: 2026-02-28T21:11:44Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -23780,6 +23780,7 @@ payload:
   - '+.yandexcloud.net'
   - '+.yandexcom.net'
   - '+.yandexmetrica.com'
+  - '+.yandexwebcache.net'
   - '+.yandexwebcache.org'
   - '+.yangzhi.org'
   - '+.yantaqu.com'
@@ -24666,6 +24667,7 @@ payload:
   - 'pchomeonline.com.tw'
   - 'pki.google.com'
   - 'poshtestgallery.cloudapp.net'
+  - 'ppl-ai-file-upload.s3.amazonaws.com'
   - 'pplx-res.cloudinary.com'
   - 'practivate.adobe'
   - 'practivate.adobe.com'
