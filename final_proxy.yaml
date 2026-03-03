@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-03-02T21:23:20Z
+# 更新时间: 2026-03-03T21:23:43Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -12230,6 +12230,7 @@ payload:
   - '+.jav.la'
   - '+.jav.land'
   - '+.jav.place'
+  - '+.jav.sb'
   - '+.jav.si'
   - '+.jav.wine'
   - '+.jav01.cc'
@@ -12303,6 +12304,7 @@ payload:
   - '+.javher.com'
   - '+.javheroine.com'
   - '+.javhihi.com'
+  - '+.javhub.com'
   - '+.javhub.me'
   - '+.javhub.net'
   - '+.javhuge.com'
@@ -12338,6 +12340,7 @@ payload:
   - '+.javpub.me'
   - '+.javpush.com'
   - '+.javqd.com'
+  - '+.javquick.com'
   - '+.javrank.com'
   - '+.javrate.com'
   - '+.javrave.club'
