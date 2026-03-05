@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-03-04T21:23:50Z
+# 更新时间: 2026-03-05T21:23:42Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -12410,6 +12410,7 @@ payload:
   - '+.jessicaturner.co.uk'
   - '+.jessicaturner.com'
   - '+.jetbrains.ai'
+  - '+.jetbrains.cloud'
   - '+.jetbrains.com'
   - '+.jetbrains.net'
   - '+.jetbrains.space'
