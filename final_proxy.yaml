@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-03-05T21:23:42Z
+# 更新时间: 2026-03-06T21:19:34Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -6754,6 +6754,7 @@ payload:
   - '+.dowjoneson.com'
   - '+.download.aircrack-ng.org'
   - '+.download.com'
+  - '+.download.dappcdn.com'
   - '+.download.qatp1.net'
   - '+.downloadpass.com'
   - '+.downloadsforipod.com'
@@ -17090,6 +17091,10 @@ payload:
   - '+.pleasurebabe.com'
   - '+.pleasuregirl.net'
   - '+.pleasuremore.com'
+  - '+.plex.com'
+  - '+.plex.services'
+  - '+.plex.tv'
+  - '+.plexapp.com'
   - '+.plexvpn.pro'
   - '+.plos.org'
   - '+.plug-into.com'
