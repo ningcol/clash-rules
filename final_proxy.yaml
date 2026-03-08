@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-03-07T21:11:46Z
+# 更新时间: 2026-03-08T21:13:39Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -1797,6 +1797,7 @@ payload:
   - '+.app-dynamics.com'
   - '+.app-measurement-cn.com'
   - '+.app-measurement.com'
+  - '+.app-pay.jp'
   - '+.app-store.wang'
   - '+.app.box.com'
   - '+.app.smartmailcloud.com'
@@ -18541,6 +18542,7 @@ payload:
   - '+.samsunggalaxyfriends.com'
   - '+.samsunghealth.com'
   - '+.samsungiotcloud.com'
+  - '+.samsungiots.com'
   - '+.samsungknox.com'
   - '+.samsungosp.com'
   - '+.samsungqbe.com'
@@ -19380,6 +19382,7 @@ payload:
   - '+.smartonesolutions.com.hk'
   - '+.smartonesolutions.hk'
   - '+.smartstream.ne.jp'
+  - '+.smartthings.com'
   - '+.smashed.xxx'
   - '+.smbc.co.jp'
   - '+.smbctb.co.jp'
