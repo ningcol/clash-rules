@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-03-08T21:13:39Z
+# 更新时间: 2026-03-09T21:22:16Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -7030,6 +7030,7 @@ payload:
   - '+.dynamobuilds.com'
   - '+.dynamopackages.com'
   - '+.dynamoreach.com'
+  - '+.dynatrace.com'
   - '+.dynawebinc.com'
   - '+.dyncdn.me'
   - '+.dynu.com'
@@ -8077,6 +8078,7 @@ payload:
   - '+.familypies.net'
   - '+.familyporn.tv'
   - '+.familypornhd.com'
+  - '+.familysearch.org'
   - '+.familysexsimulator.com'
   - '+.familysimulator.com'
   - '+.familysimulator.io'
@@ -19095,6 +19097,7 @@ payload:
   - '+.shit-porn.net'
   - '+.shithd.com'
   - '+.shitjav.com'
+  - '+.shitjournal.org'
   - '+.shittytube.com'
   - '+.shixiao.org'
   - '+.shizhao.org'

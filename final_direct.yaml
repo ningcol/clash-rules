@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-03-08T21:13:40Z
+# 更新时间: 2026-03-09T21:22:17Z
 # 说明: 本文件为自动生成的 Clash DIRECT 规则（behavior: domain）。
 #########################################
 payload:
@@ -6426,6 +6426,7 @@ payload:
   - '+.52playgame.com'
   - '+.52pojie.com'
   - '+.52post.com'
+  - '+.52ppt.com'
   - '+.52qixiang.com'
   - '+.52qmct.com'
   - '+.52qqba.com'
@@ -14708,6 +14709,7 @@ payload:
   - '+.badmintoncn.com'
   - '+.badmintone.com'
   - '+.badong.net'
+  - '+.badou.com'
   - '+.badouxueyuan.com'
   - '+.badu.com'
   - '+.badudns.cc'
@@ -45746,6 +45748,7 @@ payload:
   - '+.haohanpower.tech'
   - '+.haohanstar.com'
   - '+.haohao8888.com'
+  - '+.haohaodoc.com'
   - '+.haohaotuan.com'
   - '+.haohaowan.com'
   - '+.haohaowan.net'
@@ -63185,6 +63188,7 @@ payload:
   - '+.lazycatmicroserver.com'
   - '+.lazycomposer.com'
   - '+.lazydim.com'
+  - '+.lazyer.net'
   - '+.lazymap.com'
   - '+.lazyren.com'
   - '+.lazystones.com'
@@ -100164,6 +100168,7 @@ payload:
   - '+.wenjuanshow.com'
   - '+.wenjuntech.com'
   - '+.wenkaoba.com'
+  - '+.wenkeju.com'
   - '+.wenku.in'
   - '+.wenku.net'
   - '+.wenku365.com'
