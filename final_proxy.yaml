@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-03-09T21:22:16Z
+# 更新时间: 2026-03-10T21:20:47Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -5849,6 +5849,7 @@ payload:
   - '+.cutout.pro'
   - '+.cutscenes.net'
   - '+.cutt.ly'
+  - '+.cve.org'
   - '+.cw.com.tw'
   - '+.cwcams.com'
   - '+.cxacg.com'
