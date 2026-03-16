@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-03-15T21:18:22Z
+# 更新时间: 2026-03-16T21:28:37Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -5836,6 +5836,7 @@ payload:
   - '+.curvybbwwives.com'
   - '+.curvyerotic.com'
   - '+.cusp.hk'
+  - '+.custhelp.com'
   - '+.custom-iphonecase.com'
   - '+.custombeatsbydrebuy.com'
   - '+.custombeatsdeals.com'
@@ -15795,6 +15796,7 @@ payload:
   - '+.nnews.eu'
   - '+.nobel.se'
   - '+.nochubank.or.jp'
+  - '+.nodeget.com'
   - '+.nodeimage.com'
   - '+.nodejs.org'
   - '+.nodequality.com'
@@ -19685,6 +19687,7 @@ payload:
   - '+.spiceworks.com'
   - '+.spiceworksstatic.com'
   - '+.spicybigtits.com'
+  - '+.spicywriter.com'
   - '+.spideroak.com'
   - '+.spiderpool.com'
   - '+.spiedigitallibrary.org'
@@ -24683,6 +24686,7 @@ payload:
   - 'ntp6.ntp-servers.net'
   - 'ntp7.ntp-servers.net'
   - 'nurofensk-prod-env.eu-west-1.elasticbeanstalk.com'
+  - 'nvidia.custhelp.com'
   - 'nvidia.tt.omtrdc.net'
   - 'ocsp.microsoft.com'
   - 'officecdn-microsoft-com.akamaized.net'
