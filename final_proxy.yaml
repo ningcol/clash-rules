@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-03-20T21:20:11Z
+# 更新时间: 2026-03-21T21:14:47Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -3278,6 +3278,7 @@ payload:
   - '+.bestbuyus.com'
   - '+.bestcamsites.net'
   - '+.bestclouddrive.com'
+  - '+.bestdori.com'
   - '+.besterpornos.com'
   - '+.bestescortgirls.nl'
   - '+.bestfreecams.club'
@@ -5215,6 +5216,7 @@ payload:
   - '+.chyoa.com'
   - '+.ci-en.jp'
   - '+.ci-en.net'
+  - '+.cia.gov'
   - '+.ciattackers.com'
   - '+.cici.com'
   - '+.ciciai.com'
@@ -24307,6 +24309,7 @@ payload:
   - '+.zhuzhushipin-app.com'
   - '+.zi.media'
   - '+.zibacity.com'
+  - '+.ziglang.org'
   - '+.zigzag.kr'
   - '+.zillionk.com'
   - '+.zim.vn'
