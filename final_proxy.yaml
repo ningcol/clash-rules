@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-03-24T21:27:34Z
+# 更新时间: 2026-03-25T21:27:21Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -16469,8 +16469,15 @@ payload:
   - '+.ozeex.com'
   - '+.ozodi.org'
   - '+.ozodlik.org'
+  - '+.ozon.by'
+  - '+.ozon.com'
+  - '+.ozon.com.by'
+  - '+.ozon.com.kz'
+  - '+.ozon.kz'
   - '+.ozon.ru'
+  - '+.ozon.tm'
   - '+.ozone.ru'
+  - '+.ozonru.me'
   - '+.ozonusercontent.com'
   - '+.ozvoice.org'
   - '+.pa9pal.com'
@@ -23215,6 +23222,7 @@ payload:
   - '+.xiaolan.me'
   - '+.xiaoma.org'
   - '+.xiaomi.eu'
+  - '+.xiaomiflash.com'
   - '+.xiaoou.io'
   - '+.xiaoou.tv'
   - '+.xiaoshuobb.life'
@@ -23262,6 +23270,7 @@ payload:
   - '+.xmoviesforyou.com'
   - '+.xn--096-4g6em5t.com'
   - '+.xn--11xs86f.icu'
+  - '+.xn--1jqvh729avzfcy2d8ummib.com'
   - '+.xn--201-4g6em5t.com'
   - '+.xn--202-4g6em5t.com'
   - '+.xn--203-4g6em5t.com'
