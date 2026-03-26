@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-03-25T21:27:22Z
+# 更新时间: 2026-03-26T21:21:47Z
 # 说明: 本文件为自动生成的 Clash DIRECT 规则（behavior: domain）。
 #########################################
 payload:
@@ -12841,6 +12841,7 @@ payload:
   - '+.anhuisjx.com'
   - '+.anhuisuya.com'
   - '+.anhuiwine.com'
+  - '+.anhuiyun.com'
   - '+.anhuizk.com'
   - '+.ani-sh.com'
   - '+.aniccw.net'
@@ -117992,6 +117993,7 @@ payload:
   - 'crl.pki.goog'
   - 'crls.pki.goog'
   - 'csi.gstatic.com'
+  - 'ctdsb.clouddiffuse.xyz'
   - 'ctldl.windowsupdate.com'
   - 'cueme-api.quark.cn'
   - 'customization-cdn.dell.com'
