@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-03-26T21:21:46Z
+# 更新时间: 2026-03-27T21:24:58Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -17860,6 +17860,7 @@ payload:
   - '+.qbittorrent.org'
   - '+.qbmengmei6.mom'
   - '+.qcmod.xyz'
+  - '+.qcomgeo2.com'
   - '+.qctconnect.com'
   - '+.qdiehzz7.me'
   - '+.qgadmin.qcpp1.net'
@@ -17904,6 +17905,7 @@ payload:
   - '+.qt.io'
   - '+.qtrac.eu'
   - '+.qualcomm-email.com'
+  - '+.qualcomm-inc.com'
   - '+.qualcomm.co.id'
   - '+.qualcomm.co.in'
   - '+.qualcomm.co.jp'
@@ -23326,6 +23328,7 @@ payload:
   - '+.xn--hxtr4rozx.xn--czr694b'
   - '+.xn--i2ru8q2qg.com'
   - '+.xn--jlq480n2rg'
+  - '+.xn--kcrv3utim32hx9f6qe.com'
   - '+.xn--kput3imi374g.xn--hxt814e'
   - '+.xn--mts47c3w9b1qr.net'
   - '+.xn--mtswd61ejxq.com'
