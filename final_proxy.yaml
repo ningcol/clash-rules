@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-04-04T21:21:42Z
+# 更新时间: 2026-04-05T21:21:07Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -7681,6 +7681,7 @@ payload:
   - '+.eskimotube.com'
   - '+.eslite.com'
   - '+.esm.run'
+  - '+.esm.sh'
   - '+.esmarthealth.com'
   - '+.esmatube.com'
   - '+.esopworld.com'
@@ -17184,6 +17185,7 @@ payload:
   - '+.pjful-app.lol'
   - '+.pjgirls.com'
   - '+.pjsekai.sega.jp'
+  - '+.pkgbuild.com'
   - '+.pki-post.ch'
   - '+.pki-posta.ch'
   - '+.pki-poste.ch'
@@ -25173,6 +25175,7 @@ payload:
   - 'wip3.adobe.com'
   - 'wip4.adobe.com'
   - 'wrds-www.wharton.upenn.edu'
+  - 'ws.audioscrobbler.com'
   - 'wwis-dubc1-vip100.adobe.com'
   - 'wwis-dubc1-vip101.adobe.com'
   - 'wwis-dubc1-vip102.adobe.com'
