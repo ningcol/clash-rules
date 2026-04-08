@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-04-07T21:33:44Z
+# 更新时间: 2026-04-08T21:33:12Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -5725,6 +5725,7 @@ payload:
   - '+.crackle.com'
   - '+.craigslist.org'
   - '+.crankplayer.com'
+  - '+.crashlytics.com'
   - '+.crates.io'
   - '+.crazy-amateurs.com'
   - '+.crazyav.xyz'
@@ -8475,7 +8476,6 @@ payload:
   - '+.fiotolia.com'
   - '+.fire-emblem-heroes.com'
   - '+.firearmsworld.net'
-  - '+.firebase-settings.crashlytics.com'
   - '+.firebase.com'
   - '+.firebase.io'
   - '+.firebaseapp.com'
@@ -21719,7 +21719,6 @@ payload:
   - '+.up.audio'
   - '+.up01.cc'
   - '+.upbit.com'
-  - '+.update.crashlytics.com'
   - '+.updatetube.com'
   - '+.upfrontcfd.com'
   - '+.upfrontfea.com'
