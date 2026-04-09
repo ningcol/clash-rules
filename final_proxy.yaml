@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-04-08T21:33:12Z
+# 更新时间: 2026-04-09T21:37:34Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -14110,7 +14110,6 @@ payload:
   - '+.meetandfuckgames.com'
   - '+.meetfasttrack.com'
   - '+.meetsmartbook.com'
-  - '+.meetup.com'
   - '+.meetyourdevices.com'
   - '+.mega.co.nz'
   - '+.mega.io'
@@ -17998,7 +17997,6 @@ payload:
   - '+.python.com.tw'
   - '+.python.org'
   - '+.pythonhosted.org'
-  - '+.pytorch.org'
   - '+.pzforever.skin'
   - '+.pzforever01.homes'
   - '+.pzhanfor.today'
