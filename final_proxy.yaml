@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-04-20T21:36:47Z
+# 更新时间: 2026-04-21T21:36:20Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -14777,6 +14777,7 @@ payload:
   - '+.minilondon.co'
   - '+.minimarkham.ca'
   - '+.minimarkham.com'
+  - '+.minimax.io'
   - '+.minimoncton.ca'
   - '+.minimoncton.com'
   - '+.minimontrealcentre.ca'
@@ -19186,6 +19187,7 @@ payload:
   - '+.scolle.net'
   - '+.scoop.sh'
   - '+.scopus.com'
+  - '+.scorecardresearch.com'
   - '+.scoreclassics.com'
   - '+.scorediscounts.club'
   - '+.scoregroup.com'
