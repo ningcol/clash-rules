@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-04-21T21:36:20Z
+# 更新时间: 2026-04-22T21:40:55Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -11762,6 +11762,7 @@ payload:
   - '+.improd.works'
   - '+.imstagram.com'
   - '+.imtagram.com'
+  - '+.imtintl.com'
   - '+.imzog.com'
   - '+.inaporn.com'
   - '+.inasian.club'
