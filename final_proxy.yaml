@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-04-23T21:36:20Z
+# 更新时间: 2026-04-24T21:38:00Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -1011,6 +1011,7 @@ payload:
   - '+.agefans.com'
   - '+.agemys.org'
   - '+.agendaweek.com'
+  - '+.agentclientprotocol.com'
   - '+.agilebits.com'
   - '+.agnesb.fr'
   - '+.agoogleaday.com'
@@ -17473,6 +17474,7 @@ payload:
   - '+.placesdocs.com'
   - '+.planetminecraft.com'
   - '+.planetsuzy.org'
+  - '+.plannotator.ai'
   - '+.plansondemand.com'
   - '+.plantsvszombies2.com'
   - '+.plasticlabs.com'
@@ -21907,6 +21909,7 @@ payload:
   - '+.twistys.com'
   - '+.twitch.tv'
   - '+.twitchcdn.net'
+  - '+.twitchcon.com'
   - '+.twitchsvc.net'
   - '+.twitcomike.jp'
   - '+.twitiq.com'
