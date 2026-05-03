@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-05-02T21:29:55Z
+# 更新时间: 2026-05-03T21:31:26Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -20010,6 +20010,7 @@ payload:
   - '+.softbankventuresasia.com'
   - '+.softbankworld.com'
   - '+.softether-download.com'
+  - '+.softether.co.jp'
   - '+.softether.org'
   - '+.softfamous.com'
   - '+.softmodels.net'
