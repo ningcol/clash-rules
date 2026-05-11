@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-05-10T21:37:35Z
+# 更新时间: 2026-05-11T21:56:23Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -6087,6 +6087,7 @@ payload:
   - '+.data-tscbank.ru'
   - '+.data-vocabulary.org'
   - '+.data.com'
+  - '+.data18.com'
   - '+.datacloudmy.com'
   - '+.dataframeworks.com'
   - '+.dataliberation.org'
@@ -7020,6 +7021,7 @@ payload:
   - '+.dstk.dk'
   - '+.dswz88.xyz'
   - '+.dsyiren.com'
+  - '+.dt18.com'
   - '+.dtci.co'
   - '+.dtci.technology'
   - '+.dtiblog.com'
@@ -9535,6 +9537,7 @@ payload:
   - '+.gettyimages.us'
   - '+.getuploader.com'
   - '+.getws1.com'
+  - '+.getwsj.com'
   - '+.getwsone.com'
   - '+.getzola.org'
   - '+.gfacecbook.com'
@@ -12624,6 +12627,7 @@ payload:
   - '+.javdove.com'
   - '+.javdove8.xyz'
   - '+.javextreme.net'
+  - '+.javfc2.xyz'
   - '+.javfilms.com'
   - '+.javfinder.ai'
   - '+.javfor.me'
