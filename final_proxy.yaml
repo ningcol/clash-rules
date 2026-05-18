@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-05-17T21:43:36Z
+# 更新时间: 2026-05-18T21:57:09Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -19893,6 +19893,7 @@ payload:
   - '+.siam.org'
   - '+.sibreal.org'
   - '+.sidelinesnews.com'
+  - '+.sider.ai'
   - '+.siege-amazon.com'
   - '+.sifangclub.com'
   - '+.sigcomm.org'
@@ -25328,6 +25329,7 @@ payload:
   - '+.zhainanjidid.top'
   - '+.zhangboz1.xyz'
   - '+.zhangtianliang.com'
+  - '+.zhangzhehan.net'
   - '+.zhanlve.org'
   - '+.zhao.1984.city'
   - '+.zhengjian.org'
