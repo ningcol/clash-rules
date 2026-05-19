@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-05-18T21:57:09Z
+# 更新时间: 2026-05-19T22:04:38Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -406,6 +406,7 @@ payload:
   - '+.55dndn.com'
   - '+.567321.online'
   - '+.568xe.com'
+  - '+.573.jp'
   - '+.58avgo.com'
   - '+.592r.com'
   - '+.59mvmv.com'
@@ -13187,6 +13188,7 @@ payload:
   - '+.keytransparency.foo'
   - '+.keytransparency.org'
   - '+.kfs.io'
+  - '+.kgisystems.com'
   - '+.kgslb.com'
   - '+.khanacademy.org'
   - '+.khatrimaza.org'
@@ -13280,6 +13282,7 @@ payload:
   - '+.kissjav.com'
   - '+.kissjav.li'
   - '+.kitakyushubank.co.jp'
+  - '+.kiwi.jp'
   - '+.kiwi.kz'
   - '+.kiwibrowser.com'
   - '+.kiyobank.co.jp'
@@ -13317,6 +13320,20 @@ payload:
   - '+.konachan.com'
   - '+.konachan.net'
   - '+.konachan.wjcodes.com'
+  - '+.konami'
+  - '+.konami-igaming.online'
+  - '+.konami.co.jp'
+  - '+.konami.com'
+  - '+.konami.net'
+  - '+.konami.org'
+  - '+.konamicrossmedia.com'
+  - '+.konamigaming.com'
+  - '+.konamigaming.net'
+  - '+.konamigaming.online'
+  - '+.konamionline.com'
+  - '+.konamiopen.jp'
+  - '+.konamisportsclub.jp'
+  - '+.konamistyle.jp'
   - '+.koolsolutions.com'
   - '+.koornk.com'
   - '+.kopfhorergunstigshop.com'
@@ -18871,6 +18888,8 @@ payload:
   - '+.researchkit.net'
   - '+.researchkit.org'
   - '+.researchkit.tv'
+  - '+.resella.jp'
+  - '+.resellablue.com'
   - '+.resilio.com'
   - '+.resistchina.org'
   - '+.resonabank.co.jp'
@@ -25214,6 +25233,7 @@ payload:
   - '+.yuanming.net'
   - '+.yuenuge113.xyz'
   - '+.yuenuge18.cc'
+  - '+.yugioh-card.com'
   - '+.yulghun.com'
   - '+.yuming.qxbbs.org'
   - '+.yunchao.net'
