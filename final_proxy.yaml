@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-05-20T22:18:25Z
+# 更新时间: 2026-05-21T22:09:27Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -9274,6 +9274,7 @@ payload:
   - '+.g-tun.com'
   - '+.g-tvapp.com'
   - '+.g-xxxhub.com'
+  - '+.g.ai'
   - '+.g.co'
   - '+.g.dev'
   - '+.g.page'
@@ -13526,6 +13527,7 @@ payload:
   - '+.lenporno.net'
   - '+.lenporno.red'
   - '+.lenwhite.com'
+  - '+.leonardo.ai'
   - '+.leporno.org'
   - '+.lepornochaud.com'
   - '+.lepornofrais.com'
@@ -15334,10 +15336,12 @@ payload:
   - '+.moxing.news'
   - '+.moystoys.com'
   - '+.mozgcp.net'
+  - '+.mozilla.ai'
   - '+.mozilla.com'
   - '+.mozilla.community'
   - '+.mozilla.net'
   - '+.mozilla.org'
+  - '+.mozillafoundation.org'
   - '+.mp.world'
   - '+.mpettis.com'
   - '+.mpfinance.com'
@@ -15673,6 +15677,7 @@ payload:
   - '+.myyoungmomisnude.com'
   - '+.myyoungwifeisnude.com'
   - '+.mzed.com'
+  - '+.mzl.la'
   - '+.mzstatic.com'
   - '+.n0vadesktop.com'
   - '+.n26.com'
@@ -18633,6 +18638,7 @@ payload:
   - '+.randyblue.com'
   - '+.rapefilms.net'
   - '+.rapetube.me'
+  - '+.raphael.app'
   - '+.rapidmoviez.com'
   - '+.rapidprototyping-cadcam.com'
   - '+.rapidssl.com'
@@ -19095,6 +19101,7 @@ payload:
   - '+.ruinedking.com'
   - '+.rukoebxx.com'
   - '+.rulaisc-tv.buzz'
+  - '+.rule34.us'
   - '+.rule34.xxx'
   - '+.rule34h.com'
   - '+.rule34pornvids.com'
@@ -20344,6 +20351,7 @@ payload:
   - '+.sosad.fun'
   - '+.soso7778.com'
   - '+.sosreader.com'
+  - '+.sotwe.com'
   - '+.soubory.com'
   - '+.souka.xyz'
   - '+.soulcaliburhentai.net'
@@ -21077,6 +21085,7 @@ payload:
   - '+.tap.io'
   - '+.tapanwap.com'
   - '+.tapatalk.com'
+  - '+.tapnow.ai'
   - '+.taptap.io'
   - '+.taptotokyo.com'
   - '+.taqunuhai.vip'
