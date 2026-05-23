@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-05-22T21:56:13Z
+# 更新时间: 2026-05-23T21:42:43Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -225,6 +225,7 @@ payload:
   - '+.233abc.com'
   - '+.2371tom.com'
   - '+.24h.tv'
+  - '+.24hbook.com'
   - '+.24hjav.com'
   - '+.24hrs.ca'
   - '+.24porn.com'
@@ -14158,6 +14159,7 @@ payload:
   - '+.marvelsuperwar.com'
   - '+.marxist.net'
   - '+.marxists.org'
+  - '+.mas.to'
   - '+.masalabin.com'
   - '+.masaladesi.com'
   - '+.masalaseen.net'
@@ -15827,6 +15829,7 @@ payload:
   - '+.nenitas.club'
   - '+.nentindo.net'
   - '+.neo-miracle.com'
+  - '+.neodb.social'
   - '+.neoforged.net'
   - '+.neotokyo.supertop-100.com'
   - '+.neovim.io'
