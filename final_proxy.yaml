@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-05-29T22:23:16Z
+# 更新时间: 2026-05-30T21:49:36Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -2257,6 +2257,7 @@ payload:
   - '+.arxiv.org'
   - '+.arzon.jp'
   - '+.as-hp.ca'
+  - '+.as.mr'
   - '+.asacp.org'
   - '+.asagaku.com'
   - '+.asahi.com'
@@ -9475,6 +9476,7 @@ payload:
   - '+.gemfury.com'
   - '+.gemini.com'
   - '+.gen.lib.rus.ec'
+  - '+.gencraft.com'
   - '+.gendai.net'
   - '+.generated.photos'
   - '+.genetic-technologies.am'
@@ -22601,6 +22603,7 @@ payload:
   - '+.vdoav.com'
   - '+.vecchiescopate.casa'
   - '+.vector.im'
+  - '+.veed.io'
   - '+.veet.at'
   - '+.veet.be'
   - '+.veet.ca'
@@ -24974,7 +24977,6 @@ payload:
   - '+.yhy.cool'
   - '+.yibaochina.com'
   - '+.yibei.org'
-  - '+.yidio.com'
   - '+.yigeni.com'
   - '+.yimg.com'
   - '+.yimg.jp'
