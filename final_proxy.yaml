@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-06-01T22:53:59Z
+# 更新时间: 2026-06-02T22:53:54Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -9539,6 +9539,7 @@ payload:
   - '+.getmdl.io'
   - '+.getnews.jp'
   - '+.getoutline.org'
+  - '+.getpaint.net'
   - '+.getpocket.com'
   - '+.getporn.tv'
   - '+.getprintersupports.com'
@@ -17122,6 +17123,7 @@ payload:
   - '+.paimon.moe'
   - '+.painfulpussytortures.com'
   - '+.painnovel.com'
+  - '+.paint.net'
   - '+.paipal.com'
   - '+.paipancon.com'
   - '+.paisapay.cc'
