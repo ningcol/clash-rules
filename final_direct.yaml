@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-06-03T22:57:10Z
+# 更新时间: 2026-06-04T22:14:53Z
 # 说明: 本文件为自动生成的 Clash DIRECT 规则（behavior: domain）。
 #########################################
 payload:
@@ -17821,6 +17821,7 @@ payload:
   - '+.brightdairy.com'
   - '+.brightdecolighting.com'
   - '+.brightfood.com'
+  - '+.brighticecream.com'
   - '+.brightliao.com'
   - '+.brightmeat.com'
   - '+.brilliance-auto.com'
@@ -21765,6 +21766,7 @@ payload:
   - '+.chinacordblood.org'
   - '+.chinacosco.com'
   - '+.chinacourt.org'
+  - '+.chinacow.com'
   - '+.chinacpda.com'
   - '+.chinacpda.org'
   - '+.chinacqme.com'
@@ -100513,6 +100515,7 @@ payload:
   - '+.xinlingletu.com'
   - '+.xinlip.com'
   - '+.xinlischool.com'
+  - '+.xinlishumeng.com'
   - '+.xinliwanju.com'
   - '+.xinlixinli.net'
   - '+.xinlong-holding.com'
