@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-06-05T22:07:38Z
+# 更新时间: 2026-06-06T21:54:44Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -5445,6 +5445,7 @@ payload:
   - '+.claude.ai'
   - '+.claude.com'
   - '+.claudemcpclient.com'
+  - '+.claudemcpcontent.com'
   - '+.claudeusercontent.com'
   - '+.clawhub.ai'
   - '+.clck.ru'
@@ -21106,6 +21107,7 @@ payload:
   - '+.sustainthesound.com'
   - '+.suxib.com'
   - '+.suxiebu.com'
+  - '+.suyingtv.com'
   - '+.suzuri.jp'
   - '+.svaboda.org'
   - '+.svensksexfilm.com'
@@ -24224,6 +24226,7 @@ payload:
   - '+.wp-themes.com'
   - '+.wp.com'
   - '+.wpewebkit.org'
+  - '+.wplace.live'
   - '+.wpoforum.com'
   - '+.wpvip.com'
   - '+.wrenchead.com'
@@ -26413,6 +26416,7 @@ payload:
   - 'wwis-dubc1-vip97.adobe.com'
   - 'wwis-dubc1-vip98.adobe.com'
   - 'wwis-dubc1-vip99.adobe.com'
+  - 'www.quora.com.cdn.cloudflare.net'
   - 'yangzhi.app'
   - 'yt3.googleusercontent.com'
   - 'zeenews-fonts.s3.amazonaws.com'
