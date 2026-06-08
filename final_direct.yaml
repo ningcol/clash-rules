@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-06-07T21:56:52Z
+# 更新时间: 2026-06-08T22:17:49Z
 # 说明: 本文件为自动生成的 Clash DIRECT 规则（behavior: domain）。
 #########################################
 payload:
@@ -112525,6 +112525,7 @@ payload:
   - 'checkin.gstatic.com'
   - 'cibn-tos-5g.tvapp.eu.org'
   - 'cl2-cdn.origin-apple.com.akadns.net'
+  - 'cl2.apple.com.edgekey.net.globalredir.akadns.net'
   - 'clickserve.cc-dt.com'
   - 'clickserve.dartsearch.net'
   - 'clickserver.googleads.com'
@@ -112633,6 +112634,7 @@ payload:
   - 'googletraveladservices-cn.com'
   - 'googletraveladservices.com'
   - 'googlevads-cn.com'
+  - 'gsp11-cn.ls.apple.com'
   - 'gstatic-cn.com'
   - 'gstaticadssl.l.google.com'
   - 'gtm.oasisfeng.com'
