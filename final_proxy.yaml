@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-06-09T22:16:46Z
+# 更新时间: 2026-06-10T22:45:51Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -12000,6 +12000,7 @@ payload:
   - '+.infocert.it'
   - '+.infoglobo.com.br'
   - '+.infolinker.com.tw'
+  - '+.infoq.com'
   - '+.infoq.jp'
   - '+.informs.org'
   - '+.infosec.exchange'
@@ -16723,6 +16724,7 @@ payload:
   - '+.nxta.org'
   - '+.nxtdig.com.hk'
   - '+.nxtdig.com.tw'
+  - '+.nxtv.jp'
   - '+.nyaa.eu'
   - '+.nyaa.net'
   - '+.nyaa.si'
@@ -22556,6 +22558,9 @@ payload:
   - '+.underhentai.net'
   - '+.underlords.com'
   - '+.underwoodammo.com'
+  - '+.unext-info.jp'
+  - '+.unext.co.jp'
+  - '+.unext.jp'
   - '+.unfiltered.news'
   - '+.unholyknight.com'
   - '+.unidraw.io'
