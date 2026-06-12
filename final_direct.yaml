@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-06-11T22:46:11Z
+# 更新时间: 2026-06-12T22:17:55Z
 # 说明: 本文件为自动生成的 Clash DIRECT 规则（behavior: domain）。
 #########################################
 payload:
@@ -3310,6 +3310,7 @@ payload:
   - '+.264006.com'
   - '+.264321.com'
   - '+.264400.com'
+  - '+.265.com'
   - '+.26582.vip'
   - '+.26595.com'
   - '+.265g.com'
@@ -112511,7 +112512,6 @@ payload:
   - '+.zzzyyy.com'
   - '+.zzzzaaaa.com'
   - '+.zzzzzz.me'
-  - '265.com'
   - '2mdn-cn.net'
   - '2mdn.net'
   - 'activate.activation-v2.kaspersky.com'
@@ -112901,6 +112901,7 @@ payload:
   - 'www.entrust.cn'
   - 'www.gstatic.com'
   - 'www.pxcc.com'
+  - 'www.recaptcha-cn.net'
   - 'www.recaptcha.net'
   - 'www.support.apple.com'
   - 'www4-static.gog-statics.com'

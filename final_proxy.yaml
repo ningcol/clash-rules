@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-06-11T22:46:10Z
+# 更新时间: 2026-06-12T22:17:54Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -6924,6 +6924,7 @@ payload:
   - '+.dot-mac.de'
   - '+.dot.net'
   - '+.dot.sb'
+  - '+.dota2.com'
   - '+.dotcernpilot.info'
   - '+.dotdeb.org'
   - '+.dotfacebook.com'
@@ -13812,6 +13813,8 @@ payload:
   - '+.livehdcams.com'
   - '+.livejasmin.com'
   - '+.livejasminbabes.net'
+  - '+.livejournal.com'
+  - '+.livejournal.net'
   - '+.liveleak.com'
   - '+.livemint.com'
   - '+.livemodels.co'
@@ -16891,6 +16894,7 @@ payload:
   - '+.okx-dns.com'
   - '+.okx-dns1.com'
   - '+.okx-dns2.com'
+  - '+.okx.ac'
   - '+.okx.cab'
   - '+.okx.com'
   - '+.old.honeynet.org'
@@ -22740,6 +22744,7 @@ payload:
   - '+.v-av.com'
   - '+.v-has.com'
   - '+.v.gd'
+  - '+.v.ps'
   - '+.v2.help'
   - '+.v2.hysteria.network'
   - '+.v2ex.com'
@@ -22768,6 +22773,7 @@ payload:
   - '+.value-domain.com'
   - '+.value-server.com'
   - '+.valuegb.com'
+  - '+.valve.net'
   - '+.valvesoftware.com'
   - '+.vamo.com'
   - '+.vamzakaz.ru'
@@ -23647,6 +23653,7 @@ payload:
   - '+.vpornvideos.com'
   - '+.vpro.com'
   - '+.vpro.net'
+  - '+.vps.hosting'
   - '+.vpsxb.net'
   - '+.vrbgay.com'
   - '+.vrcams.io'
@@ -24768,6 +24775,16 @@ payload:
   - '+.xt.pub'
   - '+.xtapes.to'
   - '+.xtegvk.xyz'
+  - '+.xtom.au'
+  - '+.xtom.com'
+  - '+.xtom.de'
+  - '+.xtom.ee'
+  - '+.xtom.hk'
+  - '+.xtom.jp'
+  - '+.xtom.nl'
+  - '+.xtom.sg'
+  - '+.xtom.social'
+  - '+.xtom.us'
   - '+.xtracloud.net'
   - '+.xtube.com'
   - '+.xtubebdsm.com'
