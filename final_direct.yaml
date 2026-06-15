@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-06-14T22:01:02Z
+# 更新时间: 2026-06-15T22:54:04Z
 # 说明: 本文件为自动生成的 Clash DIRECT 规则（behavior: domain）。
 #########################################
 payload:
@@ -38830,7 +38830,6 @@ payload:
   - '+.gmtv.cc'
   - '+.gmtzy.com'
   - '+.gmugmu.com'
-  - '+.gmw.com'
   - '+.gmwiki.com'
   - '+.gmxmym.ren'
   - '+.gmya.net'
@@ -65295,11 +65294,11 @@ payload:
   - '+.meishi13.com'
   - '+.meishichina.com'
   - '+.meishiffx.online'
-  - '+.meishij.net'
   - '+.meishijr.com'
   - '+.meishilife.com'
   - '+.meishiqin.com'
   - '+.meishischool.com'
+  - '+.meishitx.com'
   - '+.meishiwangluo.com'
   - '+.meishizuofa.com'
   - '+.meishow.com'
@@ -100175,7 +100174,6 @@ payload:
   - '+.xinshengsemi.com'
   - '+.xinshi525.com'
   - '+.xinshiba.com'
-  - '+.xinshipu.com'
   - '+.xinshishen.com'
   - '+.xinshouyou.com'
   - '+.xinshouzhanzhang.com'
