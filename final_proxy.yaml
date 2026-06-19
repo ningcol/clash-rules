@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-06-18T22:50:09Z
+# 更新时间: 2026-06-19T21:57:00Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -684,6 +684,7 @@ payload:
   - '+.account-paypal.info'
   - '+.account-paypal.net'
   - '+.account-paypal.org'
+  - '+.accountboy.com'
   - '+.accountkit.com'
   - '+.accountpaypal.com'
   - '+.accountpaypal.net'
@@ -6546,6 +6547,7 @@ payload:
   - '+.dewitwithdurex.com'
   - '+.dexterhorn.com'
   - '+.dezyred.com'
+  - '+.dfvpn.com'
   - '+.dgaqp.com'
   - '+.dgg.gg'
   - '+.dgwav.com'
@@ -9440,6 +9442,7 @@ payload:
   - '+.gamesstack.com'
   - '+.gametap.com'
   - '+.gameuxmasterguide.com'
+  - '+.gamewtb.com'
   - '+.gamez.com.tw'
   - '+.gaming-notebooks.com'
   - '+.gandhara.ru'
@@ -9931,6 +9934,7 @@ payload:
   - '+.gockhuatviet.com'
   - '+.godaddy'
   - '+.godaddy.com'
+  - '+.godaddy.net'
   - '+.godbolt.org'
   - '+.godfootsteps.org'
   - '+.godoc.org'
@@ -21453,6 +21457,7 @@ payload:
   - '+.taylorandfrancis.com'
   - '+.taylorfrancis.com'
   - '+.tb-esim.ru'
+  - '+.tb.pro'
   - '+.tbank-online.com'
   - '+.tbank.ru'
   - '+.tbcollege.org'
@@ -21868,6 +21873,7 @@ payload:
   - '+.thumbzilla.com'
   - '+.thunderbird.net'
   - '+.thunderbolttechnology.net'
+  - '+.thundermail.com'
   - '+.thywords.com'
   - '+.thz7.net'
   - '+.thzu.cc'
@@ -24371,6 +24377,7 @@ payload:
   - '+.writesonic.com'
   - '+.ws-blau.com'
   - '+.ws-tcg.com'
+  - '+.wsimg.com'
   - '+.wsj.com'
   - '+.wsj.jobs'
   - '+.wsj.net'
@@ -24756,6 +24763,7 @@ payload:
   - '+.xn--uis17aj9kmuf.com'
   - '+.xn--uis44a.xn--j6w193g'
   - '+.xn--urs05q.jp'
+  - '+.xn--vuqv2cf7wzyig79c.com'
   - '+.xn--wcv22d.hk'
   - '+.xn--wcv22d.xn--j6w193g'
   - '+.xn--wcvs22d.xn--j6w193g'
