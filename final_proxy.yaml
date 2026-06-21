@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-06-20T21:58:02Z
+# 更新时间: 2026-06-21T22:06:47Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -26147,6 +26147,8 @@ payload:
   - 'github-production-upload-manifest-file-7fdce7.s3.amazonaws.com'
   - 'github-production-user-asset-6210df.s3.amazonaws.com'
   - 'gitlab-assets.oss-cn-hongkong.aliyuncs.com'
+  - 'gog-cdn-lumen.secure2.footprint.net'
+  - 'gog-cdn.akamaized.net'
   - 'google-ohttp-relay-safebrowsing.fastly-edge.com'
   - 'hamivideo.hinet.net'
   - 'hammerandchisel.ssl.zendesk.com'
