@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-06-25T22:14:07Z
+# 更新时间: 2026-06-26T22:00:55Z
 # 说明: 本文件为自动生成的 Clash DIRECT 规则（behavior: domain）。
 #########################################
 payload:
@@ -111898,6 +111898,7 @@ payload:
   - '+.zzzzzz.me'
   - '2mdn-cn.net'
   - '2mdn.net'
+  - 'account-cn.alibabacloud.com'
   - 'activate.activation-v2.kaspersky.com'
   - 'activation-v2.geo.kaspersky.com'
   - 'activation-v2.kaspersky.com'
@@ -111910,6 +111911,7 @@ payload:
   - 'amp-api-edge-lb.itunes-apple.com.akadns.net'
   - 'amp-api-edge.music.apple.com'
   - 'aod-ssl.itunes.apple.com'
+  - 'api.alibabacloud.com'
   - 'api.nbyjson.top'
   - 'app-analytics-services.com'
   - 'app-measurement-cn.com'
@@ -111946,6 +111948,7 @@ payload:
   - 'clickserver.googleads.com'
   - 'clientperipherals.dell.com'
   - 'clientservices.googleapis.com'
+  - 'cn.alibabacloud.com'
   - 'cn.download.nvidia.com'
   - 'cn.widevine.com'
   - 'cn.windowssearch.com'
@@ -112257,6 +112260,7 @@ payload:
   - 'staging-databe.floonet.goog'
   - 'staging.databe.floonet.goog'
   - 'statics.teams.cdn.office.net'
+  - 'status.alibabacloud.com'
   - 'storecorefulfillment.download.prss.microsoft.com'
   - 'storeedge.microsoft.com'
   - 'storeedgefd.dsx.mp.microsoft.com'
