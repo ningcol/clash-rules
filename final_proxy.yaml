@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-06-29T22:02:43Z
+# 更新时间: 2026-06-30T01:00:07Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -8043,6 +8043,7 @@ payload:
   - '+.explorespanking.com'
   - '+.exporntoons.net'
   - '+.exposedlatinas.com'
+  - '+.expressnews.com'
   - '+.expressvpn.com'
   - '+.expresswifi.com'
   - '+.exrates.me'
@@ -17187,8 +17188,6 @@ payload:
   - '+.optifine.net'
   - '+.optimumssl.com'
   - '+.opus-gaming.com'
-  - '+.oracle'
-  - '+.oracle.com'
   - '+.oraclefoundation.org'
   - '+.oracleimg.com'
   - '+.oracleinfinity.io'
