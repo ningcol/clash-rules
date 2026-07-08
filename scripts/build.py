@@ -6,7 +6,7 @@ suffix-tree dedup -> manual pinning + partition across routing categories ->
 shrink gate -> emit final_<cat>.yaml. Config lives entirely in config.yaml.
 
 Subcommands:
-  build   --out DIR [--previous DIR] [--dry-run]   build and write products
+  build   --out DIR [--previous DIR]               build and write products
   lint                                             validate manual/ files
   readme  [--check]                                regenerate README table
 
@@ -55,16 +55,19 @@ class Rule:
 # Parsing / normalization
 # ---------------------------------------------------------------------------
 def _normalize_domain(v: str) -> str | None:
-    """Lowercase, strip trailing dot, IDNA-encode. Return None if invalid."""
+    """Lowercase, strip trailing dot, IDNA-encode non-ASCII. Return None if invalid."""
     v = v.strip().rstrip(".").lower()
     if not v or "*" in v or ":" in v or "@" in v or "/" in v:
         return None
-    try:
-        v = v.encode("idna").decode("ascii")
-    except (UnicodeError, ValueError):
-        # Already-ASCII names with underscores can trip idna; accept if they
-        # match our permissive domain shape.
-        pass
+    if not v.isascii():
+        # Punycode non-ASCII labels. NOTE: the stdlib 'idna' codec is IDNA2003;
+        # a few characters (ß, ς, ZWJ/ZWNJ) map differently than IDNA2008/UTS46.
+        # Upstream lists are ASCII so this path is effectively unused, and we
+        # keep deps to PyYAML only rather than pull in the `idna` package.
+        try:
+            v = v.encode("idna").decode("ascii")
+        except (UnicodeError, ValueError):
+            return None
     if not DOMAIN_RE.match(v):
         return None
     # Reject bare IPs (no mask): a real TLD is never all-numeric.
@@ -543,14 +546,24 @@ def write_yaml(path: Path, payload: list[str], cat: str, ip: bool) -> None:
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
-def count_payload(path: Path) -> int | None:
+def read_payload(path: Path) -> list[str] | None:
+    """Sorted payload entries of an existing product file, or None if absent.
+    Header comments (including the volatile timestamp) are ignored, so this
+    reflects rule content only — used to decide whether a rebuild actually
+    changed anything."""
     if not path.exists():
         return None
-    n = 0
+    out = []
     for line in path.read_text(encoding="utf-8").splitlines():
-        if line.lstrip().startswith("- "):
-            n += 1
-    return n
+        s = line.lstrip()
+        if s.startswith("- "):
+            out.append(s[2:].strip().strip("'\""))
+    return sorted(out)
+
+
+def count_payload(path: Path) -> int | None:
+    p = read_payload(path)
+    return None if p is None else len(p)
 
 
 # ---------------------------------------------------------------------------
@@ -646,7 +659,7 @@ def lint(cfg: Config, root: Path) -> list[str]:
 # Commands
 # ---------------------------------------------------------------------------
 def cmd_build(cfg: Config, root: Path, out: Path, previous: Path | None,
-              dry_run: bool, fetcher: Callable[[str, int, int], str]) -> int:
+              fetcher: Callable[[str, int, int], str]) -> int:
     manual_dir = root / "manual"
     order = cfg.priority + [c for c in cfg.categories if c not in cfg.priority]
     results: dict[str, CatResult] = {}
@@ -658,7 +671,7 @@ def cmd_build(cfg: Config, root: Path, out: Path, previous: Path | None,
     for name in order:
         conflicts += results[name].conflicts
 
-    # Gate check (before writing anything).
+    # Plan every product + gate (before writing anything).
     out.mkdir(parents=True, exist_ok=True)
     planned: list[tuple[Path, list[str], str, bool]] = []
     gate_errors: list[str] = []
@@ -666,7 +679,7 @@ def cmd_build(cfg: Config, root: Path, out: Path, previous: Path | None,
         res = results[name]
         dpay = res.domains.to_payload()
         dpath = out / f"final_{name}.yaml"
-        old = count_payload(previous / f"final_{name}.yaml") if previous else None
+        old = count_payload(previous / dpath.name) if previous else None
         try:
             check_gate(dpath.name, len(dpay), old, cfg.categories[name].max_shrink)
         except GateError as e:
@@ -682,22 +695,47 @@ def cmd_build(cfg: Config, root: Path, out: Path, previous: Path | None,
                 gate_errors.append(str(e))
             planned.append((ippath, ippay, name, True))
 
+    planned_names = {p.name for p, _, _, _ in planned}
+    # Gate products that existed in the last release but are gone now — a removed
+    # category, or a category whose IP rules vanished upstream. Without this a
+    # disappearing product would slip past the shrink gate and be deleted ungated.
+    if previous:
+        for prev_file in sorted(previous.glob("final_*.yaml")):
+            if prev_file.name not in planned_names:
+                try:
+                    check_gate(prev_file.name, 0, count_payload(prev_file),
+                               cfg.default_max_shrink)
+                except GateError as e:
+                    gate_errors.append(f"{e} [product disappeared]")
+
     if gate_errors:
         for e in gate_errors:
             print(f"[gate] FAIL {e}", file=sys.stderr)
         print("[gate] refusing to publish; last release stays live", file=sys.stderr)
         return 1
 
+    # Did the built rules actually differ from the current release? Compare
+    # payloads only (the header carries a live timestamp that changes every run),
+    # so the publisher can skip no-op commits and CDN purges.
+    changed = True
+    if previous is not None:
+        prev_names = {f.name for f in previous.glob("final_*.yaml")}
+        changed = planned_names != prev_names or any(
+            payload != (read_payload(previous / path.name) or [])
+            for path, payload, _, _ in planned)
+
     for path, payload, name, ip in planned:
         write_yaml(path, payload, name, ip)
         print(f"  wrote {path.name} ({len(payload)})", file=sys.stderr)
 
-    _write_report(order, results, conflicts, out, dry_run)
+    (out / "changed.txt").write_text("true\n" if changed else "false\n", encoding="utf-8")
+    _write_report(order, results, conflicts, out)
+    print(f"[build] changed={'true' if changed else 'false'}", file=sys.stderr)
     return 0
 
 
 def _write_report(order: list[str], results: dict[str, CatResult],
-                  conflicts: list[Conflict], out: Path, dry_run: bool) -> None:
+                  conflicts: list[Conflict], out: Path) -> None:
     lines = ["# build report", ""]
     msg_lines = []
     for name in order:
@@ -733,7 +771,6 @@ def main(argv: list[str] | None = None) -> int:
     b = sub.add_parser("build")
     b.add_argument("--out", required=True)
     b.add_argument("--previous")
-    b.add_argument("--dry-run", action="store_true")
 
     sub.add_parser("lint")
 
@@ -748,7 +785,7 @@ def main(argv: list[str] | None = None) -> int:
         prev = Path(args.previous) if args.previous else None
         if prev and not prev.exists():
             prev = None
-        return cmd_build(cfg, root, Path(args.out), prev, args.dry_run, fetch_url)
+        return cmd_build(cfg, root, Path(args.out), prev, fetch_url)
 
     if args.cmd == "lint":
         errors = lint(cfg, root)

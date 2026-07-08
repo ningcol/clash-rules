@@ -39,56 +39,67 @@ jobs:
       - name: Install deps
         run: pip install -r scripts/requirements.txt
 
+      - name: Resolve publish branch from config
+        # config.yaml 是分支名的唯一出处；后续步骤统一用 $BRANCH。
+        run: |
+          echo "BRANCH=$(python -c "import yaml; print(yaml.safe_load(open('config.yaml'))['defaults']['publish-branch'])")" >> "$GITHUB_ENV"
+
       - name: Lint + tests
+        # README 订阅表同步（readme --check）由 check.yml 在 push 时强制；此处
+        # 故意不设该闸门，避免纯文档漂移把每日的规则发布卡住。
         run: |
           python scripts/build.py lint
           python -m unittest discover -s tests
 
       - name: Prepare release worktree
         run: |
-          # 用 ls-remote 查远端是否已有 release（不依赖本地 remote-tracking ref），
-          # 并用显式 refspec 拉取，确保 refs/remotes/origin/release 被填充。
-          if git ls-remote --exit-code --heads origin release >/dev/null 2>&1; then
-            git fetch origin +refs/heads/release:refs/remotes/origin/release
-            git worktree add -B release release origin/release
+          # 用 ls-remote 查远端是否已有发布分支（不依赖本地 remote-tracking ref），
+          # 并用显式 refspec 拉取，确保 refs/remotes/origin/$BRANCH 被填充。
+          # 工作树目录固定为 release/；分支名取自 config（$BRANCH）。
+          if git ls-remote --exit-code --heads origin "$BRANCH" >/dev/null 2>&1; then
+            git fetch origin "+refs/heads/$BRANCH:refs/remotes/origin/$BRANCH"
+            git worktree add -B "$BRANCH" release "origin/$BRANCH"
           else
-            # 首次：创建空的孤儿 release 分支
+            # 首次：创建空的孤儿发布分支
             git worktree add --detach release
-            git -C release checkout --orphan release
+            git -C release checkout --orphan "$BRANCH"
             git -C release rm -rf --quiet . || true
           fi
 
       - name: Build (gate compares against previous release)
         run: |
-          # build 会自动把 commit-msg.txt 写进 --out 目录（供下面 commit 用）
+          # build 把 commit-msg.txt 与 changed.txt 写进 --out（下面据此决定是否发布）。
+          # 闸门失败时 build 返回非 0 → 本步骤失败 → 不发布，上一版 release 留存。
           python scripts/build.py build --out dist --previous release
 
       - name: Publish to release branch
         id: publish
         run: |
+          # 只在规则内容真变化时发布：changed.txt 由 build 按 payload 比对得出
+          # （忽略每次都变的时间戳头），避免每天 no-op 提交 + 无谓 CDN purge。
+          if [ "$(cat dist/changed.txt)" != "true" ]; then
+            echo "No rule changes vs current release; nothing to publish."
+            echo "published=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
           find release -maxdepth 1 -name 'final_*' -delete
           cp dist/final_* release/
           cd release
           git add -A
-          if git diff --cached --quiet; then
-            echo "No changes to publish"
-            echo "published=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
           git -c user.name="github-actions[bot]" \
               -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
               commit -F ../dist/commit-msg.txt
-          git push origin release
+          git push origin "$BRANCH"
           echo "published=true" >> "$GITHUB_OUTPUT"
 
       - name: Purge jsDelivr cache
-        # 仅在 release 真有更新时刷新 CDN（否则 jsDelivr 最长 ~12h 才自动过期）。
+        # 仅在真的发布了新内容时刷新 CDN（否则 jsDelivr 最长 ~12h 才自动过期）。
         # 逐个 purge 已发布的产物；purge 失败不影响发布结果（尽力而为）。
         if: steps.publish.outputs.published == 'true'
         run: |
           for f in release/final_*; do
             name=$(basename "$f")
-            url="https://purge.jsdelivr.net/gh/${GITHUB_REPOSITORY}@release/${name}"
+            url="https://purge.jsdelivr.net/gh/${GITHUB_REPOSITORY}@${BRANCH}/${name}"
             echo "purging ${name}"
             curl -sS --max-time 30 "$url" || echo "  (purge failed, ignored)"
             echo

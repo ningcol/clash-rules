@@ -149,7 +149,7 @@ class TestPartition(unittest.TestCase):
             return upstream[url]
 
         cfg = build.load_config(tmp / "config.yaml")
-        rc = build.cmd_build(cfg, tmp, out, None, False, fake)
+        rc = build.cmd_build(cfg, tmp, out, None, fake)
         self.assertEqual(rc, 0)
         hi = set(build.Path(out / "final_hi.yaml").read_text().splitlines())
         lo = set(build.Path(out / "final_lo.yaml").read_text().splitlines())
@@ -167,6 +167,105 @@ class TestPartition(unittest.TestCase):
             hi_d = {l for l in hi if l.strip().startswith("- ")}
             lo_d = {l for l in lo if l.strip().startswith("- ")}
             self.assertEqual(hi_d & lo_d, set())
+
+
+class TestLint(unittest.TestCase):
+    CFG = (
+        "defaults: {}\n"
+        "priority: [hi, lo]\n"
+        "categories:\n"
+        "  hi: {description: hi, sources: []}\n"
+        "  lo: {description: lo, sources: []}\n"
+    )
+
+    def _lint(self, files: dict):
+        import tempfile
+        with tempfile.TemporaryDirectory() as d:
+            tmp = Path(d)
+            (tmp / "config.yaml").write_text(self.CFG)
+            m = tmp / "manual"
+            m.mkdir()
+            for name, text in files.items():
+                (m / name).write_text(text)
+            cfg = build.load_config(tmp / "config.yaml")
+            return build.lint(cfg, tmp)
+
+    def test_clean(self):
+        self.assertEqual(self._lint({"hi.txt": "a.com\n+.b.com\n"}), [])
+
+    def test_duplicate(self):
+        errs = self._lint({"hi.txt": "a.com\na.com\n"})
+        self.assertTrue(any("duplicate" in e for e in errs), errs)
+
+    def test_add_exclude_overlap(self):
+        errs = self._lint({"hi.txt": "a.com\n", "hi-exclude.txt": "a.com\n"})
+        self.assertTrue(any("both add and exclude" in e for e in errs), errs)
+
+    def test_missing_trailing_newline(self):
+        errs = self._lint({"hi.txt": "a.com"})
+        self.assertTrue(any("trailing newline" in e for e in errs), errs)
+
+    def test_invalid_rule(self):
+        errs = self._lint({"hi.txt": "*cdn.bad\n"})
+        self.assertTrue(any("invalid rule" in e for e in errs), errs)
+
+    def test_cross_category_double_pin(self):
+        errs = self._lint({"hi.txt": "shared.com\n", "lo.txt": "shared.com\n"})
+        self.assertTrue(any("pinned to both" in e for e in errs), errs)
+
+
+class TestPublishGating(unittest.TestCase):
+    """changed-detection (skip no-op publishes) and the disappeared-product gate."""
+    CFG = (
+        "defaults: {max-shrink-percent: 100}\n"
+        "priority: [hi, lo]\n"
+        "categories:\n"
+        "  hi: {description: hi, sources: [{url: 'hi://x'}]}\n"
+        "  lo: {description: lo, sources: [{url: 'lo://x'}]}\n"
+    )
+
+    def _build(self, tmp: Path, upstream: dict, previous=None, out_name="out"):
+        (tmp / "config.yaml").write_text(self.CFG)
+        (tmp / "manual").mkdir(exist_ok=True)
+        out = tmp / out_name
+
+        def fake(url, timeout, retries):
+            return upstream[url]
+
+        cfg = build.load_config(tmp / "config.yaml")
+        rc = build.cmd_build(cfg, tmp, out, previous, fake)
+        return rc, out
+
+    def test_changed_flag(self):
+        import tempfile
+        up = {"hi://x": "payload:\n  - 'a.com'\n", "lo://x": "payload:\n  - 'b.com'\n"}
+        with tempfile.TemporaryDirectory() as d:
+            tmp = Path(d)
+            rc, out1 = self._build(tmp, up)
+            self.assertEqual(rc, 0)
+            # first publish (no previous) -> changed
+            self.assertEqual((out1 / "changed.txt").read_text().strip(), "true")
+            # identical rebuild vs previous -> unchanged (timestamp differs, payload same)
+            rc, out2 = self._build(tmp, up, previous=out1, out_name="out2")
+            self.assertEqual(rc, 0)
+            self.assertEqual((out2 / "changed.txt").read_text().strip(), "false")
+            # a new domain -> changed
+            up2 = {"hi://x": "payload:\n  - 'a.com'\n  - 'c.com'\n",
+                   "lo://x": "payload:\n  - 'b.com'\n"}
+            rc, out3 = self._build(tmp, up2, previous=out1, out_name="out3")
+            self.assertEqual((out3 / "changed.txt").read_text().strip(), "true")
+
+    def test_disappeared_product_fails_gate(self):
+        import tempfile
+        up = {"hi://x": "payload:\n  - 'a.com'\n", "lo://x": "payload:\n  - 'b.com'\n"}
+        with tempfile.TemporaryDirectory() as d:
+            tmp = Path(d)
+            rc, out1 = self._build(tmp, up)
+            self.assertEqual(rc, 0)
+            # plant a product in "previous" that this build won't reproduce
+            (out1 / "final_hi_ipcidr.yaml").write_text("payload:\n  - '1.2.3.0/24'\n")
+            rc2, _ = self._build(tmp, up, previous=out1, out_name="out2")
+            self.assertEqual(rc2, 1)   # disappearance is gated -> refuse to publish
 
 
 if __name__ == "__main__":
