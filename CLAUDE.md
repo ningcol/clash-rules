@@ -22,13 +22,23 @@ python -m unittest discover -s tests               # run unit tests
 
 ## Maintenance: only edit config.yaml and manual/
 
-Products are generated — never hand-edit `final_*.yaml`. Change inputs instead:
+Products are generated — never hand-edit `final_*.yaml`. Every maintenance task is one of:
 
-- **`config.yaml`** — the single source of truth: categories, source URLs, `priority` order, thresholds. Adding a category / changing a source / adjusting priority all happen here. The README subscription table is generated from it (`readme` subcommand).
-- **`manual/<cat>.txt`** — domains manually added to a category. Every entry should carry a `# reason + date` comment.
-- **`manual/<cat>-exclude.txt`** — domains removed from a category's product without rerouting them (e.g. an ad source's false positive).
+| Task | Edit |
+|------|------|
+| Add / replace an upstream source | `config.yaml` → the category's `sources` (url + note) |
+| Add domains to a category | `manual/<cat>.txt` |
+| Force a domain to a policy (e.g. always direct) | `manual/<target-cat>.txt` — **one file only** |
+| Remove a domain from a product without rerouting it | `manual/<cat>-exclude.txt` |
+| Add a category / change priority / change a threshold | `config.yaml` |
 
-To **force a domain to a policy** (e.g. always direct), add it to `manual/<target-cat>.txt` — one file. See the partition rule below for why this suffices.
+Rules to follow:
+
+- **One file for forced routing.** Pinning a domain to a category auto-removes it from every other routing category (see the partition below), so never mirror-edit another category's exclude file — that legacy double-write is exactly what this design eliminated.
+- **`-exclude.txt` means "delete without reroute" only** — e.g. a false positive from an ad source you want to stop blocking. To send a domain to a different policy, pin it via `manual/<cat>.txt` instead.
+- **Every manual entry needs a `# reason + date` comment** (batch imports: also the source URL). Lint checks syntax / duplicates / trailing newline / cross-category double-pins, but not intent — that comment is the only record of why a line exists.
+- **`config.yaml` is the single source of truth.** Categories, sources, `priority`, and thresholds all live there; the README subscription table is generated from it (`readme` subcommand) — don't hand-edit that table.
+- **Before pushing**, run `lint`, the unit tests, and `readme --check` (CI enforces all three on PR/push).
 
 ## Architecture: the routing partition
 
