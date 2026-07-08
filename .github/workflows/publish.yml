@@ -1,10 +1,20 @@
 name: Publish rules
 
-# 每天 UTC 21:00（北京 05:00）+ 手动触发：完整构建 → 数量骤降闸门 →
-# 发布到 release 分支（普通 commit 保留历史）。闸门失败则不发布，上一版留存。
+# 触发：每天 UTC 21:00（北京 05:00）定时 / 影响产物的输入 push 到 main / 手动。
+# 完整构建 → 数量骤降闸门 → 发布到 release 分支（普通 commit 保留历史）。
+# 闸门失败则不发布，上一版留存。
 on:
   schedule:
     - cron: "0 21 * * *"
+  # 改动影响产物的输入（config / manual / build 脚本）push 到 main 即自动发布。
+  # 只推 release 分支、且限定 branches: [main]，故 release 的自动提交不会反触发本流程。
+  push:
+    branches: [main]
+    paths:
+      - 'config.yaml'
+      - 'manual/**'
+      - 'scripts/**'
+      - '.github/workflows/publish.yml'
   workflow_dispatch:
 
 permissions:
