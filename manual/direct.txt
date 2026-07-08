@@ -29,6 +29,8 @@ cdn.jsdelivr.net
 +.gstatic-cn.com
 +.gstatic.com
 +.kdltps.com
+# 快代理隧道代理域名，走直连，2026-07-08（y298.kdltps.com 已被上面 +.kdltps.com 覆盖）
++.kdltpspro.com
 
 # 萤石摄像头
 i.ys7.com
