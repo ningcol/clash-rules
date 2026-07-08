@@ -36,9 +36,11 @@ Rules to follow:
 
 - **One file for forced routing.** Pinning a domain to a category auto-removes it from every other routing category (see the partition below), so never mirror-edit another category's exclude file — that legacy double-write is exactly what this design eliminated.
 - **`-exclude.txt` means "delete without reroute" only** — e.g. a false positive from an ad source you want to stop blocking. To send a domain to a different policy, pin it via `manual/<cat>.txt` instead.
-- **Every manual entry needs a `# reason + date` comment** (batch imports: also the source URL). Lint checks syntax / duplicates / trailing newline / cross-category double-pins, but not intent — that comment is the only record of why a line exists.
+- **Every manual entry needs a `# reason + date` comment** (batch imports: also the source URL). Lint checks syntax / duplicates / trailing newline / cross-category double-pins, but not intent — that comment is the only record of why a line exists. The comment must be on **its own line**: the parser reads any non-`#` line as a rule, so an inline `domain # reason` is parsed as an illegal rule and silently dropped.
+- **Prefer the broadest correct suffix.** A specific host is redundant when a `+.suffix` already covers it (e.g. `y298.kdltps.com` under `+.kdltps.com`) — `compress()` drops it anyway. For a provider whose subdomains rotate (proxy tunnels, CDNs), pin the `+.suffix` once instead of chasing individual hosts.
 - **`config.yaml` is the single source of truth.** Categories, sources, `priority`, and thresholds all live there; the README subscription table is generated from it (`readme` subcommand) — don't hand-edit that table.
 - **Before pushing**, run `lint`, the unit tests, and `readme --check` (CI enforces all three on PR/push).
+- **Pushing is publishing.** A push to `main` touching `config.yaml`, `manual/`, or `scripts/` auto-runs `publish.yml` → a new `release` commit + jsDelivr purge within minutes (no separate step). The daily cron only exists to pick up upstream changes on days you don't push. Products go live to real subscribers, so treat a push as a release.
 
 ## Architecture: the routing partition
 
@@ -57,7 +59,7 @@ Because domain-behavior format cannot trim a subdomain out of a `+.suffix`, the 
 
 - **Shrink gate** (`check_gate`): if any product shrinks more than `max-shrink-percent` (default 30) vs the last release, the build fails and publishes nothing — the previous release stays live. Skipped on first publish. This is why a dead upstream source degrades gracefully instead of shipping a truncated list.
 - **Input validation**: illegal lines (bad wildcards like `*cdn.x`, bare IPs, `DOMAIN-KEYWORD`) are dropped and counted, never emitted.
-- **CI**: `check.yml` runs lint + tests + a dry-run build on every PR/push; `publish.yml` builds, gates, and pushes to `release` daily (cron `0 21 * * *` UTC = 05:00 Beijing) and on manual dispatch.
+- **CI**: `check.yml` validates on every PR/push (lint + tests + dry-run build; never publishes). `publish.yml` builds → shrink-gates → pushes to `release` → purges jsDelivr for each changed product. It fires three ways: daily cron `0 21 * * *` UTC = 05:00 Beijing (catches upstream drift), a push to `main` touching build inputs (`config.yaml`, `manual/`, `scripts/`, or `publish.yml`), and manual dispatch. The jsDelivr purge is gated on an actual product change (the publish step's `published` output) and is best-effort — it never fails the run. The push trigger is scoped to `branches: [main]` and `publish.yml` only pushes the `release` branch, so the release auto-commit cannot re-trigger the workflow.
 
 ## Conventions
 
