@@ -1,0 +1,68 @@
+name: Publish rules
+
+# 每天 UTC 21:00（北京 05:00）+ 手动触发：完整构建 → 数量骤降闸门 →
+# 发布到 release 分支（普通 commit 保留历史）。闸门失败则不发布，上一版留存。
+on:
+  schedule:
+    - cron: "0 21 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install deps
+        run: pip install -r scripts/requirements.txt
+
+      - name: Lint + tests
+        run: |
+          python scripts/build.py lint
+          python -m unittest discover -s tests
+
+      - name: Prepare release worktree
+        run: |
+          git fetch origin release || true
+          if git show-ref --verify --quiet refs/remotes/origin/release; then
+            git worktree add -B release release origin/release
+          else
+            # 首次：创建空的孤儿 release 分支
+            git worktree add --detach release
+            git -C release checkout --orphan release
+            git -C release rm -rf --quiet . || true
+          fi
+
+      - name: Build (gate compares against previous release)
+        run: |
+          python scripts/build.py build \
+            --out dist --previous release \
+            --commit-message-file dist/commit-msg.txt
+
+      - name: Publish to release branch
+        run: |
+          find release -maxdepth 1 -name 'final_*' -delete
+          cp dist/final_* release/
+          cd release
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to publish"
+            exit 0
+          fi
+          git -c user.name="github-actions[bot]" \
+              -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+              commit -F ../dist/commit-msg.txt
+          git push origin release

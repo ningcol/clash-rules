@@ -1,0 +1,42 @@
+name: Check rules
+
+# PR / push 验证：lint 手工文件、跑单测、干跑一次完整构建（验证所有源可拉取、
+# 可解析、可构建）。不发布。发布由 publish.yml 负责。
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install deps
+        run: pip install -r scripts/requirements.txt
+
+      - name: Lint manual files
+        run: python scripts/build.py lint
+
+      - name: Unit tests
+        run: python -m unittest discover -s tests
+
+      - name: Dry-run build (validates all sources + build pipeline)
+        run: python scripts/build.py build --out dist --dry-run
+
+      - name: Upload built rules
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+          if-no-files-found: ignore
+
+  # README 订阅表格校验将在 README 迁移到 release 分支后（迁移 Commit C）加入：
+  #   - run: python scripts/build.py readme --check

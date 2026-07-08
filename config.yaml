@@ -1,0 +1,56 @@
+# Clash 规则集构建配置 —— 唯一配置源。
+# 脚本读它构建、README 订阅表格由它生成。改配置只改这里。
+defaults:
+  timeout-seconds: 30
+  retries: 3
+  max-shrink-percent: 30      # 任一产物较上一版跌幅超此值 → 构建失败、不发布
+  publish-branch: release     # 产物发布到该分支；订阅 URL 指向它
+
+# 路由类目的线性优先级：前者从后者中排除，保证每个域名只落在一个路由类目里。
+# 手工指派（manual/<cat>.txt）优先于此顺序。reject 不在此列（策略叠加层）。
+priority: [microsoft, apple, icloud, proxy, direct]
+
+categories:
+  reject:
+    description: 广告拦截规则
+    sources:
+      - url: https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/reject.txt
+        note: Loyalsoldier/clash-rules
+      - url: https://raw.githubusercontent.com/qq5460168/AD886/refs/heads/main/clash_meta.yaml
+        note: qq5460168/AD886
+      - url: https://raw.githubusercontent.com/TG-Twilight/AWAvenue-Ads-Rule/refs/heads/main/Filters/AWAvenue-Ads-Rule-Clash.yaml
+        note: AWAvenue-Ads-Rule
+
+  microsoft:
+    description: 微软服务规则
+    sources:
+      - url: https://ruleset.skk.moe/Clash/non_ip/microsoft.txt
+        note: SukkaW/Surge
+      - url: https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/refs/heads/master/Clash/Microsoft.list
+        note: ACL4SSR Microsoft
+      - url: https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/refs/heads/master/Clash/Bing.list
+        note: ACL4SSR Bing
+
+  apple:
+    description: 苹果服务规则
+    sources:
+      - url: https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/apple.txt
+        note: Loyalsoldier/clash-rules
+
+  icloud:
+    description: iCloud 服务规则
+    sources:
+      - url: https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/icloud.txt
+        note: Loyalsoldier/clash-rules
+
+  proxy:
+    description: 代理规则
+    sources:
+      - url: https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/proxy.txt
+        note: Loyalsoldier/clash-rules
+
+  direct:
+    description: 直连规则
+    sources:
+      - url: https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/direct.txt
+        note: Loyalsoldier/clash-rules

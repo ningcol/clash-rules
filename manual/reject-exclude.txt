@@ -1,0 +1,20 @@
+# 从 reject 产物中放行的域名（误杀白名单，写清原因）
+# 注意：这里只是"从 reject 删除"，不改变它们的路由。
+
+google-analytics.com
+analytics.google.com
++.analytics.google.com
+firebasedynamiclinks.googleapis.com
+firebaseinstallations.googleapis.com
+firebaseremoteconfig.googleapis.com
+i.ys7.com
+analytics.meituan.net
++.analytics.meituan.net
+pgy.xiaohongshu.com
+ad.xiaohongshu.com
+wxa.wxs.qq.com
+open.douyin.com
++.tongjiniao.com
++.cloudflareinsights.com
+hm.baidu.com
++.hm.baidu.com

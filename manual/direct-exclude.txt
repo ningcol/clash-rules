@@ -1,0 +1,4 @@
+# 从 direct 产物中删除的域名（不改变其路由）。
+# 注：+.larksuite.com 无需在此——它已钉在 proxy，会自动从 direct 移除。
+
++.gihiji.com

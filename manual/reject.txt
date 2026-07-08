@@ -1,0 +1,7 @@
+# 手工追加的拦截域名（一行一条，写清原因+日期）
+
+# 12306 广告  2025
+ad.12306.cn
+
+# istatmenus 软件更新回连  2025
+updates.istatmenus.app
