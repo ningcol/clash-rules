@@ -64,6 +64,7 @@ jobs:
           python scripts/build.py build --out dist --previous release
 
       - name: Publish to release branch
+        id: publish
         run: |
           find release -maxdepth 1 -name 'final_*' -delete
           cp dist/final_* release/
@@ -71,9 +72,24 @@ jobs:
           git add -A
           if git diff --cached --quiet; then
             echo "No changes to publish"
+            echo "published=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
           git -c user.name="github-actions[bot]" \
               -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
               commit -F ../dist/commit-msg.txt
           git push origin release
+          echo "published=true" >> "$GITHUB_OUTPUT"
+
+      - name: Purge jsDelivr cache
+        # 仅在 release 真有更新时刷新 CDN（否则 jsDelivr 最长 ~12h 才自动过期）。
+        # 逐个 purge 已发布的产物；purge 失败不影响发布结果（尽力而为）。
+        if: steps.publish.outputs.published == 'true'
+        run: |
+          for f in release/final_*; do
+            name=$(basename "$f")
+            url="https://purge.jsdelivr.net/gh/${GITHUB_REPOSITORY}@release/${name}"
+            echo "purging ${name}"
+            curl -sS --max-time 30 "$url" || echo "  (purge failed, ignored)"
+            echo
+          done
