@@ -27,6 +27,9 @@ jobs:
       - name: Unit tests
         run: python -m unittest discover -s tests
 
+      - name: README subscription table in sync
+        run: python scripts/build.py readme --check
+
       - name: Dry-run build (validates all sources + build pipeline)
         run: python scripts/build.py build --out dist --dry-run
 
@@ -37,6 +40,3 @@ jobs:
           name: dist
           path: dist/
           if-no-files-found: ignore
-
-  # README 订阅表格校验将在 README 迁移到 release 分支后（迁移 Commit C）加入：
-  #   - run: python scripts/build.py readme --check
