@@ -36,8 +36,10 @@ jobs:
 
       - name: Prepare release worktree
         run: |
-          git fetch origin release || true
-          if git show-ref --verify --quiet refs/remotes/origin/release; then
+          # 用 ls-remote 查远端是否已有 release（不依赖本地 remote-tracking ref），
+          # 并用显式 refspec 拉取，确保 refs/remotes/origin/release 被填充。
+          if git ls-remote --exit-code --heads origin release >/dev/null 2>&1; then
+            git fetch origin +refs/heads/release:refs/remotes/origin/release
             git worktree add -B release release origin/release
           else
             # 首次：创建空的孤儿 release 分支
@@ -48,9 +50,8 @@ jobs:
 
       - name: Build (gate compares against previous release)
         run: |
-          python scripts/build.py build \
-            --out dist --previous release \
-            --commit-message-file dist/commit-msg.txt
+          # build 会自动把 commit-msg.txt 写进 --out 目录（供下面 commit 用）
+          python scripts/build.py build --out dist --previous release
 
       - name: Publish to release branch
         run: |
