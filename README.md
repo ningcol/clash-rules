@@ -11,14 +11,14 @@
 > 订阅 URL 指向 `release` 分支。规则每日构建（北京时间 05:00）。
 
 <!-- BUILD:SUBSCRIPTIONS:BEGIN -->
-| 规则类型 | 说明 | 订阅链接 |
-|---------|------|----------|
-| MICROSOFT | 微软服务规则 | [microsoft](https://raw.githubusercontent.com/ningcol/clash-rules/release/final_microsoft.yaml) |
-| APPLE | 苹果服务规则 | [apple](https://raw.githubusercontent.com/ningcol/clash-rules/release/final_apple.yaml) |
-| ICLOUD | iCloud 服务规则 | [icloud](https://raw.githubusercontent.com/ningcol/clash-rules/release/final_icloud.yaml) |
-| PROXY | 代理规则 | [proxy](https://raw.githubusercontent.com/ningcol/clash-rules/release/final_proxy.yaml) |
-| DIRECT | 直连规则 | [direct](https://raw.githubusercontent.com/ningcol/clash-rules/release/final_direct.yaml) |
-| REJECT | 广告拦截规则 | [reject](https://raw.githubusercontent.com/ningcol/clash-rules/release/final_reject.yaml) |
+| 规则类型 | 说明 | raw 订阅 | jsDelivr 订阅（国内更稳） |
+|---------|------|----------|--------------------------|
+| MICROSOFT | 微软服务规则 | [raw](https://raw.githubusercontent.com/ningcol/clash-rules/release/final_microsoft.yaml) | [jsDelivr](https://cdn.jsdelivr.net/gh/ningcol/clash-rules@release/final_microsoft.yaml) |
+| APPLE | 苹果服务规则 | [raw](https://raw.githubusercontent.com/ningcol/clash-rules/release/final_apple.yaml) | [jsDelivr](https://cdn.jsdelivr.net/gh/ningcol/clash-rules@release/final_apple.yaml) |
+| ICLOUD | iCloud 服务规则 | [raw](https://raw.githubusercontent.com/ningcol/clash-rules/release/final_icloud.yaml) | [jsDelivr](https://cdn.jsdelivr.net/gh/ningcol/clash-rules@release/final_icloud.yaml) |
+| PROXY | 代理规则 | [raw](https://raw.githubusercontent.com/ningcol/clash-rules/release/final_proxy.yaml) | [jsDelivr](https://cdn.jsdelivr.net/gh/ningcol/clash-rules@release/final_proxy.yaml) |
+| DIRECT | 直连规则 | [raw](https://raw.githubusercontent.com/ningcol/clash-rules/release/final_direct.yaml) | [jsDelivr](https://cdn.jsdelivr.net/gh/ningcol/clash-rules@release/final_direct.yaml) |
+| REJECT | 广告拦截规则 | [raw](https://raw.githubusercontent.com/ningcol/clash-rules/release/final_reject.yaml) | [jsDelivr](https://cdn.jsdelivr.net/gh/ningcol/clash-rules@release/final_reject.yaml) |
 <!-- BUILD:SUBSCRIPTIONS:END -->
 
 ## 🚀 快速使用
@@ -72,7 +72,9 @@ rules:
   - MATCH,PROXY
 ```
 
-> 规则集之间基本互不重叠（同一域名只出现在一个路由类目里），因此绝大多数域名的路由与 RULE-SET 顺序无关。**建议保持上面的顺序**（与构建优先级 `microsoft → apple → icloud → proxy → direct` 一致）：少数域名被上游的广义后缀规则（如 proxy 源里的 `+.mzstatic.com`）覆盖，而 domain 格式无法对后缀做“减一个子域”的裁剪，这些域名依赖此顺序才能路由到正确的策略。
+> 规则集之间基本互不重叠（同一域名只出现在一个路由类目里），因此绝大多数域名的路由与 RULE-SET 顺序无关。**建议保持上面的顺序**（与构建优先级 `microsoft → apple → icloud → proxy → direct` 一致）：少数域名被上游的广义后缀规则（如 direct 源里的 `+.mi.com`、proxy 源里的共享 CA `+.digicert.com`）覆盖，而 domain 格式无法对后缀做“减一个子域”的裁剪，这些域名依赖此顺序才能路由到正确的策略。
+
+> **jsDelivr 缓存**：`@release` 分支形式的 jsDelivr 链接有约 12 小时 CDN 缓存，push 后最长约半天才刷新；想立即生效可用上面的 raw 链接，或访问一次 `https://purge.jsdelivr.net/gh/ningcol/clash-rules@release/<文件名>` 强制回源。
 
 ## 🧩 工作原理
 

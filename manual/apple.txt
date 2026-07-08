@@ -1,6 +1,13 @@
 # 手工追加的 Apple 域名（迁移自 apple/rules.txt，保持完整）。
 # 含 +.apple.com 兜底后缀——构建时 compress 会自动压掉被它覆盖的 *.apple.com
 # 子域，产物只保留兜底规则与 apple.com 之外的域名，此文件仍留全量作为记录。
+# Apple 自有 CDN 广义后缀：原被 proxy 上游用广义后缀笼统收走，移到此处归位。
+# 因 apple 优先级高于 proxy，划分会据此自动把它们从 proxy 移除（无需 proxy-exclude），
+# 且 compress 会压掉本文件下面的对应精确子域。
++.mzstatic.com
++.cdn-apple.com
++.apple-mapkit.com
++.aaplimg.com
 a1.mzstatic.com
 a2.mzstatic.com
 a3.mzstatic.com

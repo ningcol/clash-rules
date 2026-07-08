@@ -1,5 +1,8 @@
 # source: https://docs.microsoft.com/en-us/office365/enterprise/urls-and-ip-address-ranges
 # 迁移自 microsoft/rules.txt；原 `*cdn.onenote.net`（非法通配）已修正为 +.cdn.onenote.net
+# Microsoft 自有广义后缀：原被 proxy 上游收走，移到此处归位（划分自动从 proxy 移除）。
++.microsoftazuread-sso.com
++.microsoft365.com
 +.cdn.onenote.net
 *.acompli.net
 *.activity.windows.com

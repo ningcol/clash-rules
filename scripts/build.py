@@ -561,14 +561,17 @@ END = "<!-- BUILD:SUBSCRIPTIONS:END -->"
 
 
 def render_readme_table(cfg: Config) -> str:
-    base = (f"https://raw.githubusercontent.com/ningcol/clash-rules/"
-            f"{cfg.publish_branch}")
-    rows = ["| 规则类型 | 说明 | 订阅链接 |", "|---------|------|----------|"]
+    br = cfg.publish_branch
+    raw = f"https://raw.githubusercontent.com/ningcol/clash-rules/{br}"
+    jsd = f"https://cdn.jsdelivr.net/gh/ningcol/clash-rules@{br}"
+    rows = ["| 规则类型 | 说明 | raw 订阅 | jsDelivr 订阅（国内更稳） |",
+            "|---------|------|----------|--------------------------|"]
     order = cfg.priority + [c for c in cfg.categories if c not in cfg.priority]
     for name in order:
         cat = cfg.categories[name]
-        url = f"{base}/final_{name}.yaml"
-        rows.append(f"| {name.upper()} | {cat.description} | [{name}]({url}) |")
+        f = f"final_{name}.yaml"
+        rows.append(f"| {name.upper()} | {cat.description} | "
+                    f"[raw]({raw}/{f}) | [jsDelivr]({jsd}/{f}) |")
     return "\n".join(rows)
 
 

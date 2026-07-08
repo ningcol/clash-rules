@@ -6,6 +6,14 @@ on:
   pull_request:
   push:
     branches: [main]
+    # 只在影响构建的输入变动时触发，避免旧管线每日往 main 提交 final_*.yaml 时空跑。
+    paths:
+      - 'config.yaml'
+      - 'scripts/**'
+      - 'manual/**'
+      - 'tests/**'
+      - 'README.md'
+      - '.github/workflows/check.yml'
   workflow_dispatch:
 
 jobs:
