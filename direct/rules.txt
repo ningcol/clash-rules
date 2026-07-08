@@ -42,3 +42,5 @@ v.cdnlz30.com
 
 resend.com
 +.resend.com
+
+*.kdltps.com
