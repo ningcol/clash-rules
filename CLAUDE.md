@@ -43,6 +43,8 @@ Two things decide a domain's category, **manual assignment winning over priority
 
 `reject` is a policy overlay and does not participate in the partition. The suffix-tree engine (`DomainSet` in `scripts/build.py`) does the covering-relation work: `compress()` removes entries covered by an ancestor suffix, `subtract()` does priority/manual exclusion and reports `Conflict`s when a narrow rule can't be removed from a broader suffix (surfaced in the build report, not fatal).
 
+Because domain-behavior format cannot trim a subdomain out of a `+.suffix`, the partition is not 100% clean: when a lower/other category carries a broad suffix (e.g. proxy's `+.mzstatic.com`) that covers a higher category's specific domain (apple's `a1.mzstatic.com`), both match it and routing becomes order-dependent for that domain (~tens of cases, all in the conflict report). The README's recommended RULE-SET order is the build's `priority` order, which resolves them correctly — so keep those two in sync.
+
 ## Safety mechanisms
 
 - **Shrink gate** (`check_gate`): if any product shrinks more than `max-shrink-percent` (default 30) vs the last release, the build fails and publishes nothing — the previous release stays live. Skipped on first publish. This is why a dead upstream source degrades gracefully instead of shipping a truncated list.
