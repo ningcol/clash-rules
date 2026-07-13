@@ -54,3 +54,7 @@ img.bwcgee.cn
 img.liangzipic.com
 api.nbyjson.top
 v.cdnlz30.com
+
+# 其他
+# ynzs.cn 域名及子域名走直连，2026-07-13
++.ynzs.cn
