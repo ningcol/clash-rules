@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-07-13T14:58:32Z
+# 更新时间: 2026-07-14T22:01:55Z
 # 说明: 本文件为自动生成的 Clash DIRECT 规则（behavior: domain）。
 #########################################
 payload:
@@ -30649,6 +30649,7 @@ payload:
   - '+.dulife.com'
   - '+.dulifei.com'
   - '+.dullr.com'
+  - '+.dulupay.com'
   - '+.dulwich.org'
   - '+.dumall.com'
   - '+.dumanhua.com'
@@ -106595,6 +106596,7 @@ payload:
   - '+.yzs.io'
   - '+.yzsbh.com'
   - '+.yzsfuer.com'
+  - '+.yzsgo.com'
   - '+.yzshkjxx.com'
   - '+.yzshyzz.com'
   - '+.yzsljz.com'
