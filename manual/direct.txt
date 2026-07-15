@@ -60,3 +60,7 @@ v.cdnlz30.com
 +.ynzs.cn
 # youzy.cn 域名及子域名走直连，2026-07-13
 +.youzy.cn
+# ioput.cn 域名及子域名走直连，2026-07-15
++.ioput.cn
+# zhixun.chat 域名及子域名走直连，2026-07-15
++.zhixun.chat
