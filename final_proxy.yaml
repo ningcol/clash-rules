@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-07-15T13:09:08Z
+# 更新时间: 2026-07-16T22:05:58Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -2782,6 +2782,7 @@ payload:
   - '+.azuredns-prd.info'
   - '+.azuredns-prd.org'
   - '+.azureedge-test.net'
+  - '+.azureedge.us'
   - '+.azurefd.net'
   - '+.azureiotsolutions.com'
   - '+.azureiotsuite.com'
@@ -5798,6 +5799,7 @@ payload:
   - '+.coova.com'
   - '+.coova.net'
   - '+.coova.org'
+  - '+.copilot-stg.com'
   - '+.copilot.com'
   - '+.copro.pw'
   - '+.copy-manga.com'
@@ -14741,6 +14743,7 @@ payload:
   - '+.mh4u.org'
   - '+.mhcb.ru'
   - '+.mhcbr.ru'
+  - '+.mhgui.com'
   - '+.mhhanman.xyz'
   - '+.mhqwe.xyz'
   - '+.mhradio.org'
@@ -20988,6 +20991,7 @@ payload:
   - '+.starfox.com'
   - '+.stargazer-games.com'
   - '+.stark-verlag.ch'
+  - '+.starlink.com'
   - '+.starott.com'
   - '+.starp2p.com'
   - '+.starplus.com'
@@ -26018,7 +26022,6 @@ payload:
   - 'sberpro.vedomosti.ru'
   - 'straitsx-826709081262441084-b790f87a2ae6fd417434295.freshchat.com'
   - 'supercell.helpshift.com'
-  - 'tesla-cdn.thron.com'
   - 'ubisoft.siteintercept.qualtrics.com'
   - 'ut1-time.colorado.edu'
   - 'utcnist.colorado.edu'

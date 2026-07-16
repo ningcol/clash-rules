@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-07-15T13:09:08Z
+# 更新时间: 2026-07-16T22:05:58Z
 # 说明: 本文件为自动生成的 Clash DIRECT 规则（behavior: domain）。
 #########################################
 payload:
@@ -111274,7 +111274,6 @@ payload:
   - 'staging-controlbe.floonet.goog'
   - 'staging-databe.floonet.goog'
   - 'staging.databe.floonet.goog'
-  - 'tesla-cdn.thron.cn'
   - 'time.amazonaws.cn'
   - 'v.cdnlz30.com'
   - 'v.fengbao8.com'
