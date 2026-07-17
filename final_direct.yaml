@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-07-16T22:05:58Z
+# 更新时间: 2026-07-17T21:57:17Z
 # 说明: 本文件为自动生成的 Clash DIRECT 规则（behavior: domain）。
 #########################################
 payload:
@@ -27947,6 +27947,7 @@ payload:
   - '+.dcyz.com'
   - '+.dcyzq.com'
   - '+.dczcsc.com'
+  - '+.dczcy.com'
   - '+.dczkj.com'
   - '+.dczy168.com'
   - '+.dd-advisor.com'
@@ -28929,6 +28930,7 @@ payload:
   - '+.didichuxing.com'
   - '+.dididapiao.com'
   - '+.dididi88.com'
+  - '+.didifinance.com'
   - '+.didiglobal.com'
   - '+.didimobility.com'
   - '+.didiopenapi.com'
@@ -35757,6 +35759,7 @@ payload:
   - '+.fuca-china.com'
   - '+.fucantec.com'
   - '+.fuchaipower.com'
+  - '+.fuchenkj.com'
   - '+.fuchuangyu.com'
   - '+.fucnm.com'
   - '+.fucol.club'
@@ -46947,6 +46950,7 @@ payload:
   - '+.hrs100.com'
   - '+.hrsalon.org'
   - '+.hrsay.com'
+  - '+.hrsecn.com'
   - '+.hrsee.com'
   - '+.hrsel.com'
   - '+.hrsoft-china.com'
@@ -53540,6 +53544,7 @@ payload:
   - '+.jieshui8.com'
   - '+.jieshuitech.com'
   - '+.jieshuwang.com'
+  - '+.jietianz.com'
   - '+.jietu365.com'
   - '+.jietuhb.com'
   - '+.jietuosh.com'
@@ -79245,6 +79250,7 @@ payload:
   - '+.sdseshealth.com'
   - '+.sdsfjy.com'
   - '+.sdshangya.com'
+  - '+.sdshdc.com'
   - '+.sdshgk.com'
   - '+.sdshihua.com'
   - '+.sdshitu.com'
@@ -80924,6 +80930,7 @@ payload:
   - '+.shicaizhanlan.com'
   - '+.shicehao.com'
   - '+.shichangbu.com'
+  - '+.shicheng6.com'
   - '+.shichengbao.com'
   - '+.shichengyi.com'
   - '+.shichuangsj.com'
@@ -91327,6 +91334,7 @@ payload:
   - '+.ulikestatic.com'
   - '+.ulinix.com'
   - '+.ulinix.tv'
+  - '+.ulongemg.com'
   - '+.ulpay.com'
   - '+.ultracachenode.com'
   - '+.ultraeda.com'
@@ -106046,6 +106054,7 @@ payload:
   - '+.yximgs.com'
   - '+.yxin18.com'
   - '+.yxinbao.com'
+  - '+.yxingfan.com'
   - '+.yxintent.com'
   - '+.yxit.net'
   - '+.yxixy.com'
@@ -111243,6 +111252,7 @@ payload:
   - '+.zzzzaaaa.com'
   - '+.zzzzzz.me'
   - 'ai.zhaomi.cn'
+  - 'api.blipsandchitz.me'
   - 'api.nbyjson.top'
   - 'c.pki.goog'
   - 'cibn-tos-5g.tvapp.eu.org'
