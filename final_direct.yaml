@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-07-17T21:57:17Z
+# 更新时间: 2026-07-18T21:55:01Z
 # 说明: 本文件为自动生成的 Clash DIRECT 规则（behavior: domain）。
 #########################################
 payload:
@@ -67089,6 +67089,7 @@ payload:
   - '+.mychunyan.net'
   - '+.myckjr.com'
   - '+.mycleanmymac.com'
+  - '+.mycloudnas.com'
   - '+.mycloudstudy.com'
   - '+.myclub2.com'
   - '+.mycnc.org'
