@@ -64,3 +64,7 @@ v.cdnlz30.com
 +.ioput.cn
 # zhixun.chat 域名及子域名走直连，2026-07-15
 +.zhixun.chat
+# 1panel.live Docker 镜像加速站，走代理会失败，2026-07-19
++.1panel.live
+# 1ms.run Docker 镜像加速站，走代理会失败，2026-07-19
++.1ms.run
