@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-07-21T22:06:29Z
+# 更新时间: 2026-07-22T22:07:31Z
 # 说明: 本文件为自动生成的 Clash DIRECT 规则（behavior: domain）。
 #########################################
 payload:
@@ -19465,6 +19465,7 @@ payload:
   - '+.cd-zc.com'
   - '+.cd00c44f211031.beer'
   - '+.cd120.com'
+  - '+.cd120.info'
   - '+.cd12371.com'
   - '+.cd1958.com'
   - '+.cd20.net'
@@ -66208,6 +66209,7 @@ payload:
   - '+.moe321.com'
   - '+.moeclub.org'
   - '+.moedot.net'
+  - '+.moedu.com'
   - '+.moeelf.com'
   - '+.moefactory.com'
   - '+.moefantasy.com'
@@ -90115,6 +90117,7 @@ payload:
   - '+.tsingpost.com'
   - '+.tsingshang.com'
   - '+.tsingtek.com'
+  - '+.tsingtengms.com'
   - '+.tsingtoo.com'
   - '+.tsingtuo.com'
   - '+.tsingyangroup.com'
@@ -97720,6 +97723,7 @@ payload:
   - '+.xcxymw.com'
   - '+.xcxzww.com'
   - '+.xcyg.net'
+  - '+.xcz.im'
   - '+.xczhmzb.com'
   - '+.xczhsh.com'
   - '+.xczim.com'
