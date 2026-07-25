@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-07-24T22:08:35Z
+# 更新时间: 2026-07-25T21:59:25Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -5385,6 +5385,7 @@ payload:
   - '+.cinepornogratis.com'
   - '+.cinny.in'
   - '+.cios.org'
+  - '+.circle19.org'
   - '+.cirosantilli.com'
   - '+.cisco-returns.com'
   - '+.cisco-warrantyfinder.com'
@@ -6895,6 +6896,7 @@ payload:
   - '+.doclercdn.com'
   - '+.docs.new'
   - '+.docs.rs'
+  - '+.docs.rw'
   - '+.doctor-videos.com'
   - '+.documentforce.com'
   - '+.documentingreality.com'
@@ -13271,6 +13273,7 @@ payload:
   - '+.karabako-gmo.com'
   - '+.karafarinbank.ir'
   - '+.karayou.com'
+  - '+.kards.com'
   - '+.karechat.ai'
   - '+.karger.com'
   - '+.karinahart.com'
@@ -13945,6 +13948,7 @@ payload:
   - '+.localpresshk.com'
   - '+.localxlist.org'
   - '+.lockestek.com'
+  - '+.log.rw'
   - '+.logi.com'
   - '+.logicool.co.jp'
   - '+.logicoolg.com'
@@ -22323,6 +22327,7 @@ payload:
   - '+.truyenkk1.com'
   - '+.truyentranh86.com'
   - '+.truyenwk.com'
+  - '+.try.rw'
   - '+.tryalias.com'
   - '+.tryboobs.com'
   - '+.trycloudflare.com'
