@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-07-27T22:11:16Z
+# 更新时间: 2026-07-28T22:07:44Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -9841,6 +9841,7 @@ payload:
   - '+.githubnext.com'
   - '+.githubpreview.dev'
   - '+.githubstatus.com'
+  - '+.githubsupport.com'
   - '+.githubuniverse.com'
   - '+.githubusercontent.com'
   - '+.gitlab-static.net'
@@ -22328,6 +22329,7 @@ payload:
   - '+.truyentranh86.com'
   - '+.truyenwk.com'
   - '+.try.rw'
+  - '+.tryai.dev'
   - '+.tryalias.com'
   - '+.tryboobs.com'
   - '+.trycloudflare.com'
