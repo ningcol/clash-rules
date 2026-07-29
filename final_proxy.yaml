@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-07-28T22:07:44Z
+# 更新时间: 2026-07-29T22:04:14Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -3851,6 +3851,7 @@ payload:
   - '+.bluemix.net'
   - '+.bluestacks.com'
   - '+.bluffyporn.com'
+  - '+.blurams.app'
   - '+.blurams.com'
   - '+.blylq.buzz'
   - '+.blz-contentstack.com'
@@ -5102,6 +5103,7 @@ payload:
   - '+.cencoastbmw.com'
   - '+.cenews.eu'
   - '+.cenkei.com'
+  - '+.ceno.app'
   - '+.censorship.ai'
   - '+.censorship.no'
   - '+.centauro.com.br'
@@ -12718,6 +12720,7 @@ payload:
   - '+.iutunes.com'
   - '+.ivacy.com'
   - '+.ivi.ru'
+  - '+.ivicdn.tv'
   - '+.ivintageporn.com'
   - '+.ivonblog.com'
   - '+.ivpn.net'
@@ -13425,6 +13428,7 @@ payload:
   - '+.kindleren.com'
   - '+.kindnudist.com'
   - '+.kindteenporn.com'
+  - '+.kinescopecdn.net'
   - '+.kingcomix.com'
   - '+.kingdomsalvation.org'
   - '+.kingextre.me'
@@ -19670,6 +19674,7 @@ payload:
   - '+.sber.ru'
   - '+.sberauto.com'
   - '+.sberbank-insurance.ru'
+  - '+.sberbank-tele.com'
   - '+.sberbank.com'
   - '+.sberbank.ru'
   - '+.sberbankaktivno.ru'
