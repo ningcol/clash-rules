@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-08-05T22:14:36Z
+# 更新时间: 2026-08-07T01:01:10Z
 # 说明: 本文件为自动生成的 Clash DIRECT 规则（behavior: domain）。
 #########################################
 payload:
@@ -63225,6 +63225,7 @@ payload:
   - '+.madajiefood.com'
   - '+.madaomall.com'
   - '+.madboxi.com'
+  - '+.made-in-china.com'
   - '+.madefuns.com'
   - '+.madeinchinastone.com'
   - '+.madewei.com'
@@ -64960,6 +64961,7 @@ payload:
   - '+.microxiang.com'
   - '+.microyan.com'
   - '+.microzuji.com'
+  - '+.micstatic.com'
   - '+.mictormedical.com'
   - '+.micu.hk'
   - '+.micun.com'
@@ -72534,6 +72536,7 @@ payload:
   - '+.powerchinayun.com'
   - '+.powerde.com'
   - '+.powereasy.net'
+  - '+.poweremarket.com'
   - '+.powerex1.com'
   - '+.powerflow-tech.com'
   - '+.powerfulchina.com'
