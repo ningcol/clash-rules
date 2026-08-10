@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-08-09T21:36:18Z
+# 更新时间: 2026-08-10T21:45:34Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -1059,6 +1059,7 @@ payload:
   - '+.ai91porn.cc'
   - '+.aiaa.org'
   - '+.aiasahi.jp'
+  - '+.aihub.top'
   - '+.aimei133.com'
   - '+.aimsciences.org'
   - '+.aiosearch.com'
@@ -7957,6 +7958,7 @@ payload:
   - '+.esforce.com'
   - '+.esforce.ru'
   - '+.esg.t91y.com'
+  - '+.esim.redteago.com'
   - '+.eskimotube.com'
   - '+.eslite.com'
   - '+.esm.run'
