@@ -5,6 +5,37 @@
 # NAS / 动态域名
 +.synology.com
 +.synology.cn
+# 群晖套件与 DSM 的下载/更新分发域。上游 Loyalsoldier proxy.txt 把整个群晖
+# 按「境外厂商」一刀切归了代理，而这两个是独立注册域、+.synology.com 的后缀
+# 盖不到；群晖在国内有 cndl.synology.cn 分发，走代理等于从境外把国内的包绕
+# 回来下。域名出处：群晖官方 KB「What websites does my Synology NAS connect
+# to when running services or updating software」，2026-08-12
++.synologydownload.com
++.synologyupdate.com
+# 群晖官方 DDNS 域名全族。这些主机名解析到的就是「你自己家的公网 IP」，
+# 走代理是把回自己家的流量绕出境再绕回来，只会更慢、且可能直接连不上。
+# myds.me 早就在下面，这批是把同族补齐（其余全在上游的 proxy 清单里）。
+# 出处：publicsuffix.org 的 Synology, Inc. 段，2026-08-12
++.diskstation.me
++.dscloud.biz
++.dscloud.me
++.dscloud.mobi
++.dsmynas.com
++.dsmynas.net
++.dsmynas.org
++.familyds.com
++.familyds.net
++.familyds.org
++.i234.me
++.synology.me
++.vpnplus.to
+# QuickConnect：协商 + 打洞 + 中继，最终连的还是自己家的 NAS。
+# 走代理时群晖按「代理出口 IP」挑中继节点，会挑到境外机房，
+# 变成 中国→境外中继→中国 三跳。direct.quickconnect.to 更是直接解析到
+# 自家公网 IP。.cn 那侧已被 direct 的 +.cn 覆盖，无需单列，2026-08-12
++.quickconnect.to
+# 群晖 File Station / Drive 的分享短链域，链接最终指向自家 NAS，2026-08-12
++.gofile.me
 +.synocircle.top
 +.dyndns.org
 +.ddns.net
