@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-08-12T03:10:40Z
+# 更新时间: 2026-08-12T08:07:47Z
 # 说明: 本文件为自动生成的 Clash MICROSOFT 规则（behavior: domain）。
 #########################################
 payload:
@@ -112,7 +112,6 @@ payload:
   - '+.xboxservices.com'
   - '+.yammer.com'
   - '+.yammerusercontent.com'
-  - '7h15.ru1353t.1s.m4d3.by.5ukk4w.skk.moe'
   - 'cacerts.digicert.com'
   - 'cert.int-x3.letsencrypt.org'
   - 'clientconfig.microsoftonline-p.net'
