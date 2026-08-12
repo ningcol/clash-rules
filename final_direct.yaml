@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-08-12T09:25:06Z
+# 更新时间: 2026-08-12T15:15:35Z
 # 说明: 本文件为自动生成的 Clash DIRECT 规则（behavior: domain）。
 #########################################
 payload:
@@ -28998,6 +28998,7 @@ payload:
   - '+.dishuge.com'
   - '+.dishuizhijia.com'
   - '+.disimy.com'
+  - '+.diskstation.me'
   - '+.dislux.com'
   - '+.dislytegame.com'
   - '+.dismall.com'
@@ -30195,6 +30196,9 @@ payload:
   - '+.dsb.ink'
   - '+.dsblog.net'
   - '+.dscbs.com'
+  - '+.dscloud.biz'
+  - '+.dscloud.me'
+  - '+.dscloud.mobi'
   - '+.dscq.com'
   - '+.dsdbxg.com'
   - '+.dsdod.com'
@@ -30223,6 +30227,9 @@ payload:
   - '+.dsm888.com'
   - '+.dsmxp.com'
   - '+.dsmyiyuan.com'
+  - '+.dsmynas.com'
+  - '+.dsmynas.net'
+  - '+.dsmynas.org'
   - '+.dsmzyy.com'
   - '+.dsnpz.com'
   - '+.dsnzyy120.com'
@@ -33369,6 +33376,9 @@ payload:
   - '+.famens.com'
   - '+.famensi.com'
   - '+.family-marathon.com'
+  - '+.familyds.com'
+  - '+.familyds.net'
+  - '+.familyds.org'
   - '+.familyincloud.com'
   - '+.familykoloro.com'
   - '+.familyzuji.com'
@@ -38371,6 +38381,7 @@ payload:
   - '+.goertek.com'
   - '+.goetheslz.com'
   - '+.gofarqzyy.com'
+  - '+.gofile.me'
   - '+.goforandroid.com'
   - '+.goframe.org'
   - '+.gofreeplay.com'
@@ -49133,6 +49144,7 @@ payload:
   - '+.i1766.com'
   - '+.i178.info'
   - '+.i1r.cc'
+  - '+.i234.me'
   - '+.i2863.com'
   - '+.i2abc.com'
   - '+.i2eas.com'
@@ -75390,6 +75402,7 @@ payload:
   - '+.quickbass.com'
   - '+.quickcan.com'
   - '+.quickcep.com'
+  - '+.quickconnect.to'
   - '+.quickddns.com'
   - '+.quickdetection.com'
   - '+.quickingdata.com'
@@ -85172,7 +85185,10 @@ payload:
   - '+.synodc.com'
   - '+.synology-cn.com'
   - '+.synology.com'
+  - '+.synology.me'
+  - '+.synologydownload.com'
   - '+.synologyssb.com'
+  - '+.synologyupdate.com'
   - '+.syntao.com'
   - '+.synyan.net'
   - '+.synyi.com'
@@ -92502,6 +92518,7 @@ payload:
   - '+.vplayer.net'
   - '+.vpmagic.com'
   - '+.vpn39.com'
+  - '+.vpnplus.to'
   - '+.vpnsoft.net'
   - '+.vpnvpn.com'
   - '+.vpquc9rn.com'

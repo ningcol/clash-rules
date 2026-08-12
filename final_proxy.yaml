@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-08-12T09:25:06Z
+# 更新时间: 2026-08-12T15:15:35Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -6782,7 +6782,6 @@ payload:
   - '+.discussionsapple.com'
   - '+.dish.com'
   - '+.dishworld.com'
-  - '+.diskstation.me'
   - '+.disney-asia.com'
   - '+.disney-discount.com'
   - '+.disney-plus.net'
@@ -7180,16 +7179,10 @@ payload:
   - '+.drweb.kz'
   - '+.drweb.ru'
   - '+.drweb.uz'
-  - '+.dscloud.biz'
-  - '+.dscloud.me'
-  - '+.dscloud.mobi'
   - '+.dscn.info'
   - '+.dsex.to'
   - '+.dslr.net'
   - '+.dslreports.com'
-  - '+.dsmynas.com'
-  - '+.dsmynas.net'
-  - '+.dsmynas.org'
   - '+.dssott.com'
   - '+.dstk.dk'
   - '+.dswz88.xyz'
@@ -8443,9 +8436,6 @@ payload:
   - '+.family-simulator.io'
   - '+.family.co.jp'
   - '+.family.com.tw'
-  - '+.familyds.com'
-  - '+.familyds.net'
-  - '+.familyds.org'
   - '+.familymart.com.my'
   - '+.familymart.com.ph'
   - '+.familypies.net'
@@ -10054,7 +10044,6 @@ payload:
   - '+.godfootsteps.org'
   - '+.godoc.org'
   - '+.goduckgo.com'
-  - '+.gofile.me'
   - '+.gofucker.com'
   - '+.gofuckmenow.com'
   - '+.gofundme.com'
@@ -11719,7 +11708,6 @@ payload:
   - '+.i.111666.best'
   - '+.i.lithium.com'
   - '+.i.org'
-  - '+.i234.me'
   - '+.i2p2.de'
   - '+.i69.com.tw'
   - '+.i818hk.com'
@@ -18958,7 +18946,6 @@ payload:
   - '+.quickbooksenligne.ca'
   - '+.quickbooksgetconnected.co.za'
   - '+.quickbooksonline.com'
-  - '+.quickconnect.to'
   - '+.quickiepage.com'
   - '+.quickoffice.com'
   - '+.quicksrv.de'
@@ -21522,9 +21509,6 @@ payload:
   - '+.synaptic.net'
   - '+.syncback.com'
   - '+.synergyse.com'
-  - '+.synology.me'
-  - '+.synologydownload.com'
-  - '+.synologyupdate.com'
   - '+.syosetu.com'
   - '+.sysinternals.com'
   - '+.system76.com'
