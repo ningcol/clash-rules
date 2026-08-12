@@ -8,7 +8,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
 import build  # noqa: E402
 from build import (  # noqa: E402
     Rule, DomainSet, classify_value, parse_line, parse_text,
-    check_gate, GateError,
+    check_gate, check_invalid_gate, GateError,
 )
 
 
@@ -33,6 +33,40 @@ class TestClassify(unittest.TestCase):
         for bad in ["*cdn.onenote.net", "1.2.3.4", "not a domain",
                     "foo@bar.com", "sub.*.example.com", "single", ""]:
             self.assertIsNone(classify_value(bad), bad)
+
+    def test_bare_tld_suffix(self):
+        """A suffix rule may be a bare TLD; an exact rule may not.
+
+        Upstream direct lists carry `+.cn` as ONE line covering the whole ccTLD
+        and therefore list almost no individual .cn domains. Rejecting it does
+        not lose one rule — it drops the entire .cn top-level domain out of
+        direct, and every Chinese .cn site then falls through to the catch-all
+        group and goes out over the proxy. The failure is silent: the line is
+        only counted as `dropped_invalid` and the build still succeeds.
+        """
+        self.assertEqual(classify_value("+.cn"), Rule("suffix", "cn"))
+        self.assertEqual(classify_value("*.cn"), Rule("suffix", "cn"))
+        self.assertEqual(classify_value(".icbc"), Rule("suffix", "icbc"))
+        self.assertEqual(classify_value("+.xn--fiqs8s"), Rule("suffix", "xn--fiqs8s"))
+        self.assertEqual(parse_line("DOMAIN-SUFFIX,cn"), ("ok", Rule("suffix", "cn")))
+        # Exact form is untouched: DOMAIN,cn matches nothing real.
+        self.assertIsNone(classify_value("cn"))
+        self.assertEqual(parse_line("DOMAIN,cn")[0], "invalid")
+        # An all-numeric single label is a bare IP fragment, not a TLD.
+        self.assertIsNone(classify_value("+.123"))
+
+    def test_leading_dot_digit_first_label(self):
+        """`.95572.com` is a suffix rule, not garbage.
+
+        The old guard skipped the leading-dot branch whenever the next character
+        was a digit — meant to stop `.1.2.3` becoming a suffix, but it rejected
+        every domain whose first label starts with a digit. Bare IPs are already
+        caught by the all-numeric-last-label check below.
+        """
+        self.assertEqual(classify_value(".95572.com"), Rule("suffix", "95572.com"))
+        self.assertEqual(classify_value(".360doc11.net"), Rule("suffix", "360doc11.net"))
+        self.assertIsNone(classify_value(".1.2.3"))       # still a bare IP
+        self.assertIsNone(classify_value("1.2.3.4"))
 
 
 class TestParseLine(unittest.TestCase):
@@ -118,6 +152,20 @@ class TestGate(unittest.TestCase):
 
     def test_shrink_within_limit_ok(self):
         check_gate("f", 80, 100, 30)       # 20% shrink
+
+    def test_one_invalid_line_fails_a_routing_category(self):
+        """A single dropped line must fail the build, not just get counted.
+
+        The `+.cn` regression was 1 line in 111,516 — a percentage gate would
+        have waved it through while the whole .cn TLD leaked to the proxy. The
+        limit for routing categories is therefore 0, and the samples ride along
+        in the message so the failure is diagnosable without a rebuild.
+        """
+        with self.assertRaises(GateError) as cm:
+            check_invalid_gate("direct", 1, ["upstream: - '+.cn'"], 0)
+        self.assertIn("+.cn", str(cm.exception))
+        check_invalid_gate("direct", 0, [], 0)      # nothing dropped -> ok
+        check_invalid_gate("reject", 2, ["x"], 20)  # reject's slack -> ok
 
 
 class TestPartition(unittest.TestCase):

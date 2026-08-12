@@ -39,6 +39,16 @@ import yaml
 # trailing hyphen. A domain is >=2 labels.
 _LABEL = r"[a-z0-9_](?:[a-z0-9_-]{0,61}[a-z0-9_])?"
 DOMAIN_RE = re.compile(rf"^(?:{_LABEL}\.)+{_LABEL}$")
+# A suffix rule may be a bare TLD (`+.cn`, `+.icbc`, punycode `+.xn--fiqs8s`).
+# Upstream direct lists carry `+.cn` as ONE line covering the whole ccTLD and
+# therefore list almost no individual .cn domains — so requiring >=2 labels here
+# does not drop one rule, it drops the entire .cn top-level domain from direct
+# and every Chinese .cn site falls through to the catch-all group (measured:
+# 12306.cn / gov.cn / edu.cn / quark.cn / 189.cn all leaked to the proxy, which
+# is how ~57 GiB of domestic cloud-drive traffic went out over a paid VPS).
+# The drop is silent: it is counted as `dropped_invalid` and never fails a build.
+# Bare TLDs stay illegal for EXACT rules — `DOMAIN,cn` matches nothing real.
+TLD_RE = re.compile(rf"^{_LABEL}$")
 ASN_RE = re.compile(r"^as[0-9]+$")
 
 ROUTING_HEADER = "# 说明: 本文件为自动生成的 Clash {up} 规则（behavior: domain）。"
@@ -54,8 +64,12 @@ class Rule:
 # ---------------------------------------------------------------------------
 # Parsing / normalization
 # ---------------------------------------------------------------------------
-def _normalize_domain(v: str) -> str | None:
-    """Lowercase, strip trailing dot, IDNA-encode non-ASCII. Return None if invalid."""
+def _normalize_domain(v: str, *, allow_tld: bool = False) -> str | None:
+    """Lowercase, strip trailing dot, IDNA-encode non-ASCII. Return None if invalid.
+
+    allow_tld admits a single-label value (a bare TLD). Only suffix rules may set
+    it; see TLD_RE above for what breaks when they cannot.
+    """
     v = v.strip().rstrip(".").lower()
     if not v or "*" in v or ":" in v or "@" in v or "/" in v:
         return None
@@ -68,7 +82,7 @@ def _normalize_domain(v: str) -> str | None:
             v = v.encode("idna").decode("ascii")
         except (UnicodeError, ValueError):
             return None
-    if not DOMAIN_RE.match(v):
+    if not (DOMAIN_RE.match(v) or (allow_tld and TLD_RE.match(v))):
         return None
     # Reject bare IPs (no mask): a real TLD is never all-numeric.
     if v.rsplit(".", 1)[-1].isdigit():
@@ -99,13 +113,20 @@ def classify_value(v: str) -> Rule | None:
 
     # Suffix forms: +.x  *.x  .x
     if low.startswith("+."):
-        d = _normalize_domain(low[2:])
+        d = _normalize_domain(low[2:], allow_tld=True)
         return Rule("suffix", d) if d else None
     if low.startswith("*."):
-        d = _normalize_domain(low[2:])
+        d = _normalize_domain(low[2:], allow_tld=True)
         return Rule("suffix", d) if d else None
-    if low.startswith(".") and not low[1:2].isdigit():
-        d = _normalize_domain(low[1:])
+    # Leading-dot suffix form. Do NOT gate this on "second char is not a digit":
+    # that guard was meant to keep `.1.2.3` from becoming a suffix rule, but it
+    # also rejects every domain whose first label starts with a digit, and those
+    # are common in Chinese lists (numeric brand names). _normalize_domain
+    # already rejects bare IPs via its all-numeric-last-label check, so the
+    # guard bought nothing and silently dropped ~9.5k rules from one candidate
+    # source.
+    if low.startswith("."):
+        d = _normalize_domain(low[1:], allow_tld=True)
         return Rule("suffix", d) if d else None
 
     # Bare domain.
@@ -150,7 +171,7 @@ def parse_line(line: str) -> tuple[str, Rule | None]:
                 d = _normalize_domain(val)
                 return ("ok", Rule("exact", d)) if d else ("invalid", None)
             if t == "DOMAIN-SUFFIX":
-                d = _normalize_domain(val)
+                d = _normalize_domain(val, allow_tld=True)
                 return ("ok", Rule("suffix", d)) if d else ("invalid", None)
             r = classify_value(val)  # IP-CIDR/6/ASN
             return ("ok", r) if r else ("invalid", None)
@@ -353,6 +374,7 @@ class Category:
     description: str
     sources: list[Source]
     max_shrink: int
+    max_invalid: int
 
 
 @dataclass
@@ -360,6 +382,7 @@ class Config:
     timeout: int
     retries: int
     default_max_shrink: int
+    default_max_invalid: int
     publish_branch: str
     priority: list[str]
     categories: dict[str, Category]
@@ -372,6 +395,7 @@ def load_config(path: Path) -> Config:
     data = yaml.safe_load(path.read_text(encoding="utf-8"))
     d = data.get("defaults", {})
     default_shrink = int(d.get("max-shrink-percent", 30))
+    default_invalid = int(d.get("max-invalid", 0))
     priority = list(data.get("priority", []))
     cats: dict[str, Category] = {}
     for name, c in (data.get("categories") or {}).items():
@@ -381,6 +405,7 @@ def load_config(path: Path) -> Config:
             description=c.get("description", name),
             sources=srcs,
             max_shrink=int(c.get("max-shrink-percent", default_shrink)),
+            max_invalid=int(c.get("max-invalid", default_invalid)),
         )
     for p in priority:
         if p not in cats:
@@ -389,6 +414,7 @@ def load_config(path: Path) -> Config:
         timeout=int(d.get("timeout-seconds", 30)),
         retries=int(d.get("retries", 3)),
         default_max_shrink=default_shrink,
+        default_max_invalid=default_invalid,
         publish_branch=d.get("publish-branch", "release"),
         priority=priority,
         categories=cats,
@@ -433,6 +459,8 @@ class CatResult:
     manual_covered: int
     conflicts: list[Conflict]
     source_notes: list[str]
+    invalid_total: int = 0
+    invalid_samples: list[str] = field(default_factory=list)
 
 
 def _read_manual(manual_dir: Path, name: str) -> list[Rule]:
@@ -456,10 +484,16 @@ def build_category(cat: Category, cfg: Config, manual_dir: Path,
             else:
                 ips[f"{r.kind},{r.value}"] = r
 
+    invalid_total = 0
+    invalid_samples: list[str] = []
     for src in cat.sources:
         body = fetcher(src.url, cfg.timeout, cfg.retries)
         rules, st = parse_text(body)
         ingest(rules)
+        invalid_total += st.dropped_invalid
+        for s in st.invalid_samples:
+            if len(invalid_samples) < 10:
+                invalid_samples.append(f"{src.note or src.url}: {s}")
         notes.append(f"{src.note or src.url}: {st.parsed} rules, "
                      f"{st.dropped_invalid} invalid, {st.dropped_keyword} keyword")
 
@@ -472,7 +506,8 @@ def build_category(cat: Category, cfg: Config, manual_dir: Path,
     excl = DomainSet.from_rules(_read_manual(manual_dir, f"{cat.name}-exclude"))
     _, conflicts = domains.subtract(excl)
 
-    return CatResult(cat.name, domains, list(ips.values()), dedup, covered, conflicts, notes)
+    return CatResult(cat.name, domains, list(ips.values()), dedup, covered, conflicts,
+                     notes, invalid_total, invalid_samples)
 
 
 def apply_partition(cfg: Config, results: dict[str, CatResult],
@@ -501,6 +536,28 @@ def apply_partition(cfg: Config, results: dict[str, CatResult],
 
 class GateError(Exception):
     pass
+
+
+def check_invalid_gate(cat: str, n_invalid: int, samples: list[str], limit: int) -> None:
+    """Fail the build when a category's upstream sources lose too many lines.
+
+    An ABSOLUTE count, not a percentage — and the difference is the whole point.
+    The `+.cn` regression was ONE dropped line out of 111,516 (0.0009%); any
+    percentage threshold worth having would have waved it through, yet that line
+    was the entire .cn top-level domain and every Chinese .cn site leaked to the
+    proxy for as long as it was gone. A dropped rule's breadth has nothing to do
+    with how many of them there are, so the only safe limit for a routing
+    category is zero: every new drop has to be looked at by a human.
+
+    `reject` is the one category allowed slack, because a dropped rule there
+    cannot misroute traffic — it only means one ad goes unblocked. Raising any
+    limit means reading the samples first and deciding they are genuine junk.
+    """
+    if n_invalid > limit:
+        detail = "; ".join(samples[:5]) or "(no samples captured)"
+        raise GateError(
+            f"{cat}: {n_invalid} upstream line(s) dropped as invalid, limit {limit} — "
+            f"{detail}")
 
 
 def check_gate(filename: str, new_n: int, old_n: int | None, max_shrink: int) -> None:
@@ -677,6 +734,11 @@ def cmd_build(cfg: Config, root: Path, out: Path, previous: Path | None,
     gate_errors: list[str] = []
     for name in order:
         res = results[name]
+        try:
+            check_invalid_gate(name, res.invalid_total, res.invalid_samples,
+                               cfg.categories[name].max_invalid)
+        except GateError as e:
+            gate_errors.append(str(e))
         dpay = res.domains.to_payload()
         dpath = out / f"final_{name}.yaml"
         old = count_payload(previous / dpath.name) if previous else None

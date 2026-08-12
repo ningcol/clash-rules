@@ -5,6 +5,11 @@ defaults:
   retries: 3
   max-shrink-percent: 30      # 任一产物较上一版跌幅超此值 → 构建失败、不发布
   publish-branch: release     # 产物发布到该分支；订阅 URL 指向它
+  # 上游被判为非法而丢弃的行数上限（绝对条数，不是比例）→ 超了构建失败、不发布。
+  # 默认 0：路由类目里丢一条就可能丢掉一整个顶级域。`+.cn` 那次是 111516 行里的
+  # 1 行，任何比例阈值都会放行，而它是整个 .cn 直连规则，中国站点全部漏去代理。
+  # 要调高先看构建报告里的样本，确认那些行确实是垃圾。
+  max-invalid: 0
 
 # 路由类目的线性优先级：前者从后者中排除，保证每个域名只落在一个路由类目里。
 # 手工指派（manual/<cat>.txt）优先于此顺序。reject 不在此列（策略叠加层）。
@@ -13,6 +18,10 @@ priority: [microsoft, apple, icloud, proxy, direct]
 categories:
   reject:
     description: 广告拦截规则
+    # 唯一放宽 max-invalid 的类目：拦截规则丢一条只是少拦一个广告，不会把流量
+    # 送错方向，而广告源的行内垃圾多、随上游天天变。当前实测丢 2 行
+    # （一个标签以连字符开头、一个单段裸域名），留 10 倍余量。
+    max-invalid: 20
     sources:
       - url: https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/reject.txt
         note: Loyalsoldier/clash-rules
