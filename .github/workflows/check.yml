@@ -16,13 +16,28 @@ on:
       - '.github/workflows/check.yml'
   workflow_dispatch:
 
+# 本流程只读：它不发布任何东西。默认令牌权限由仓库设置决定，可能是写 —— 显式
+# 收窄，别让一个只跑校验的流程握着能推分支的令牌。
+permissions:
+  contents: read
+
+# 同一分支上连推两次时取消旧的那次：校验结果只有最新提交的那份有意义。
+concurrency:
+  group: check-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   check:
     runs-on: ubuntu-latest
+    # 六个上游全部超时也就几分钟；卡住时别占满默认的 6 小时。
+    timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
+      # Action 按 commit SHA 锁定：v4 / v5 这类标签是可变的，而这个仓库直接
+      # 决定一台旁路由的分流，标签被改写等于分流规则被改写。注释里留版本号，
+      # 升级时改 SHA、同步改注释。
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
         with:
           python-version: "3.11"
 
@@ -38,8 +53,8 @@ jobs:
       - name: README subscription table in sync
         run: python scripts/build.py readme --check
 
-      # 取上一版 release 做基线。没有它，--previous 缺席 -> 收缩闸与「产物消失」
-      # 闸在 PR 上完全不生效，一个把某类目砍掉一半的改动会全绿通过。
+      # 取上一版 release 做基线。没有它，--previous 缺席 -> 收缩闸、「产物消失」闸、
+      # 裸顶级域闸、逐源闸在 PR 上全部不生效，一个把某类目砍掉一半的改动会全绿通过。
       - name: Fetch current release as gate baseline
         id: baseline
         continue-on-error: true
@@ -54,13 +69,13 @@ jobs:
           if [ "${{ steps.baseline.outcome }}" = "success" ]; then
             python scripts/build.py build --out dist --previous prev
           else
-            echo "::warning::no release baseline; shrink/removal gates skipped"
+            echo "::warning::no release baseline; shrink/removal/tld/source gates skipped"
             python scripts/build.py build --out dist
           fi
 
       - name: Upload built rules
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: dist
           path: dist/

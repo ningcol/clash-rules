@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import argparse
 import http.client
+import json
 import os
 import re
 import sys
@@ -66,14 +67,15 @@ HANDLED_TYPES = {"DOMAIN", "DOMAIN-SUFFIX", "IP-CIDR", "IP-CIDR6", "IP-ASN"}
 UNSUPPORTED_TYPES = {
     # domain matchers we cannot express in a `behavior: domain` payload
     "DOMAIN-REGEX", "DOMAIN-WILDCARD", "HOST", "HOST-SUFFIX", "HOST-KEYWORD",
-    "USER-AGENT", "URL-REGEX", "GEOSITE",
+    "USER-AGENT", "URL-REGEX", "GEOSITE", "DOMAIN-SET",
     # ip matchers outside our two cidr kinds
     "GEOIP", "SRC-GEOIP", "IP-SUFFIX", "SRC-IP-CIDR", "SRC-IP-SUFFIX",
-    "IP6-CIDR", "SRC-IP", "IP-CIDR-SET",
+    "IP6-CIDR", "SRC-IP", "IP-CIDR-SET", "SRC-IP-ASN", "SUBNET",
     # connection / process / port / misc matchers
-    "SRC-PORT", "DST-PORT", "IN-PORT", "IN-TYPE", "IN-USER", "IN-NAME",
-    "NETWORK", "DSCP", "UID", "PROCESS-NAME", "PROCESS-PATH",
-    "PROCESS-NAME-REGEX", "PROCESS-PATH-REGEX", "SCRIPT",
+    "SRC-PORT", "DST-PORT", "DEST-PORT", "IN-PORT", "IN-TYPE", "IN-USER",
+    "IN-NAME", "NETWORK", "PROTOCOL", "DSCP", "UID", "PROCESS-NAME",
+    "PROCESS-PATH", "PROCESS-NAME-REGEX", "PROCESS-PATH-REGEX", "SCRIPT",
+    "CELLULAR-RADIO", "DEVICE-NAME",
     # composition / control
     "AND", "OR", "NOT", "RULE-SET", "SUB-RULE", "MATCH", "FINAL",
 }
@@ -387,6 +389,26 @@ class DomainSet:
                 return True
         return False
 
+    def covering_suffix(self, domain: str) -> str | None:
+        """The most specific suffix rule in this set that covers `domain`.
+
+        Used only for reporting: when the partition takes a domain away from a
+        category, the useful thing to print is not the domain but the one broad
+        suffix that swallowed it — a single `+.kaspersky.com` accounts for
+        dozens of lost hosts, and that suffix is what you would put in an
+        exclude file.
+        """
+        node = self.root
+        labels = self._labels(domain)
+        best = None
+        for i, lbl in enumerate(labels):
+            node = node.children.get(lbl)
+            if node is None:
+                break
+            if node.suffix:
+                best = ".".join(labels[:i + 1][::-1])
+        return best
+
     def covered(self, rule: Rule) -> bool:
         """Is this rule already implied by the set (ancestor/own suffix, or exact)?"""
         if self._ancestor_suffix(rule.value, strict=False):
@@ -468,7 +490,9 @@ class Config:
     retries: int
     default_max_shrink: int
     default_max_invalid: int
+    default_max_source_shrink: int
     allow_product_removal: bool
+    allow_tld_removal: bool
     publish_branch: str
     priority: list[str]
     categories: dict[str, Category]
@@ -482,7 +506,9 @@ def load_config(path: Path) -> Config:
     d = data.get("defaults", {})
     default_shrink = int(d.get("max-shrink-percent", 30))
     default_invalid = int(d.get("max-invalid", 0))
+    default_source_shrink = int(d.get("max-source-shrink-percent", 30))
     allow_removal = bool(d.get("allow-product-removal", False))
+    allow_tld_removal = bool(d.get("allow-tld-removal", False))
     priority = list(data.get("priority", []))
     cats: dict[str, Category] = {}
     for name, c in (data.get("categories") or {}).items():
@@ -502,7 +528,9 @@ def load_config(path: Path) -> Config:
         retries=int(d.get("retries", 3)),
         default_max_shrink=default_shrink,
         default_max_invalid=default_invalid,
+        default_max_source_shrink=default_source_shrink,
         allow_product_removal=allow_removal,
+        allow_tld_removal=allow_tld_removal,
         publish_branch=d.get("publish-branch", "release"),
         priority=priority,
         categories=cats,
@@ -555,6 +583,12 @@ class CatResult:
     invalid_total: int = 0
     invalid_samples: list[str] = field(default_factory=list)
     exclude_noop: list[str] = field(default_factory=list)
+    # url -> rules this source contributed on THIS run. Published alongside the
+    # products and used next run as the per-source gate's baseline.
+    source_counts: dict[str, int] = field(default_factory=dict)
+    # Sources that rejected more lines than they accepted — a format change,
+    # not junk. Judged per source; see check_invalid_gate.
+    format_suspects: list[str] = field(default_factory=list)
 
 
 def _read_manual(manual_dir: Path, name: str) -> list[Rule]:
@@ -579,12 +613,17 @@ def build_category(cat: Category, cfg: Config, manual_dir: Path,
                 ips[f"{r.kind},{r.value}"] = r
 
     invalid_total = 0
+    source_counts: dict[str, int] = {}
+    format_suspects: list[str] = []
     invalid_samples: list[str] = []
     for src in cat.sources:
         body = fetcher(src.url, cfg.timeout, cfg.retries)
         rules, st = parse_text(body)
         ingest(rules)
+        source_counts[src.url] = st.parsed
         invalid_total += st.dropped_invalid
+        if st.dropped_invalid > max(20, st.parsed):
+            format_suspects.append(src.note or src.url)
         for s in st.invalid_samples:
             if len(invalid_samples) < 10:
                 invalid_samples.append(f"{src.note or src.url}: {s}")
@@ -613,12 +652,27 @@ def build_category(cat: Category, cfg: Config, manual_dir: Path,
     _, conflicts = domains.subtract(excl)
 
     return CatResult(cat.name, domains, list(ips.values()), dedup, covered, conflicts,
-                     notes, invalid_total, invalid_samples, excl_noop)
+                     notes, invalid_total, invalid_samples, excl_noop,
+                     source_counts, format_suspects)
 
 
 def apply_partition(cfg: Config, results: dict[str, CatResult],
-                    manual_dir: Path) -> list[Conflict]:
-    """Enforce the routing partition with manual pinning overriding priority."""
+                    manual_dir: Path) -> tuple[list[Conflict], dict[str, list[tuple[str, str]]]]:
+    """Enforce the routing partition with manual pinning overriding priority.
+
+    Returns (conflicts, taken). `taken` maps a category to the entries it lost
+    and who took each one — the transfers that actually happened, as opposed to
+    `conflicts`, which are the ones that could NOT happen.
+
+    Reporting the transfers matters because they are the silent half. A broad
+    upstream suffix in a high-priority category swallows whole families of
+    specific hosts out of a lower one (measured 2026-08: microsoft's
+    `+.edgesuite.net` / `+.cloudapp.net` — Akamai and Azure address space, not
+    Microsoft services — took 137 hosts away from proxy, and proxy's
+    `+.kaspersky.com` / `+.dell.com` took 403 China-region hosts away from
+    direct). Every one of those is a routing decision nobody made on purpose,
+    and until this report existed there was no number to watch.
+    """
     routing = cfg.routing()
     pins: dict[str, DomainSet] = {}     # cat -> domains pinned to it
     for name in routing:
@@ -626,9 +680,11 @@ def apply_partition(cfg: Config, results: dict[str, CatResult],
             r for r in _read_manual(manual_dir, name) if r.kind in ("exact", "suffix"))
 
     conflicts: list[Conflict] = []
+    taken: dict[str, list[tuple[str, str]]] = {}
     claimed = DomainSet()
-    for name in routing:               # high priority first
+    for idx, name in enumerate(routing):   # high priority first
         ds = results[name].domains
+        before = set(ds.to_payload())
         pins_other = DomainSet()
         for other, pset in pins.items():
             if other != name:
@@ -636,15 +692,30 @@ def apply_partition(cfg: Config, results: dict[str, CatResult],
         _, c1 = ds.subtract(pins_other)   # drop domains pinned to other cats
         _, c2 = ds.subtract(claimed)      # drop domains claimed by higher cats
         conflicts.extend(c1 + c2)
+        lost = before - set(ds.to_payload())
+        if lost:
+            # Attribute each loss. Pins are checked first because a pin
+            # overrides priority; the already-finalized higher categories are
+            # the only other thing that can have taken it.
+            for entry in sorted(lost):
+                rule = (Rule("suffix", entry[2:]) if entry.startswith("+.")
+                        else Rule("exact", entry))
+                by = next((o for o in routing
+                           if o != name and pins[o].covered(rule)), None)
+                if by is None:
+                    by = next((o for o in routing[:idx]
+                               if results[o].domains.covered(rule)), "?")
+                taken.setdefault(name, []).append((entry, by))
         claimed.merge(ds)
-    return conflicts
+    return conflicts, taken
 
 
 class GateError(Exception):
     pass
 
 
-def check_invalid_gate(cat: str, n_invalid: int, samples: list[str], limit: int) -> None:
+def check_invalid_gate(cat: str, n_invalid: int, format_suspects: list[str],
+                       samples: list[str], limit: int) -> None:
     """Fail the build when a category's upstream sources lose too many lines.
 
     An ABSOLUTE count, not a percentage — and the difference is the whole point.
@@ -666,9 +737,129 @@ def check_invalid_gate(cat: str, n_invalid: int, samples: list[str], limit: int)
     """
     if n_invalid > limit:
         detail = "; ".join(samples[:5]) or "(no samples captured)"
+        # Distinguish "upstream added a junk line" from "upstream changed
+        # format wholesale". Both arrive as the same counter, but the fix is
+        # completely different — one is a line to look at, the other is a
+        # source that has to be re-pointed or a rule type to add to
+        # UNSUPPORTED_TYPES. Without this the five samples read as ordinary
+        # garbage and the real cause takes a rebuild to spot.
+        #
+        # The ratio is judged PER SOURCE, not per category. reject pulls 163897
+        # good lines from its first source, so the second one switching to hosts
+        # syntax (17223 lines, all rejected) still leaves the category-wide ratio
+        # looking healthy — the signal is diluted exactly in the multi-source
+        # case where you cannot tell which source broke.
+        hint = ""
+        if format_suspects:
+            hint = (f" — NOTE: {', '.join(format_suspects)} rejected more lines "
+                    f"than it accepted; that source has most likely changed format "
+                    f"(hosts / AdGuard syntax) or introduced a rule type missing "
+                    f"from UNSUPPORTED_TYPES, rather than added junk")
         raise GateError(
             f"{cat}: {n_invalid} upstream line(s) dropped as invalid, limit {limit} — "
-            f"{detail}")
+            f"{detail}{hint}")
+
+
+def _bare_tlds(payload: list[str]) -> set[str]:
+    """Suffix rules that are a single label — `+.cn`, `+.icbc`, `+.xn--fiqs8s`."""
+    return {p[2:] for p in payload if p.startswith("+.") and "." not in p[2:]}
+
+
+def check_tld_gate(filename: str, new_payload: list[str],
+                   old_payload: list[str] | None) -> None:
+    """Fail when a bare top-level-domain suffix rule disappears.
+
+    The invalid gate only sees lines WE drop. This one sees lines the upstream
+    drops, and it exists because the two failures are indistinguishable from
+    the outside and equally catastrophic. `+.cn` is one line out of 110757: if
+    it goes away upstream, the product shrinks 0.0009%, the shrink gate is
+    silent, the invalid gate is silent, the product-disappeared gate is silent
+    — and every Chinese .cn site falls through to the catch-all group and goes
+    out over a metered VPS. That is exactly the shape of the 2026-08-11
+    incident, only sourced one step further upstream.
+
+    Counting is useless here (110609 of direct's 110757 entries are suffix
+    rules); breadth is what matters, and a single label is as broad as a rule
+    can get. Measured over the last 12 releases: direct carries 50 of these and
+    proxy 71, with zero churn between builds, so this gate has no realistic
+    false-positive rate. apple / icloud / microsoft / reject carry none, so it
+    is a no-op for them.
+    """
+    if old_payload is None:
+        return
+    gone = sorted(_bare_tlds(old_payload) - _bare_tlds(new_payload))
+    if gone:
+        shown = ", ".join(f"+.{t}" for t in gone[:8])
+        more = f" (+{len(gone) - 8} more)" if len(gone) > 8 else ""
+        raise GateError(
+            f"{filename}: {len(gone)} bare top-level-domain suffix rule(s) "
+            f"disappeared: {shown}{more} — each one is an ENTIRE TLD, not one "
+            f"rule; if the removal is intended, set defaults.allow-tld-removal: "
+            f"true for one run")
+
+
+def check_source_gate(cat: str, new_counts: dict[str, int],
+                      old_counts: dict[str, int] | None,
+                      max_shrink: int, floor: int = 20) -> None:
+    """Fail when one upstream source of a category collapses.
+
+    The shrink gate measures a whole category, so a multi-source category hides
+    the death of any single source behind the others. Measured 2026-08 by
+    blanking each source in turn: 7 of the 10 configured sources could return an
+    empty payload with the product shrinking less than 8%, and apple's ONLY
+    source could die with the product not changing by a single entry — its
+    content is carried entirely by manual/apple.txt, so the category-level gate
+    is structurally incapable of noticing.
+
+    Two rules, because sources differ in size by four orders of magnitude:
+      * any source that parsed >0 last time and 0 now is fatal, always. That is
+        the dead-source case and it needs no threshold.
+      * a percentage drop is only meaningful above `floor` rules. ACL4SSR Bing
+        contributes 3; gating it on percentage would fail the build every time
+        it moved by one line.
+
+    A source absent from the baseline is new (or the baseline predates it) and
+    is skipped; a source in the baseline but no longer in config was removed on
+    purpose and is skipped too.
+    """
+    if not old_counts:
+        return
+    bad: list[str] = []
+    for url, old_n in sorted(old_counts.items()):
+        if url not in new_counts:
+            continue
+        new_n = new_counts[url]
+        if old_n > 0 and new_n == 0:
+            bad.append(f"{url}: parsed 0 rules (was {old_n}) — source is dead or "
+                       f"now returns an empty payload")
+            continue
+        if old_n >= floor:
+            shrink = (old_n - new_n) / old_n * 100
+            if shrink > max_shrink:
+                bad.append(f"{url}: {shrink:.0f}% fewer rules ({old_n} -> {new_n}), "
+                           f"limit {max_shrink}%")
+    if bad:
+        raise GateError(f"{cat}: upstream source collapsed — " + "; ".join(bad))
+
+
+def read_source_counts(d: Path) -> dict[str, dict[str, int]] | None:
+    """Per-source baseline from a previous release, or None if it has none yet.
+
+    A file that exists but cannot be read is an ERROR, not a missing baseline:
+    falling back to None there would disable the per-source gate for exactly as
+    long as the file stayed corrupt, and nothing else would report it.
+    """
+    f = d / "sources.json"
+    if not f.exists():
+        return None
+    try:
+        data = json.loads(f.read_text(encoding="utf-8"))
+    except (ValueError, OSError) as e:
+        raise GateError(f"{f}: unreadable per-source baseline ({e}); refusing to "
+                        f"build with the per-source gate silently off")
+    if not isinstance(data, dict):
+        raise GateError(f"{f}: per-source baseline is not an object")
+    return data
 
 
 def check_gate(filename: str, new_n: int, old_n: int | None, max_shrink: int) -> None:
@@ -872,6 +1063,43 @@ def lint(cfg: Config, root: Path) -> list[str]:
     return errors
 
 
+def lint_notes(cfg: Config, root: Path) -> list[str]:
+    """Non-fatal observations. Printed by `lint`; never fail the build.
+
+    Excluding from a routing category is NOT the routing-neutral deletion the
+    docs used to describe. Exclusion runs before the partition, so dropping a
+    domain from a high-priority category releases its claim and the next
+    category that also carries it takes over — the traffic reroutes. Only the
+    LAST routing category can exclude without that risk, because nothing is
+    below it to inherit.
+
+    This cannot be decided at lint time (it depends on upstream content nobody
+    has fetched yet), so it is a note rather than an error: name the categories
+    that could inherit and let the author confirm.
+    """
+    notes: list[str] = []
+    routing = cfg.priority
+    for i, name in enumerate(routing[:-1]):
+        f = root / "manual" / f"{name}-exclude.txt"
+        if not f.exists():
+            continue
+        vals = []
+        for line in f.read_text(encoding="utf-8").splitlines():
+            status, rule = parse_line(line)
+            if status == "ok" and rule and rule.kind in ("exact", "suffix"):
+                vals.append(rule.value)
+        if not vals:
+            continue
+        heirs = ", ".join(routing[i + 1:])
+        notes.append(
+            f"manual/{name}-exclude.txt: {len(vals)} entr(ies). Excluding from "
+            f"'{name}' releases the claim — if {heirs} also carries the domain, "
+            f"that category takes it over and the traffic REROUTES. Confirm that "
+            f"is intended: {', '.join(vals[:5])}"
+            + (" …" if len(vals) > 5 else ""))
+    return notes
+
+
 # ---------------------------------------------------------------------------
 # Commands
 # ---------------------------------------------------------------------------
@@ -884,7 +1112,7 @@ def cmd_build(cfg: Config, root: Path, out: Path, previous: Path | None,
         print(f"[build] {name}", file=sys.stderr)
         results[name] = build_category(cfg.categories[name], cfg, manual_dir, fetcher)
 
-    conflicts = apply_partition(cfg, results, manual_dir)
+    conflicts, taken = apply_partition(cfg, results, manual_dir)
     for name in order:
         conflicts += results[name].conflicts
 
@@ -892,20 +1120,37 @@ def cmd_build(cfg: Config, root: Path, out: Path, previous: Path | None,
     out.mkdir(parents=True, exist_ok=True)
     planned: list[tuple[Path, list[str], str, bool]] = []
     gate_errors: list[str] = []
+    prev_sources = read_source_counts(previous) if previous else None
+    if previous is not None and prev_sources is None:
+        print("[gate] no sources.json in the baseline; per-source gate is off for "
+              "this run and armed from the next publish onwards", file=sys.stderr)
     for name in order:
         res = results[name]
         try:
-            check_invalid_gate(name, res.invalid_total, res.invalid_samples,
-                               cfg.categories[name].max_invalid)
+            check_invalid_gate(name, res.invalid_total, res.format_suspects,
+                               res.invalid_samples, cfg.categories[name].max_invalid)
+        except GateError as e:
+            gate_errors.append(str(e))
+        try:
+            check_source_gate(name, res.source_counts,
+                              (prev_sources or {}).get(name),
+                              cfg.default_max_source_shrink)
         except GateError as e:
             gate_errors.append(str(e))
         dpay = res.domains.to_payload()
         dpath = out / f"final_{name}.yaml"
-        old = count_payload(previous / dpath.name) if previous else None
+        old_pay = read_payload(previous / dpath.name) if previous else None
         try:
-            check_gate(dpath.name, len(dpay), old, cfg.categories[name].max_shrink)
+            check_gate(dpath.name, len(dpay),
+                       None if old_pay is None else len(old_pay),
+                       cfg.categories[name].max_shrink)
         except GateError as e:
             gate_errors.append(str(e))
+        if not cfg.allow_tld_removal:
+            try:
+                check_tld_gate(dpath.name, dpay, old_pay)
+            except GateError as e:
+                gate_errors.append(str(e))
         planned.append((dpath, dpay, name, False))
         if res.ips:
             # `behavior: ipcidr` payloads carry CIDRs only; an `AS####` entry
@@ -944,7 +1189,7 @@ def cmd_build(cfg: Config, root: Path, out: Path, previous: Path | None,
     # list — and it used to be the one path that produced no report at all,
     # leaving an empty output directory and only the five samples in the error
     # line. Products are still not written, so nothing can be published.
-    _write_report(order, results, conflicts, out, gate_errors)
+    _write_report(order, results, conflicts, out, gate_errors, taken)
 
     if gate_errors:
         for e in gate_errors:
@@ -963,19 +1208,82 @@ def cmd_build(cfg: Config, root: Path, out: Path, previous: Path | None,
         changed = planned_names != prev_names or any(
             payload != (read_payload(previous / path.name) or [])
             for path, payload, _, _ in planned)
+        if prev_sources is None:
+            # Bootstrap: the per-source gate needs its baseline ON the release
+            # branch, and publishing only happens when `changed` is true. Left
+            # alone, a day where the rules happen not to move would skip the
+            # publish, sources.json would never land, and the gate would stay
+            # off forever — armed in the code, absent in practice. Force one
+            # publish to lay the baseline down.
+            changed = True
+            print("[build] forcing a publish to lay down the per-source baseline",
+                  file=sys.stderr)
 
     for path, payload, name, ip in planned:
         write_yaml(path, payload, name, ip)
         print(f"  wrote {path.name} ({len(payload)})", file=sys.stderr)
+
+    # Ships with the products so the next run has a per-source baseline. It is
+    # written only on the success path, for the same reason the products are:
+    # a baseline that recorded a build nobody published would gate the next run
+    # against numbers that never went live.
+    (out / "sources.json").write_text(
+        json.dumps({n: results[n].source_counts for n in order},
+                   indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
     (out / "changed.txt").write_text("true\n" if changed else "false\n", encoding="utf-8")
     print(f"[build] changed={'true' if changed else 'false'}", file=sys.stderr)
     return 0
 
 
+def _report_transfers(lines: list[str], results: dict[str, CatResult],
+                      taken: dict[str, list[tuple[str, str]]]) -> None:
+    """Per category: what the partition took away, and which broad suffix took it.
+
+    Grouped by the covering suffix rather than listed domain by domain — one
+    `+.kaspersky.com` accounts for 81 lost hosts, and that suffix is the thing
+    you would act on. Listing 403 hostnames would just be noise.
+    """
+    if not taken:
+        return
+    lines += ["", "## partition transfers (domains this category lost, and to whom)",
+              "",
+              "Not conflicts — these succeeded. A broad suffix in the winning "
+              "category swallowed specific hosts out of this one, which is a "
+              "routing decision nobody made explicitly. Watch the totals; "
+              "investigate suffixes that are not actually owned by the winner.",
+              ""]
+    for name, entries in taken.items():
+        by_cat: dict[str, int] = {}
+        for _, who in entries:
+            by_cat[who] = by_cat.get(who, 0) + 1
+        share = ", ".join(f"{w} {n}" for w, n in
+                          sorted(by_cat.items(), key=lambda kv: -kv[1]))
+        noun = "entry" if len(entries) == 1 else "entries"
+        lines.append(f"- **{name}**: lost {len(entries)} {noun} ({share})")
+        groups: dict[tuple[str, str], int] = {}
+        for entry, who in entries:
+            dom = entry[2:] if entry.startswith("+.") else entry
+            winner = results.get(who)
+            suf = winner.domains.covering_suffix(dom) if winner else None
+            key = (f"+.{suf}" if suf else entry, who)
+            groups[key] = groups.get(key, 0) + 1
+        # Only the suffixes that swallowed SEVERAL hosts are worth naming — those
+        # are the ones a single exclude line would undo. One-for-one transfers
+        # are the partition doing exactly its job; listing them buries the rest.
+        bulk = sorted(((k, n) for k, n in groups.items() if n > 1),
+                      key=lambda kv: -kv[1])[:8]
+        for (suf, who), n in bulk:
+            lines.append(f"  - `{suf}` ({who}) took {n}")
+        ones = sum(n for n in groups.values() if n == 1)
+        if ones:
+            lines.append(f"  - plus {ones} one-for-one transfer(s)")
+
+
 def _write_report(order: list[str], results: dict[str, CatResult],
                   conflicts: list[Conflict], out: Path,
-                  gate_errors: list[str] | None = None) -> None:
+                  gate_errors: list[str] | None = None,
+                  taken: dict[str, list[tuple[str, str]]] | None = None) -> None:
     lines = ["# build report", ""]
     if gate_errors:
         lines += ["## GATE FAILED — nothing published", ""]
@@ -995,8 +1303,9 @@ def _write_report(order: list[str], results: dict[str, CatResult],
         for note in r.source_notes:
             lines.append(f"- {note}")
         msg_lines.append(f"{name}: {n} domains")
+    _report_transfers(lines, results, taken or {})
     if conflicts:
-        lines += ["", "## conflicts"]
+        lines += ["", "## conflicts (exclusions that could NOT be applied)"]
         lines += [f"- {c.detail}" for c in conflicts]
     report = "\n".join(lines) + "\n"
     (out / "report.md").write_text(report, encoding="utf-8")
@@ -1005,7 +1314,12 @@ def _write_report(order: list[str], results: dict[str, CatResult],
         encoding="utf-8")
     summary = os.environ.get("GITHUB_STEP_SUMMARY")
     if summary:
-        Path(summary).write_text(report, encoding="utf-8")
+        # APPEND. The step summary is a shared, workflow-wide buffer: writing it
+        # truncates whatever an earlier step put there. Nothing else writes to it
+        # today, which is precisely why an overwrite would go unnoticed until the
+        # day something does.
+        with open(summary, "a", encoding="utf-8") as fh:
+            fh.write(report)
     if conflicts:
         print(f"[warn] {len(conflicts)} conflict(s); see report.md", file=sys.stderr)
 
@@ -1041,10 +1355,22 @@ def main(argv: list[str] | None = None) -> int:
                   f"all gates disabled. Omit --previous for a first publish.",
                   file=sys.stderr)
             return 1
-        return cmd_build(cfg, root, Path(args.out), prev, fetch_url)
+        try:
+            return cmd_build(cfg, root, Path(args.out), prev, fetch_url)
+        except (FetchError, GateError) as e:
+            # An unreachable source after all retries used to escape as a bare
+            # traceback. The outcome was right (nothing published) but the
+            # message was not: it named a urllib exception, not the category or
+            # the URL, and it looked like a crash rather than a refusal.
+            print(f"[build] FAIL {e}", file=sys.stderr)
+            print("[build] refusing to publish; last release stays live",
+                  file=sys.stderr)
+            return 1
 
     if args.cmd == "lint":
         errors = lint(cfg, root)
+        for n in lint_notes(cfg, root):
+            print(f"[lint] note: {n}", file=sys.stderr)
         for e in errors:
             print(f"[lint] {e}", file=sys.stderr)
         if errors:

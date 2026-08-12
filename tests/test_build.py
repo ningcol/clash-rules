@@ -1,4 +1,5 @@
 """Unit tests for scripts/build.py. Run: python -m unittest discover -s tests"""
+import os
 import sys
 import unittest
 from pathlib import Path
@@ -8,8 +9,11 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
 import build  # noqa: E402
 from build import (  # noqa: E402
     Rule, DomainSet, classify_value, parse_line, parse_text,
-    check_gate, check_invalid_gate, GateError,
+    check_gate, check_invalid_gate, check_tld_gate, check_source_gate,
+    GateError,
 )
+
+REPO = Path(__file__).resolve().parent.parent
 
 
 class TestClassify(unittest.TestCase):
@@ -162,10 +166,30 @@ class TestGate(unittest.TestCase):
         in the message so the failure is diagnosable without a rebuild.
         """
         with self.assertRaises(GateError) as cm:
-            check_invalid_gate("direct", 1, ["upstream: - '+.cn'"], 0)
+            check_invalid_gate("direct", 1, [], ["upstream: - '+.cn'"], 0)
         self.assertIn("+.cn", str(cm.exception))
-        check_invalid_gate("direct", 0, [], 0)      # nothing dropped -> ok
-        check_invalid_gate("reject", 2, ["x"], 20)  # reject's slack -> ok
+        check_invalid_gate("direct", 0, [], [], 0)      # nothing dropped -> ok
+        check_invalid_gate("reject", 2, [], ["x"], 20)  # reject's slack -> ok
+
+    def test_wholesale_format_change_names_the_source(self):
+        """"Upstream added a junk line" and "upstream switched to hosts format"
+        arrive as the same counter but need completely different fixes.
+
+        The ratio must be judged PER SOURCE. reject pulls 163897 good lines from
+        its first source, so its second source flipping to hosts syntax (17223
+        lines, every one rejected) still leaves the category-wide ratio looking
+        healthy — diluted in exactly the multi-source case where you cannot
+        otherwise tell which source broke.
+        """
+        with self.assertRaises(GateError) as cm:
+            check_invalid_gate("reject", 17223, ["qq5460168/AD886"],
+                               ["0.0.0.0 ads.example.com"], 20)
+        self.assertIn("changed format", str(cm.exception))
+        self.assertIn("qq5460168/AD886", str(cm.exception))
+        # A handful of junk lines among many good ones must NOT claim that.
+        with self.assertRaises(GateError) as cm:
+            check_invalid_gate("reject", 30, [], ["junk"], 20)
+        self.assertNotIn("changed format", str(cm.exception))
 
 
 class TestPartition(unittest.TestCase):
@@ -316,10 +340,6 @@ class TestPublishGating(unittest.TestCase):
             self.assertEqual(rc2, 1)   # disappearance is gated -> refuse to publish
 
 
-if __name__ == "__main__":
-    unittest.main()
-
-
 class TestUnsupportedRuleTypes(unittest.TestCase):
     """A rule type we do not emit must be SKIPPED, never counted as invalid.
 
@@ -343,6 +363,16 @@ class TestUnsupportedRuleTypes(unittest.TestCase):
         "AND,((DOMAIN,x.com),(NETWORK,tcp)),DIRECT",
         "MATCH,DIRECT",
         "SUB-RULE,(NETWORK,tcp),sub",
+        # Real mihomo / Surge types that were missing from the allowlist and so
+        # counted as invalid. With the gate at 0 that means one upstream line of
+        # any of these stops the publish for ALL SIX rule sets.
+        "SRC-IP-ASN,13335,DIRECT",
+        "DEST-PORT,443,PROXY",
+        "PROTOCOL,udp,REJECT",
+        "DOMAIN-SET,https://example.com/set.txt,DIRECT",
+        "SUBNET,SSID:home,DIRECT",
+        "CELLULAR-RADIO,LTE,PROXY",
+        "DEVICE-NAME,iPhone,DIRECT",
     ]
 
     def test_all_skipped_not_invalid(self):
@@ -558,3 +588,346 @@ class TestProductRemovalKnob(unittest.TestCase):
         that branch."""
         self.assertEqual(self._run("false"), 1)
         self.assertEqual(self._run("true"), 0)
+
+
+class TestBareTldGate(unittest.TestCase):
+    """A vanishing bare TLD must fail the build even though it is one line.
+
+    The invalid gate only sees lines WE drop. When the UPSTREAM drops `+.cn`
+    the product goes 110757 -> 110756: shrink gate silent, invalid gate silent,
+    product-disappeared gate silent — and the entire .cn top-level domain has
+    no direct rule, so every Chinese .cn site falls through to the catch-all
+    group and leaves over a metered VPS. That is the 2026-08-11 incident with
+    the cause moved one step upstream, and nothing else in this file catches it.
+    """
+
+    def test_a_disappearing_tld_fails_even_though_it_is_one_line(self):
+        old = ["+.cn", "+.icbc"] + [f"+.host{i}.com" for i in range(5000)]
+        new = [p for p in old if p != "+.cn"]
+        with self.assertRaises(GateError) as cm:
+            check_tld_gate("final_direct.yaml", new, old)
+        self.assertIn("+.cn", str(cm.exception))
+        self.assertIn("allow-tld-removal", str(cm.exception))
+
+    def test_ordinary_churn_and_growth_do_not_trip_it(self):
+        old = ["+.cn", "+.a.com", "+.b.com"]
+        check_tld_gate("f", ["+.cn", "+.a.com", "+.c.com"], old)   # host swapped
+        check_tld_gate("f", ["+.cn", "+.icbc", "+.a.com"], old)    # TLD added
+        check_tld_gate("f", ["+.a.com"], None)                     # first publish
+
+    def test_an_exact_rule_named_like_a_tld_is_not_one(self):
+        """Only `+.cn` is the whole TLD. A bare `cn` exact entry matches
+        nothing real and must not arm or satisfy the gate."""
+        check_tld_gate("f", [], ["cn", "a.com"])
+
+    def test_the_knob_turns_it_off_for_one_run(self):
+        """End-to-end: the gate is wired into cmd_build and honours the knob."""
+        import tempfile
+        for flag, want in (("false", 1), ("true", 0)):
+            with tempfile.TemporaryDirectory() as d:
+                tmp = Path(d)
+                (tmp / "config.yaml").write_text(
+                    f"defaults: {{max-shrink-percent: 100, allow-tld-removal: {flag}}}\n"
+                    "priority: [hi]\ncategories:\n"
+                    "  hi: {description: hi, sources: [{url: 'hi://x'}]}\n")
+                (tmp / "manual").mkdir()
+                prev = tmp / "prev"
+                prev.mkdir()
+                (prev / "final_hi.yaml").write_text(
+                    "payload:\n  - '+.cn'\n  - '+.keep.com'\n")
+                rc = build.cmd_build(build.load_config(tmp / "config.yaml"), tmp,
+                                     tmp / "out", prev,
+                                     lambda u, t_, r: "payload:\n  - '+.keep.com'\n")
+                self.assertEqual(rc, want, flag)
+
+
+class TestPerSourceGate(unittest.TestCase):
+    """A dead upstream source must be loud even when its category is not.
+
+    The shrink gate measures a whole category, so in a multi-source category the
+    survivors hide the corpse. Measured 2026-08 by blanking each source in turn:
+    7 of 10 sources could return an empty payload for under 8% category shrink,
+    and apple's ONLY source could die with the product not moving by a single
+    entry, because manual/apple.txt carries all of it.
+    """
+
+    def test_a_source_that_goes_to_zero_is_always_fatal(self):
+        with self.assertRaises(GateError) as cm:
+            check_source_gate("microsoft", {"u": 0}, {"u": 81}, 30)
+        self.assertIn("dead", str(cm.exception))
+
+    def test_percentage_only_applies_above_the_floor(self):
+        """ACL4SSR Bing contributes 3 rules. Judging it by percentage would fail
+        the build every time it moved by one line — a gate that cries wolf gets
+        its limit raised, and then it guards nothing."""
+        check_source_gate("microsoft", {"u": 2}, {"u": 3}, 30)     # 33%, below floor
+        with self.assertRaises(GateError):
+            check_source_gate("reject", {"u": 100}, {"u": 1000}, 30)
+
+    def test_new_and_removed_sources_are_not_gated(self):
+        check_source_gate("c", {"new": 5}, {"old": 900}, 30)   # config changed
+        check_source_gate("c", {}, None, 30)                   # no baseline yet
+
+    def test_end_to_end_a_blanked_source_fails_even_with_an_unchanged_product(self):
+        """The apple case exactly: one source, product identical, gate must fire."""
+        import tempfile, json as _json
+        with tempfile.TemporaryDirectory() as d:
+            tmp = Path(d)
+            (tmp / "config.yaml").write_text(
+                "defaults: {max-shrink-percent: 100}\npriority: [hi]\ncategories:\n"
+                "  hi: {description: hi, sources: [{url: 'hi://x'}]}\n")
+            (tmp / "manual").mkdir()
+            # manual carries the whole product, so upstream dying changes nothing
+            (tmp / "manual" / "hi.txt").write_text("+.example.com\n")
+            prev = tmp / "prev"
+            prev.mkdir()
+            (prev / "final_hi.yaml").write_text("payload:\n  - '+.example.com'\n")
+            (prev / "sources.json").write_text(_json.dumps({"hi": {"hi://x": 164}}))
+            rc = build.cmd_build(build.load_config(tmp / "config.yaml"), tmp,
+                                 tmp / "out", prev,
+                                 lambda u, t_, r: "payload: []\n")
+            self.assertEqual(rc, 1)
+            self.assertIn("dead", (tmp / "out" / "report.md").read_text())
+
+    def test_a_corrupt_baseline_is_an_error_not_a_missing_one(self):
+        """Falling back to "no baseline" would switch the gate off for exactly
+        as long as the file stayed broken, and nothing would say so."""
+        import tempfile
+        with tempfile.TemporaryDirectory() as d:
+            tmp = Path(d)
+            (tmp / "sources.json").write_text("{not json")
+            with self.assertRaises(GateError):
+                build.read_source_counts(tmp)
+
+    def test_a_missing_baseline_forces_one_publish_so_it_can_be_created(self):
+        """The gate's baseline lives on the release branch, and the publisher
+        only pushes when `changed` is true. Without this, the first run after
+        the gate shipped would find the rules unchanged, skip the publish,
+        never write sources.json — and the gate would sit armed in the code and
+        absent in reality, forever."""
+        import tempfile
+        with tempfile.TemporaryDirectory() as d:
+            tmp = Path(d)
+            (tmp / "config.yaml").write_text(
+                "priority: [hi]\ncategories:\n"
+                "  hi: {description: hi, sources: [{url: 'hi://x'}]}\n")
+            (tmp / "manual").mkdir()
+            prev = tmp / "prev"
+            prev.mkdir()
+            (prev / "final_hi.yaml").write_text("payload:\n  - 'a.com'\n")
+            out = tmp / "out"
+            build.cmd_build(build.load_config(tmp / "config.yaml"), tmp, out, prev,
+                            lambda u, t_, r: "payload:\n  - 'a.com'\n")
+            # identical rules, yet it must publish — otherwise no baseline
+            self.assertEqual((out / "changed.txt").read_text().strip(), "true")
+            self.assertTrue((out / "sources.json").exists())
+
+    def test_the_baseline_is_written_next_to_the_products(self):
+        import tempfile, json as _json
+        with tempfile.TemporaryDirectory() as d:
+            tmp = Path(d)
+            (tmp / "config.yaml").write_text(
+                "priority: [hi]\ncategories:\n"
+                "  hi: {description: hi, sources: [{url: 'hi://x'}]}\n")
+            (tmp / "manual").mkdir()
+            out = tmp / "out"
+            build.cmd_build(build.load_config(tmp / "config.yaml"), tmp, out, None,
+                            lambda u, t_, r: "payload:\n  - 'a.com'\n")
+            self.assertEqual(_json.loads((out / "sources.json").read_text()),
+                             {"hi": {"hi://x": 1}})
+
+
+class TestPartitionTransfersAreReported(unittest.TestCase):
+    def test_what_a_category_lost_and_to_whom(self):
+        """`conflicts` lists the exclusions that could NOT happen. The ones that
+        DID happen were invisible, and they are the expensive half: a broad
+        upstream suffix in a high-priority category swallows specific hosts out
+        of a lower one, which is a routing decision nobody made. Measured
+        2026-08: 137 proxy hosts taken by microsoft, 403 direct hosts by proxy.
+        """
+        import tempfile
+        with tempfile.TemporaryDirectory() as d:
+            tmp = Path(d)
+            (tmp / "config.yaml").write_text(
+                "defaults: {max-shrink-percent: 100}\npriority: [hi, lo]\n"
+                "categories:\n"
+                "  hi: {description: hi, sources: [{url: 'hi://x'}]}\n"
+                "  lo: {description: lo, sources: [{url: 'lo://x'}]}\n")
+            (tmp / "manual").mkdir()
+            up = {"hi://x": "payload:\n  - '+.shared.net'\n",
+                  "lo://x": "payload:\n  - 'a.shared.net'\n  - 'b.shared.net'\n"}
+            out = tmp / "out"
+            build.cmd_build(build.load_config(tmp / "config.yaml"), tmp, out, None,
+                            lambda u, t_, r: up[u])
+            rpt = (out / "report.md").read_text()
+            self.assertIn("partition transfers", rpt)
+            self.assertIn("**lo**: lost 2 entries (hi 2)", rpt)
+            self.assertIn("`+.shared.net` (hi) took 2", rpt)
+
+    def test_one_for_one_transfers_are_summarised_not_listed(self):
+        """A suffix that swallowed many hosts is actionable — one exclude line
+        undoes it. A 1:1 transfer is the partition doing its job. Listing every
+        one of them buries the handful that matter (proxy has 134 transfers, of
+        which the interesting ones are a dozen)."""
+        import tempfile
+        with tempfile.TemporaryDirectory() as d:
+            tmp = Path(d)
+            (tmp / "config.yaml").write_text(
+                "defaults: {max-shrink-percent: 100}\npriority: [hi, lo]\n"
+                "categories:\n"
+                "  hi: {description: hi, sources: [{url: 'hi://x'}]}\n"
+                "  lo: {description: lo, sources: [{url: 'lo://x'}]}\n")
+            (tmp / "manual").mkdir()
+            shared = "".join(f"  - 'n{i}.com'\n" for i in range(4))
+            up = {"hi://x": f"payload:\n{shared}", "lo://x": f"payload:\n{shared}"}
+            out = tmp / "out"
+            build.cmd_build(build.load_config(tmp / "config.yaml"), tmp, out, None,
+                            lambda u, t_, r: up[u])
+            rpt = (out / "report.md").read_text()
+            self.assertIn("plus 4 one-for-one transfer(s)", rpt)
+            self.assertNotIn("n0.com", rpt)
+
+
+class TestExcludeRerouteNote(unittest.TestCase):
+    def test_excluding_from_a_non_last_category_is_flagged_as_a_reroute(self):
+        """Both docs described `-exclude.txt` as deleting without rerouting.
+        It runs BEFORE the partition, so dropping a domain from a high-priority
+        category releases the claim and the next category carrying it takes
+        over — the traffic moves. Only the last routing category is safe."""
+        import tempfile
+        with tempfile.TemporaryDirectory() as d:
+            tmp = Path(d)
+            (tmp / "config.yaml").write_text(
+                "priority: [hi, lo]\ncategories:\n"
+                "  hi: {description: hi, sources: []}\n"
+                "  lo: {description: lo, sources: []}\n")
+            (tmp / "manual").mkdir()
+            (tmp / "manual" / "hi-exclude.txt").write_text("x.com\n")
+            (tmp / "manual" / "lo-exclude.txt").write_text("y.com\n")
+            cfg = build.load_config(tmp / "config.yaml")
+            notes = build.lint_notes(cfg, tmp)
+            self.assertEqual(len(notes), 1, notes)      # only hi, not the last one
+            self.assertIn("REROUTES", notes[0])
+            self.assertIn("x.com", notes[0])
+            self.assertEqual(build.lint(cfg, tmp), [])  # a note is never an error
+
+
+class TestReportIsAppendedToTheStepSummary(unittest.TestCase):
+    def test_an_earlier_step_is_not_clobbered(self):
+        """GITHUB_STEP_SUMMARY is one workflow-wide buffer. Overwriting it works
+        today only because nothing else writes there — which is why the day
+        something does, the loss is silent."""
+        import tempfile
+        with tempfile.TemporaryDirectory() as d:
+            tmp = Path(d)
+            summary = tmp / "summary.md"
+            summary.write_text("EARLIER STEP OUTPUT\n")
+            (tmp / "config.yaml").write_text(
+                "priority: [hi]\ncategories:\n"
+                "  hi: {description: hi, sources: [{url: 'hi://x'}]}\n")
+            (tmp / "manual").mkdir()
+            old = os.environ.get("GITHUB_STEP_SUMMARY")
+            os.environ["GITHUB_STEP_SUMMARY"] = str(summary)
+            try:
+                build.cmd_build(build.load_config(tmp / "config.yaml"), tmp,
+                                tmp / "out", None,
+                                lambda u, t_, r: "payload:\n  - 'a.com'\n")
+            finally:
+                if old is None:
+                    del os.environ["GITHUB_STEP_SUMMARY"]
+                else:
+                    os.environ["GITHUB_STEP_SUMMARY"] = old
+            text = summary.read_text()
+            self.assertIn("EARLIER STEP OUTPUT", text)
+            self.assertIn("build report", text)
+
+
+class TestUnreachableSourceIsARefusalNotACrash(unittest.TestCase):
+    def test_it_exits_1_with_a_readable_message(self):
+        """A source that stays unreachable after every retry used to escape as a
+        bare urllib traceback. The outcome was right — nothing published — but
+        the message named an exception, not the category or the URL, so it read
+        as a crash in the builder rather than a refusal to publish."""
+        import tempfile
+        with tempfile.TemporaryDirectory() as d:
+            tmp = Path(d)
+            (tmp / "config.yaml").write_text(
+                "defaults: {retries: 1, timeout-seconds: 2}\n"
+                "priority: [hi]\ncategories:\n"
+                "  hi: {description: hi, sources: "
+                "[{url: 'file:///nonexistent/clash-rules-test'}]}\n")
+            (tmp / "manual").mkdir()
+            rc = build.main(["--root", str(tmp), "build", "--out", str(tmp / "out")])
+            self.assertEqual(rc, 1)
+
+
+class TestRealConfig(unittest.TestCase):
+    """Pins the repo's own config.yaml, not a fixture.
+
+    Every knob below is one whose wrong value is silent: the build still runs,
+    the products still publish, and a safety mechanism is simply not there any
+    more. A fixture-only test suite cannot see that.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        cls.cfg = build.load_config(REPO / "config.yaml")
+
+    def test_routing_categories_allow_no_invalid_lines(self):
+        """`+.cn` was 1 line in 111516. Any nonzero limit on a routing category
+        re-opens that exact hole, and raising one is a two-character edit."""
+        for name in self.cfg.priority:
+            self.assertEqual(self.cfg.categories[name].max_invalid, 0, name)
+
+    def test_reject_is_the_only_category_with_slack(self):
+        slack = [n for n, c in self.cfg.categories.items() if c.max_invalid > 0]
+        self.assertEqual(slack, ["reject"], slack)
+
+    def test_escape_hatches_are_closed(self):
+        """Both are "set true, publish once, set it back" knobs. Left on, the
+        gate they disable is gone and nothing ever says so again."""
+        self.assertFalse(self.cfg.allow_product_removal)
+        self.assertFalse(self.cfg.allow_tld_removal)
+
+    def test_every_category_has_at_least_one_source(self):
+        for name, c in self.cfg.categories.items():
+            self.assertTrue(c.sources, name)
+
+    def test_every_source_url_is_https(self):
+        for name, c in self.cfg.categories.items():
+            for s in c.sources:
+                self.assertTrue(s.url.startswith("https://"), f"{name}: {s.url}")
+
+    def test_reject_is_an_overlay_and_stays_out_of_the_partition(self):
+        """In the partition, reject would strip ad domains out of direct/proxy
+        instead of overlaying them, and the RULE-SET order in the README stops
+        describing what the products do."""
+        self.assertNotIn("reject", self.cfg.priority)
+        extra = set(self.cfg.categories) - set(self.cfg.priority)
+        self.assertEqual(extra, {"reject"}, extra)
+
+    def test_priority_matches_the_order_the_readme_tells_people_to_use(self):
+        """~330 domains are covered by another category's broader suffix, and
+        which policy they land on is decided purely by RULE-SET order. The
+        products are built assuming the README's order; if the two drift, those
+        domains route the other way and nothing reports it."""
+        readme = (REPO / "README.md").read_text(encoding="utf-8")
+        order = [n for n in self.cfg.priority
+                 if f"RULE-SET,{n}," in readme]
+        self.assertEqual(order, self.cfg.priority)
+        positions = [readme.index(f"RULE-SET,{n},") for n in self.cfg.priority]
+        self.assertEqual(positions, sorted(positions), self.cfg.priority)
+
+    def test_publish_branch_is_what_the_subscription_urls_point_at(self):
+        readme = (REPO / "README.md").read_text(encoding="utf-8")
+        self.assertIn(f"clash-rules/{self.cfg.publish_branch}/", readme)
+
+
+class TestRealManualFiles(unittest.TestCase):
+    def test_the_repos_own_manual_files_lint_clean(self):
+        cfg = build.load_config(REPO / "config.yaml")
+        self.assertEqual(build.lint(cfg, REPO), [])
+
+
+if __name__ == "__main__":
+    unittest.main()

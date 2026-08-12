@@ -1,0 +1,93 @@
+name: Release freshness
+
+# 每周检查 release 分支有多久没更新过。
+#
+# 为什么需要单独一条：publish.yml 失败时会开 Issue，但**它没跑**的时候什么都
+# 不会发生 —— 定时任务被停用、工作流文件语法错、仓库配额用尽，症状都是「Actions
+# 页面一片安静」，连红色都没有。而订阅侧看到的仍是一份完全正常的旧规则。
+# 这条流程把「多久没发过新规则」变成一个会主动找上门的信号。
+#
+# 它测不出自己被停用（同样是 schedule 触发）。GitHub 会在仓库连续 60 天没有活动
+# 后自动停用所有 schedule 触发器 —— 本仓库每天都会往 release 推提交，正常情况下
+# 不会到那一步；真安静了两个月，就得手工去 Actions 页面重新启用一次。
+on:
+  schedule:
+    - cron: "0 1 * * 1"     # 每周一 UTC 01:00 = 北京 09:00
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+# 规则实际上每天发布一次（近 30 次里只出现过一次隔天）。取 5 天：容得下连着
+# 两三天上游没动静，又能在一次真故障拖过一个周末之前叫出来。
+env:
+  MAX_AGE_DAYS: "5"
+
+jobs:
+  freshness:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: "3.11"
+
+      - name: Install deps
+        run: pip install -r scripts/requirements.txt
+
+      - name: How old is the newest release commit?
+        id: age
+        run: |
+          # 分支名的唯一出处仍是 config.yaml，别在这里写死第二份。
+          branch=$(python -c "import yaml; print(yaml.safe_load(open('config.yaml'))['defaults']['publish-branch'])")
+          git fetch --depth=1 origin "$branch"
+          days=$(( ( $(date +%s) - $(git log -1 --format=%ct "origin/$branch") ) / 86400 ))
+          # 比较在 shell 里做完再输出布尔值：GHA 表达式里 `>` 两侧都是字符串，
+          # 是否按数字比较取决于隐式转换，而这条判断错了就是「永远不报警」。
+          if [ "$days" -gt "$MAX_AGE_DAYS" ]; then stale=true; else stale=false; fi
+          {
+            echo "days=$days"
+            echo "branch=$branch"
+            echo "stale=$stale"
+          } >> "$GITHUB_OUTPUT"
+          echo "$branch 最新提交在 $days 天前（阈值 ${MAX_AGE_DAYS} 天，stale=$stale）" \
+            >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Raise an issue when the rules have gone stale
+        if: steps.age.outputs.stale == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TITLE: "规则已陈旧：release 分支长时间没有新提交"
+          DAYS: ${{ steps.age.outputs.days }}
+          BRANCH: ${{ steps.age.outputs.branch }}
+        run: |
+          actions="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions"
+          body=$(printf '%s\n' \
+            "\`${BRANCH}\` 分支最新提交在 **${DAYS} 天前**，超过 ${MAX_AGE_DAYS} 天阈值。" \
+            "" \
+            "客户端仍然每 24 小时拉一次那份旧规则，看不出任何异常。可能的原因：" \
+            "" \
+            "1. publish.yml 连续被闸门拦下（去看它自己开的那个 Issue）" \
+            "2. 定时任务被停用 —— 仓库 60 天无活动会触发，去 ${actions} 手工启用" \
+            "3. 上游连续多日无变化（这种情况下产物确实不该变，属于误报，直接关掉）" \
+            "" \
+            "第 3 种是唯一可以忽略的。")
+          # 按标题精确匹配已开的 Issue，不用 `--search`：搜索索引是最终一致的，
+          # 刚建的 Issue 可能几分钟内搜不到，于是每周重复建一个新的。
+          num=$(gh issue list --state open --limit 100 --json number,title \
+                  --jq ".[] | select(.title == \"$TITLE\") | .number" | head -1)
+          if [ -n "$num" ]; then
+            gh issue comment "$num" --body "$body"
+          else
+            gh issue create --title "$TITLE" --body "$body"
+          fi
+
+      - name: Fail the run so the badge goes red too
+        if: steps.age.outputs.stale == 'true'
+        run: exit 1

@@ -1,8 +1,9 @@
 name: Publish rules
 
 # 触发：每天 UTC 21:00（北京 05:00）定时 / 影响产物的输入 push 到 main / 手动。
-# 完整构建 → 数量骤降闸门 → 发布到 release 分支（普通 commit 保留历史）。
-# 闸门失败则不发布，上一版留存。
+# 完整构建 → 全部闸门 → 发布到 release 分支（普通 commit 保留历史）。
+# 闸门失败则不发布，上一版留存，并开 Issue（红色 badge 是给别人看的，Issue 是
+# 给自己看的 —— 规则冻结在订阅侧完全不可观测，客户端照常拉到旧规则）。
 on:
   schedule:
     - cron: "0 21 * * *"
@@ -19,6 +20,7 @@ on:
 
 permissions:
   contents: write
+  issues: write          # 闸门拦下时开 Issue
 
 concurrency:
   group: publish
@@ -27,12 +29,15 @@ concurrency:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    # 六个上游各 30s 超时 ×3 次重试，正常两三分钟跑完。别占满默认的 6 小时。
+    timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
+      # Action 按 commit SHA 锁定，理由见 check.yml。这条流程握着 contents: write。
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
         with:
           python-version: "3.11"
 
@@ -66,9 +71,9 @@ jobs:
             git -C release rm -rf --quiet . || true
           fi
 
-      - name: Build (gate compares against previous release)
+      - name: Build (gates compare against previous release)
         run: |
-          # build 把 commit-msg.txt 与 changed.txt 写进 --out（下面据此决定是否发布）。
+          # build 把 commit-msg.txt / changed.txt / sources.json 写进 --out。
           # 闸门失败时 build 返回非 0 → 本步骤失败 → 不发布，上一版 release 留存。
           python scripts/build.py build --out dist --previous release
 
@@ -77,13 +82,15 @@ jobs:
         run: |
           # 只在规则内容真变化时发布：changed.txt 由 build 按 payload 比对得出
           # （忽略每次都变的时间戳头），避免每天 no-op 提交 + 无谓 CDN purge。
+          # 上一版 release 还没有 sources.json 时 build 会强制置 true，好让逐源闸
+          # 的基线能第一次落到分支上 —— 否则规则恰好没变就永远建不起基线。
           if [ "$(cat dist/changed.txt)" != "true" ]; then
             echo "No rule changes vs current release; nothing to publish."
             echo "published=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
           find release -maxdepth 1 -name 'final_*' -delete
-          cp dist/final_* release/
+          cp dist/final_* dist/sources.json release/
           cd release
           git add -A
           git -c user.name="github-actions[bot]" \
@@ -104,3 +111,34 @@ jobs:
             curl -sS --max-time 30 "$url" || echo "  (purge failed, ignored)"
             echo
           done
+
+      - name: Raise an issue when nothing was published
+        # 失败在订阅侧**完全不可观测**：上一版 release 原样留在分支上，客户端每
+        # 24 小时照常拉到它，一切正常。红色 badge 要主动去看才看得见，而这条流程
+        # 每天自己跑，没人每天去看。Issue 会进通知。
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          # 显式给出仓库：checkout 那步就失败时目录里没有 git remote，gh 推断不出来。
+          GH_REPO: ${{ github.repository }}
+          TITLE: "规则发布被拦下：订阅已停止更新"
+        run: |
+          run="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          body=$(printf '%s\n' \
+            "构建或闸门失败，**没有发布任何东西**，上一版 release 仍然在线。" \
+            "" \
+            "订阅端看不出任何异常：客户端会继续拉到那份旧规则，直到这里恢复。" \
+            "" \
+            "- 失败的运行：${run}" \
+            "- 逐源计数、被丢弃的样本、划分转移、冲突列表都在该运行的 \`dist\` artifact 里的 \`report.md\`" \
+            "" \
+            "修好后本 Issue 不会自动关闭，确认 release 分支有了新提交再手动关。")
+          # 按标题精确匹配，不用 `--search`：搜索索引是最终一致的，刚建的 Issue
+          # 可能几分钟内搜不到，于是每天重复建一个新的。
+          num=$(gh issue list --state open --limit 100 --json number,title \
+                  --jq ".[] | select(.title == \"$TITLE\") | .number" | head -1)
+          if [ -n "$num" ]; then
+            gh issue comment "$num" --body "$body"
+          else
+            gh issue create --title "$TITLE" --body "$body"
+          fi
