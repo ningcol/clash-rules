@@ -19,6 +19,7 @@ routing categories. reject is a policy overlay and does not participate.
 from __future__ import annotations
 
 import argparse
+import http.client
 import os
 import re
 import sys
@@ -50,6 +51,32 @@ DOMAIN_RE = re.compile(rf"^(?:{_LABEL}\.)+{_LABEL}$")
 # Bare TLDs stay illegal for EXACT rules — `DOMAIN,cn` matches nothing real.
 TLD_RE = re.compile(rf"^{_LABEL}$")
 ASN_RE = re.compile(r"^as[0-9]+$")
+# Rule types this builder turns into output. The dispatch in parse_line reads
+# this set — do not keep a second hardcoded copy: two lists that must agree,
+# with only one of them live, is the same silent-drift shape as everything else
+# guarded in this file.
+HANDLED_TYPES = {"DOMAIN", "DOMAIN-SUFFIX", "IP-CIDR", "IP-CIDR6", "IP-ASN"}
+# Real Clash/mihomo/Surge rule types we knowingly do not emit. Skipping is only
+# safe for names on THIS list: matching "anything that looks like a type token"
+# instead would swallow a typo — `DOMAIN-SUFIX,cn` would be dropped with no
+# signal at all, re-opening the very silent-drop hole the invalid gate exists to
+# close, just through a new door. An unrecognised all-caps token is therefore
+# 'invalid' (loud) rather than 'unsupported' (quiet): a genuinely new upstream
+# type costs one line here, a typo costs a real rule.
+UNSUPPORTED_TYPES = {
+    # domain matchers we cannot express in a `behavior: domain` payload
+    "DOMAIN-REGEX", "DOMAIN-WILDCARD", "HOST", "HOST-SUFFIX", "HOST-KEYWORD",
+    "USER-AGENT", "URL-REGEX", "GEOSITE",
+    # ip matchers outside our two cidr kinds
+    "GEOIP", "SRC-GEOIP", "IP-SUFFIX", "SRC-IP-CIDR", "SRC-IP-SUFFIX",
+    "IP6-CIDR", "SRC-IP", "IP-CIDR-SET",
+    # connection / process / port / misc matchers
+    "SRC-PORT", "DST-PORT", "IN-PORT", "IN-TYPE", "IN-USER", "IN-NAME",
+    "NETWORK", "DSCP", "UID", "PROCESS-NAME", "PROCESS-PATH",
+    "PROCESS-NAME-REGEX", "PROCESS-PATH-REGEX", "SCRIPT",
+    # composition / control
+    "AND", "OR", "NOT", "RULE-SET", "SUB-RULE", "MATCH", "FINAL",
+}
 
 ROUTING_HEADER = "# 说明: 本文件为自动生成的 Clash {up} 规则（behavior: domain）。"
 IP_HEADER = "# 说明: 本文件为自动生成的 Clash {up} IP规则（behavior: ipcidr）。"
@@ -140,13 +167,34 @@ class ParseStats:
     parsed: int = 0
     dropped_invalid: int = 0
     dropped_keyword: int = 0
+    dropped_unsupported: int = 0
     invalid_samples: list[str] = field(default_factory=list)
+    unsupported_types: set[str] = field(default_factory=set)
 
 
 def parse_line(line: str) -> tuple[str, Rule | None]:
-    """Return ('ok'|'skip'|'keyword'|'invalid', rule). rule set only for 'ok'."""
-    s = line.rstrip("\r\n").strip()
+    """Return ('ok'|'skip'|'keyword'|'unsupported'|'invalid', rule).
+
+    'unsupported' means a well-formed rule of a type this builder does not
+    emit (regex/process/port/logic rules...). It is NOT an error — see
+    UNSUPPORTED_TYPES for why conflating it with 'invalid' takes the site down.
+    """
+    # Strip a UTF-8 BOM before anything else. fetch_url decodes as plain utf-8,
+    # so a BOM stays glued to the first character; the first line of three of
+    # the microsoft sources is a `#` comment, and `﻿#...` is neither a
+    # comment nor a rule -> 'invalid' -> with the gate at 0, one upstream edit
+    # from a Windows editor takes the whole publish down.
+    s = line.lstrip("\ufeff").rstrip("\r\n").strip()
+    # Trailing comment after a rule (`DOMAIN-SUFFIX,cn # China`) is common in
+    # .list files; without this the whole line is judged as one token.
+    if "#" in s:
+        head = s.split("#", 1)[0].rstrip()
+        if head:
+            s = head
     if not s or s.startswith("#") or s.startswith("!"):
+        return "skip", None
+    # YAML scaffolding: document markers, directives, empty payload.
+    if s in ("---", "...", "payload: []", "payload: {}") or s.startswith("%YAML"):
         return "skip", None
     if s == "payload:" or s.rstrip().endswith("payload:"):
         return "skip", None
@@ -161,11 +209,7 @@ def parse_line(line: str) -> tuple[str, Rule | None]:
         t = parts[0].upper()
         if t == "DOMAIN-KEYWORD":
             return "keyword", None
-        mapping = {
-            "DOMAIN": "exact", "DOMAIN-SUFFIX": "suffix",
-            "IP-CIDR": None, "IP-CIDR6": None, "IP-ASN": None,
-        }
-        if t in mapping:
+        if t in HANDLED_TYPES:
             val = parts[1] if len(parts) > 1 else ""
             if t == "DOMAIN":
                 d = _normalize_domain(val)
@@ -173,9 +217,38 @@ def parse_line(line: str) -> tuple[str, Rule | None]:
             if t == "DOMAIN-SUFFIX":
                 d = _normalize_domain(val, allow_tld=True)
                 return ("ok", Rule("suffix", d)) if d else ("invalid", None)
-            r = classify_value(val)  # IP-CIDR/6/ASN
-            return ("ok", r) if r else ("invalid", None)
-        # Unknown TYPE,value — fall through to classify the whole token.
+            if t in ("IP-CIDR", "IP-CIDR6"):
+                # Validate against the DECLARED type instead of re-sniffing the
+                # value. Delegating to classify_value made `IP-CIDR,+.foo.com`
+                # parse as a domain suffix rule and land in the category's
+                # DOMAIN payload — a malformed IP line silently routing a whole
+                # suffix, past a green gate.
+                if "/" not in val:
+                    return "invalid", None
+                r = classify_value(val)
+                ok = r is not None and r.kind in ("ip-cidr", "ip-cidr6")
+                return ("ok", r) if ok else ("invalid", None)
+            if t == "IP-ASN":
+                # Clash's text form carries the bare number (`IP-ASN,13335`);
+                # only the standalone token form is written `AS13335`. Sending
+                # the bare number through classify_value made the canonical
+                # spelling parse as a malformed domain -> 'invalid' -> with the
+                # gate at 0, one such upstream line fails the whole build.
+                low = val.lower()
+                if low.isdigit():
+                    return "ok", Rule("ip-asn", f"AS{low}")
+                if ASN_RE.match(low):
+                    return "ok", Rule("ip-asn", low.upper())
+                return "invalid", None
+        # A rule type we knowingly do not emit. Match on the UPPERCASED token:
+        # the handled-type dispatch above is case-insensitive, so testing the
+        # raw token here would make the builder lenient for the six types it
+        # parses and strict for every type it skips — one lowercase
+        # `process-name,...` line upstream and the whole build fails.
+        if t in UNSUPPORTED_TYPES:
+            return "unsupported", None
+        # An all-caps token we do not recognise is a typo until proven
+        # otherwise — see UNSUPPORTED_TYPES. Fall through: 'invalid', loudly.
 
     r = classify_value(s)
     return ("ok", r) if r else ("invalid", None)
@@ -194,6 +267,10 @@ def parse_text(text: str) -> tuple[list[Rule], ParseStats]:
             st.parsed += 1
         elif status == "keyword":
             st.dropped_keyword += 1
+        elif status == "unsupported":
+            st.dropped_unsupported += 1
+            head = line.strip().lstrip("- ").strip("'\"").split(",", 1)[0].upper()
+            st.unsupported_types.add(head)
         elif status == "invalid":
             st.dropped_invalid += 1
             if len(st.invalid_samples) < 10:
@@ -320,9 +397,17 @@ class DomainSet:
         return node.exact if rule.kind == "exact" else node.suffix
 
     def subtract(self, other: "DomainSet") -> tuple[int, list[Conflict]]:
-        """Remove other's rules from self. Return (removed, conflicts)."""
+        """Remove other's rules from self. Return (removed, conflicts).
+
+        `other` is left untouched: compression happens on a throwaway copy.
+        It used to compress `other` in place, which quietly mutated the
+        caller's set — apply_partition reuses one accumulating `claimed` set
+        across every category, so a side effect there is a landmine for anyone
+        later reading that set expecting what they put in.
+        """
         removed = 0
         conflicts: list[Conflict] = []
+        other = DomainSet.from_rules(other.iter_rules())
         other.compress()
         for r in list(other.iter_rules()):
             if r.kind == "suffix":
@@ -383,6 +468,7 @@ class Config:
     retries: int
     default_max_shrink: int
     default_max_invalid: int
+    allow_product_removal: bool
     publish_branch: str
     priority: list[str]
     categories: dict[str, Category]
@@ -396,6 +482,7 @@ def load_config(path: Path) -> Config:
     d = data.get("defaults", {})
     default_shrink = int(d.get("max-shrink-percent", 30))
     default_invalid = int(d.get("max-invalid", 0))
+    allow_removal = bool(d.get("allow-product-removal", False))
     priority = list(data.get("priority", []))
     cats: dict[str, Category] = {}
     for name, c in (data.get("categories") or {}).items():
@@ -415,6 +502,7 @@ def load_config(path: Path) -> Config:
         retries=int(d.get("retries", 3)),
         default_max_shrink=default_shrink,
         default_max_invalid=default_invalid,
+        allow_product_removal=allow_removal,
         publish_branch=d.get("publish-branch", "release"),
         priority=priority,
         categories=cats,
@@ -440,7 +528,12 @@ def fetch_url(url: str, timeout: int, retries: int) -> str:
             if not body.strip():
                 raise FetchError("empty body")
             return body
-        except (urllib.error.URLError, FetchError, TimeoutError) as e:
+        # OSError covers URLError/HTTPError (both subclass it), TimeoutError,
+        # and the connection-reset family. HTTPException covers read-phase
+        # failures like IncompleteRead. Neither of the latter two used to be
+        # caught, so a blip while reading the body escaped the retry loop and
+        # killed the run instead of retrying it.
+        except (OSError, FetchError, http.client.HTTPException) as e:
             last = e
             if attempt < retries - 1:
                 time.sleep(2 ** attempt)
@@ -461,6 +554,7 @@ class CatResult:
     source_notes: list[str]
     invalid_total: int = 0
     invalid_samples: list[str] = field(default_factory=list)
+    exclude_noop: list[str] = field(default_factory=list)
 
 
 def _read_manual(manual_dir: Path, name: str) -> list[Rule]:
@@ -494,8 +588,13 @@ def build_category(cat: Category, cfg: Config, manual_dir: Path,
         for s in st.invalid_samples:
             if len(invalid_samples) < 10:
                 invalid_samples.append(f"{src.note or src.url}: {s}")
+        unsup = ""
+        if st.dropped_unsupported:
+            unsup = (f", {st.dropped_unsupported} unsupported "
+                     f"({','.join(sorted(st.unsupported_types))})")
         notes.append(f"{src.note or src.url}: {st.parsed} rules, "
-                     f"{st.dropped_invalid} invalid, {st.dropped_keyword} keyword")
+                     f"{st.dropped_invalid} invalid, "
+                     f"{st.dropped_keyword} keyword{unsup}")
 
     manual = _read_manual(manual_dir, cat.name)
     covered = sum(1 for r in manual if r.kind in ("exact", "suffix") and domains.covered(r))
@@ -503,11 +602,18 @@ def build_category(cat: Category, cfg: Config, manual_dir: Path,
 
     dedup = domains.compress()
 
-    excl = DomainSet.from_rules(_read_manual(manual_dir, f"{cat.name}-exclude"))
+    # Which exclude entries actually matched anything? An exclude that removes
+    # nothing is indistinguishable from one that worked — upstream renames a
+    # domain and the false positive you "un-blocked" quietly comes back. Check
+    # coverage before subtracting; report the misses.
+    excl_rules = [r for r in _read_manual(manual_dir, f"{cat.name}-exclude")
+                  if r.kind in ("exact", "suffix")]
+    excl_noop = [r.value for r in excl_rules if not domains.covered(r)]
+    excl = DomainSet.from_rules(excl_rules)
     _, conflicts = domains.subtract(excl)
 
     return CatResult(cat.name, domains, list(ips.values()), dedup, covered, conflicts,
-                     notes, invalid_total, invalid_samples)
+                     notes, invalid_total, invalid_samples, excl_noop)
 
 
 def apply_partition(cfg: Config, results: dict[str, CatResult],
@@ -549,9 +655,14 @@ def check_invalid_gate(cat: str, n_invalid: int, samples: list[str], limit: int)
     with how many of them there are, so the only safe limit for a routing
     category is zero: every new drop has to be looked at by a human.
 
-    `reject` is the one category allowed slack, because a dropped rule there
-    cannot misroute traffic — it only means one ad goes unblocked. Raising any
-    limit means reading the samples first and deciding they are genuine junk.
+    `reject` is the one category allowed slack. Note the reason is NOT "a
+    reject failure is harmless" — gate errors are collected globally and any
+    one of them refuses the whole publish, so an over-limit reject freezes
+    direct and proxy too. The reason is that reject's upstreams are ad lists
+    with hand-edited junk lines, so its baseline is noisy in a way the routing
+    sources are not; the allowance is headroom so that noise cannot take the
+    publish down. Raising any limit means reading the samples in report.md
+    first and deciding they are genuine junk.
     """
     if n_invalid > limit:
         detail = "; ".join(samples[:5]) or "(no samples captured)"
@@ -564,7 +675,17 @@ def check_gate(filename: str, new_n: int, old_n: int | None, max_shrink: int) ->
     if old_n is None:
         return  # first publish for this file
     if new_n == 0 and old_n > 0:
-        raise GateError(f"{filename}: dropped to 0 entries (was {old_n})")
+        # This failure is self-perpetuating and needs a documented way out.
+        # Creating a product is ungated, destroying one is fatal: an upstream
+        # that ships a single IP rule for one day creates final_<cat>_ipcidr.yaml,
+        # and the day it goes away EVERY subsequent run fails identically — the
+        # file is still on the release branch, so the next build sees it vanish
+        # again, and the daily cron never publishes anything again. Name the
+        # escape hatch in the message so recovery does not require reading this
+        # file or hand-deleting from the release branch.
+        raise GateError(
+            f"{filename}: dropped to 0 entries (was {old_n}); if the removal is "
+            f"intended, set defaults.allow-product-removal: true for one run")
     if old_n > 0:
         shrink = (old_n - new_n) / old_n * 100
         if shrink > max_shrink:
@@ -666,6 +787,20 @@ def lint(cfg: Config, root: Path) -> list[str]:
     manual_dir = root / "manual"
     errors: list[str] = []
     pin_owner: dict[str, str] = {}
+
+    # Only these filenames are ever read. A typo (`dirct.txt`, `Direct.txt`,
+    # `direct_exclude.txt`) lints clean and is never opened — the whole edit
+    # silently does nothing, which is the failure shape this repo exists to
+    # avoid. Enumerate the directory rather than only the names we expect.
+    expected = {f"{n}.txt" for n in cfg.categories}
+    expected |= {f"{n}-exclude.txt" for n in cfg.categories}
+    if manual_dir.is_dir():
+        for f in sorted(manual_dir.iterdir()):
+            if f.is_file() and f.name not in expected:
+                errors.append(
+                    f"manual/{f.name}: not a recognised manual file; it is "
+                    f"never read. Expected <category>.txt or "
+                    f"<category>-exclude.txt")
     for name in cfg.categories:
         add_file = manual_dir / f"{name}.txt"
         excl_file = manual_dir / f"{name}-exclude.txt"
@@ -685,7 +820,32 @@ def lint(cfg: Config, root: Path) -> list[str]:
                 if status == "invalid":
                     errors.append(f"{f.relative_to(root)}:{i}: invalid rule '{s}'")
                     continue
+                if status == "unsupported":
+                    # 'unsupported' is the right verdict for upstream files we
+                    # do not control; in a hand-written manual file it means the
+                    # line you added does nothing. Skipping it here would be a
+                    # regression: before the unsupported bucket existed these
+                    # landed in 'invalid' and lint caught them.
+                    errors.append(
+                        f"{f.relative_to(root)}:{i}: '{s}' is a rule type this "
+                        f"builder does not emit; it would be silently ignored")
+                    continue
+                if status == "keyword":
+                    errors.append(
+                        f"{f.relative_to(root)}:{i}: '{s}' — DOMAIN-KEYWORD "
+                        f"cannot be expressed in a behavior:domain payload")
+                    continue
                 if status != "ok" or rule is None:
+                    continue
+                # An exclude file can only remove domains: the subtraction runs
+                # on the domain suffix tree, IP rules never reach it. Writing an
+                # IP/CIDR/ASN there parses fine, lints clean, builds clean — and
+                # the rule you meant to remove is still in the product. Refuse it
+                # instead of dropping it on the floor.
+                if label == "exclude" and rule.kind not in ("exact", "suffix"):
+                    errors.append(
+                        f"{f.relative_to(root)}:{i}: '{s}' is an IP rule; "
+                        f"exclude files only remove domains")
                     continue
                 key = f"{rule.kind},{rule.value}"
                 if key in seen:
@@ -748,7 +908,16 @@ def cmd_build(cfg: Config, root: Path, out: Path, previous: Path | None,
             gate_errors.append(str(e))
         planned.append((dpath, dpay, name, False))
         if res.ips:
-            ippay = sorted({r.value for r in res.ips})
+            # `behavior: ipcidr` payloads carry CIDRs only; an `AS####` entry
+            # makes mihomo reject the whole provider. Keep them out, and say so
+            # in the report rather than dropping them on the floor.
+            ippay = sorted({r.value for r in res.ips if r.kind != "ip-asn"})
+            if not ippay:
+                planned_skip_asn = sum(1 for r in res.ips if r.kind == "ip-asn")
+                if planned_skip_asn:
+                    print(f"  [skip] {name}: {planned_skip_asn} ASN rule(s) have "
+                          f"no ipcidr-compatible product", file=sys.stderr)
+                continue
             ippath = out / f"final_{name}_ipcidr.yaml"
             old_ip = count_payload(previous / ippath.name) if previous else None
             try:
@@ -761,7 +930,7 @@ def cmd_build(cfg: Config, root: Path, out: Path, previous: Path | None,
     # Gate products that existed in the last release but are gone now — a removed
     # category, or a category whose IP rules vanished upstream. Without this a
     # disappearing product would slip past the shrink gate and be deleted ungated.
-    if previous:
+    if previous and not cfg.allow_product_removal:
         for prev_file in sorted(previous.glob("final_*.yaml")):
             if prev_file.name not in planned_names:
                 try:
@@ -770,10 +939,19 @@ def cmd_build(cfg: Config, root: Path, out: Path, previous: Path | None,
                 except GateError as e:
                     gate_errors.append(f"{e} [product disappeared]")
 
+    # Write the report BEFORE deciding to bail. A gate failure is exactly when
+    # someone needs the per-source counts, the dropped samples and the conflict
+    # list — and it used to be the one path that produced no report at all,
+    # leaving an empty output directory and only the five samples in the error
+    # line. Products are still not written, so nothing can be published.
+    _write_report(order, results, conflicts, out, gate_errors)
+
     if gate_errors:
         for e in gate_errors:
             print(f"[gate] FAIL {e}", file=sys.stderr)
         print("[gate] refusing to publish; last release stays live", file=sys.stderr)
+        print(f"[gate] see {out / 'report.md'} for per-source counts",
+              file=sys.stderr)
         return 1
 
     # Did the built rules actually differ from the current release? Compare
@@ -791,14 +969,18 @@ def cmd_build(cfg: Config, root: Path, out: Path, previous: Path | None,
         print(f"  wrote {path.name} ({len(payload)})", file=sys.stderr)
 
     (out / "changed.txt").write_text("true\n" if changed else "false\n", encoding="utf-8")
-    _write_report(order, results, conflicts, out)
     print(f"[build] changed={'true' if changed else 'false'}", file=sys.stderr)
     return 0
 
 
 def _write_report(order: list[str], results: dict[str, CatResult],
-                  conflicts: list[Conflict], out: Path) -> None:
+                  conflicts: list[Conflict], out: Path,
+                  gate_errors: list[str] | None = None) -> None:
     lines = ["# build report", ""]
+    if gate_errors:
+        lines += ["## GATE FAILED — nothing published", ""]
+        lines += [f"- {e}" for e in gate_errors]
+        lines.append("")
     msg_lines = []
     for name in order:
         r = results[name]
@@ -806,6 +988,10 @@ def _write_report(order: list[str], results: dict[str, CatResult],
         lines.append(f"## {name}: {n} domains")
         lines.append(f"- dedup removed: {r.dedup_removed}, manual already covered: "
                      f"{r.manual_covered}")
+        if r.exclude_noop:
+            lines.append(f"- **exclude entries that matched nothing** "
+                         f"(upstream renamed or removed them?): "
+                         f"{', '.join(sorted(r.exclude_noop))}")
         for note in r.source_notes:
             lines.append(f"- {note}")
         msg_lines.append(f"{name}: {n} domains")
@@ -845,8 +1031,16 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.cmd == "build":
         prev = Path(args.previous) if args.previous else None
-        if prev and not prev.exists():
-            prev = None
+        if prev is not None and not prev.exists():
+            # Silently treating a bad --previous as "first ever publish" turns
+            # every gate off at once: a typo in the workflow, or a failed
+            # checkout of the release branch, and a gutted product ships with
+            # rc=0 and no warning anywhere. Asking for a baseline that is not
+            # there is an error, not a mode.
+            print(f"--previous {prev} does not exist; refusing to build with "
+                  f"all gates disabled. Omit --previous for a first publish.",
+                  file=sys.stderr)
+            return 1
         return cmd_build(cfg, root, Path(args.out), prev, fetch_url)
 
     if args.cmd == "lint":

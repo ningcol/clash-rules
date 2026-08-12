@@ -38,8 +38,25 @@ jobs:
       - name: README subscription table in sync
         run: python scripts/build.py readme --check
 
+      # 取上一版 release 做基线。没有它，--previous 缺席 -> 收缩闸与「产物消失」
+      # 闸在 PR 上完全不生效，一个把某类目砍掉一半的改动会全绿通过。
+      - name: Fetch current release as gate baseline
+        id: baseline
+        continue-on-error: true
+        run: |
+          git fetch --depth=1 origin release
+          rm -rf prev && mkdir prev
+          git archive origin/release | tar -x -C prev
+          ls prev/final_*.yaml >/dev/null 2>&1
+
       - name: Validation build (fetches all sources + full pipeline, no publish)
-        run: python scripts/build.py build --out dist
+        run: |
+          if [ "${{ steps.baseline.outcome }}" = "success" ]; then
+            python scripts/build.py build --out dist --previous prev
+          else
+            echo "::warning::no release baseline; shrink/removal gates skipped"
+            python scripts/build.py build --out dist
+          fi
 
       - name: Upload built rules
         if: always()

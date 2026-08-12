@@ -318,3 +318,243 @@ class TestPublishGating(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestUnsupportedRuleTypes(unittest.TestCase):
+    """A rule type we do not emit must be SKIPPED, never counted as invalid.
+
+    The invalid gate fails the build at one dropped line. If an unhandled but
+    perfectly legal upstream rule type lands in that bucket, the first day an
+    upstream adds a DOMAIN-REGEX / PROCESS-NAME / logic rule the whole build
+    fails, nothing is published, and every subscriber's rules freeze at the
+    last release — caused by a line that was never ours to parse. A gate that
+    fires on someone else's valid input is worse than no gate.
+    """
+
+    UNSUPPORTED = [
+        "DOMAIN-REGEX,^ad[0-9]+\\.x\\.com$,DIRECT",
+        "PROCESS-NAME,Telegram,PROXY",
+        "GEOSITE,cn,DIRECT",
+        "GEOIP,CN,DIRECT,no-resolve",
+        "RULE-SET,mycn,DIRECT",
+        "SRC-IP-CIDR,192.168.1.0/24,DIRECT",
+        "DST-PORT,443,PROXY",
+        "NETWORK,udp,REJECT",
+        "AND,((DOMAIN,x.com),(NETWORK,tcp)),DIRECT",
+        "MATCH,DIRECT",
+        "SUB-RULE,(NETWORK,tcp),sub",
+    ]
+
+    def test_all_skipped_not_invalid(self):
+        for line in self.UNSUPPORTED:
+            self.assertEqual(parse_line(line)[0], "unsupported", line)
+
+    def test_stats_keep_them_out_of_the_invalid_bucket(self):
+        text = "\n".join(["payload:", "  - 'a.com'"] + self.UNSUPPORTED)
+        rules, st = parse_text(text)
+        self.assertEqual(st.parsed, 1)
+        self.assertEqual(st.dropped_invalid, 0, st.invalid_samples)
+        self.assertEqual(st.dropped_unsupported, len(self.UNSUPPORTED))
+        self.assertIn("DOMAIN-REGEX", st.unsupported_types)
+
+    def test_a_real_malformed_line_is_still_invalid(self):
+        """The escape hatch must not swallow genuine garbage."""
+        for bad in ["*cdn.x.net", "not a domain", "foo,bar baz", "1.2.3.4"]:
+            self.assertEqual(parse_line(bad)[0], "invalid", bad)
+
+    def test_type_token_is_matched_case_insensitively(self):
+        """Handled types are upper()-ed before dispatch; skipped types must be
+        too. Testing the raw token made the builder lenient for the six types
+        it parses and strict for every type it skips — one lowercase
+        `process-name,...` line upstream and the whole publish stops."""
+        for line in ["process-name,Telegram,PROXY", "Geosite,cn,DIRECT",
+                     "and,((DOMAIN,x.com),(NETWORK,tcp)),DIRECT",
+                     "MaTcH,DIRECT"]:
+            self.assertEqual(parse_line(line)[0], "unsupported", line)
+
+    def test_a_typo_in_a_handled_type_stays_loud(self):
+        """Only names on the known-unsupported list may be skipped.
+
+        Skipping "anything that looks like a type token" would swallow
+        `DOMAIN-SUFIX,cn` with no signal at all — the same silent drop the
+        invalid gate exists to catch, through a new door.
+        """
+        for typo in ["DOMAIN-SUFIX,cn", "DOMIAN-SUFFIX,cn", "IP-CDIR,1.1.1.0/24",
+                     "HOSTSUFFIX,cn", "GARBAGE,,,"]:
+            self.assertEqual(parse_line(typo)[0], "invalid", typo)
+
+    def test_bom_and_yaml_scaffolding_are_not_invalid(self):
+        """A BOM on line 1 used to make that line invalid. Three of the
+        microsoft sources start with a `#` comment, so one Windows edit
+        upstream would have failed the whole build with a baffling error."""
+        self.assertEqual(parse_line("\ufeff# Microsoft Services")[0], "skip")
+        self.assertEqual(parse_line("\ufeffpayload:")[0], "skip")
+        self.assertEqual(parse_line("\ufeff  - '+.cn'"),
+                         ("ok", Rule("suffix", "cn")))
+        for scaffold in ["---", "...", "%YAML 1.2", "payload: []"]:
+            self.assertEqual(parse_line(scaffold)[0], "skip", scaffold)
+
+    def test_inline_comment_after_a_rule(self):
+        """`.list` files commonly carry trailing comments."""
+        self.assertEqual(parse_line("DOMAIN-SUFFIX,cn # China"),
+                         ("ok", Rule("suffix", "cn")))
+        self.assertEqual(parse_line("  - '+.cn'   # China"),
+                         ("ok", Rule("suffix", "cn")))
+        self.assertEqual(parse_line("# whole line")[0], "skip")
+
+    def test_ip_types_validate_against_their_declared_type(self):
+        """The IP branches used to re-sniff the value with classify_value, so
+        `IP-CIDR,+.foo.com` became a domain SUFFIX rule and landed in the
+        category's domain payload — a malformed IP line silently routing a
+        whole suffix, past a green gate."""
+        for bad in ["IP-CIDR,+.example.com", "IP-CIDR6,.example.com",
+                    "IP-CIDR,example.com", "IP-CIDR,as123"]:
+            self.assertEqual(parse_line(bad)[0], "invalid", bad)
+        self.assertEqual(parse_line("IP-CIDR,1.1.1.0/24,no-resolve"),
+                         ("ok", Rule("ip-cidr", "1.1.1.0/24")))
+        self.assertEqual(parse_line("IP-CIDR6,2001:db8::/32"),
+                         ("ok", Rule("ip-cidr6", "2001:db8::/32")))
+
+
+class TestIpAsn(unittest.TestCase):
+    def test_bare_number_is_the_canonical_clash_form(self):
+        """`IP-ASN,13335` is how Clash writes it; only the standalone token
+        form is `AS13335`. Routing the bare number through the domain parser
+        made the canonical spelling count as invalid — one upstream line with
+        it would fail the whole build once the gate is at 0."""
+        self.assertEqual(parse_line("IP-ASN,13335,DIRECT"),
+                         ("ok", Rule("ip-asn", "AS13335")))
+        self.assertEqual(parse_line("IP-ASN,AS13335,DIRECT"),
+                         ("ok", Rule("ip-asn", "AS13335")))
+        self.assertEqual(parse_line("IP-ASN,notanasn,DIRECT")[0], "invalid")
+        self.assertEqual(classify_value("AS13335"), Rule("ip-asn", "AS13335"))
+
+
+class TestSubtractDoesNotMutateArgument(unittest.TestCase):
+    def test_other_survives_intact(self):
+        """subtract() used to compress its argument in place. apply_partition
+        threads one accumulating `claimed` set through every category, so the
+        side effect silently rewrote shared state mid-loop."""
+        a = DomainSet.from_rules([Rule("suffix", "x.com"), Rule("exact", "y.com")])
+        other = DomainSet.from_rules(
+            [Rule("suffix", "x.com"), Rule("exact", "a.x.com"), Rule("exact", "y.com")])
+        before = sorted(other.to_payload())
+        a.subtract(other)
+        self.assertEqual(sorted(other.to_payload()), before)
+
+
+class TestPreviousBaselineIsRequiredWhenAskedFor(unittest.TestCase):
+    def test_missing_previous_dir_is_an_error_not_a_mode(self):
+        """A typo'd --previous silently turned every gate off and looked
+        exactly like a first publish: a gutted product would ship with rc=0."""
+        import tempfile
+        with tempfile.TemporaryDirectory() as d:
+            tmp = Path(d)
+            (tmp / "config.yaml").write_text(
+                "priority: [hi]\ncategories:\n  hi: {description: hi, sources: []}\n")
+            (tmp / "manual").mkdir()
+            rc = build.main(["--root", str(tmp), "--config", "config.yaml",
+                             "build", "--out", str(tmp / "out"),
+                             "--previous", str(tmp / "nope")])
+            self.assertEqual(rc, 1)
+
+
+class TestExcludeNoopIsReported(unittest.TestCase):
+    def test_an_exclude_that_matches_nothing_is_surfaced(self):
+        """A stale exclude is indistinguishable from a working one: upstream
+        renamed Sukka's watermark domain and the old entry silently became a
+        no-op, shipping the watermark for months."""
+        import tempfile
+        with tempfile.TemporaryDirectory() as d:
+            tmp = Path(d)
+            (tmp / "config.yaml").write_text(
+                "priority: [hi]\ncategories:\n"
+                "  hi: {description: hi, sources: [{url: 'hi://x'}]}\n")
+            (tmp / "manual").mkdir()
+            (tmp / "manual" / "hi-exclude.txt").write_text("gone.example\n")
+            cfg = build.load_config(tmp / "config.yaml")
+            out = tmp / "out"
+            rc = build.cmd_build(cfg, tmp, out, None,
+                                 lambda u, t_, r: "payload:\n  - 'a.com'\n")
+            self.assertEqual(rc, 0)
+            self.assertIn("gone.example", (out / "report.md").read_text())
+            self.assertIn("matched nothing", (out / "report.md").read_text())
+
+
+class TestLintCatchesDeadManualEdits(unittest.TestCase):
+    def _lint(self, tmp, files):
+        (tmp / "config.yaml").write_text(
+            "priority: [direct]\ncategories:\n"
+            "  direct: {description: d, sources: []}\n")
+        (tmp / "manual").mkdir(exist_ok=True)
+        for n, body in files.items():
+            (tmp / "manual" / n).write_text(body)
+        return build.lint(build.load_config(tmp / "config.yaml"), tmp)
+
+    def test_misnamed_file_is_never_read(self):
+        """`dirct.txt` / `Direct.txt` / `direct_exclude.txt` lint clean and are
+        never opened — the whole edit does nothing."""
+        import tempfile
+        for name in ("dirct.txt", "Direct.txt", "direct_exclude.txt"):
+            with tempfile.TemporaryDirectory() as d:
+                errs = self._lint(Path(d), {name: "example.com\n"})
+                self.assertTrue(any(name in e for e in errs), f"{name}: {errs}")
+
+    def test_unsupported_type_in_a_manual_file_is_an_error(self):
+        """'unsupported' is right for upstream files we do not control; in a
+        hand-written file it means the line you added does nothing. Before the
+        unsupported bucket existed these were 'invalid' and lint caught them."""
+        import tempfile
+        with tempfile.TemporaryDirectory() as d:
+            errs = self._lint(Path(d), {"direct.txt": "GEOSITE,cn\nDOMAIN-KEYWORD,x\n"})
+            self.assertEqual(len(errs), 2, errs)
+
+
+class TestAsnNeverEntersAnIpcidrProduct(unittest.TestCase):
+    def test_asn_rules_are_kept_out(self):
+        """`behavior: ipcidr` payloads carry CIDRs only; an `AS####` entry
+        makes mihomo reject the whole provider."""
+        import tempfile
+        with tempfile.TemporaryDirectory() as d:
+            tmp = Path(d)
+            (tmp / "config.yaml").write_text(
+                "priority: [hi]\ncategories:\n"
+                "  hi: {description: hi, sources: [{url: 'hi://x'}]}\n")
+            (tmp / "manual").mkdir()
+            cfg = build.load_config(tmp / "config.yaml")
+            out = tmp / "out"
+            rc = build.cmd_build(
+                cfg, tmp, out, None,
+                lambda u, t_, r: "IP-ASN,13335,DIRECT\nIP-CIDR,1.1.1.0/24,DIRECT\n")
+            self.assertEqual(rc, 0)
+            ipc = (out / "final_hi_ipcidr.yaml").read_text()
+            self.assertIn("1.1.1.0/24", ipc)
+            self.assertNotIn("AS13335", ipc)
+
+
+class TestProductRemovalKnob(unittest.TestCase):
+    CFG = ("defaults: {{allow-product-removal: {flag}}}\n"
+           "priority: [hi]\ncategories:\n"
+           "  hi: {{description: hi, sources: [{{url: 'hi://x'}}]}}\n")
+
+    def _run(self, flag):
+        import tempfile
+        with tempfile.TemporaryDirectory() as d:
+            tmp = Path(d)
+            (tmp / "config.yaml").write_text(self.CFG.format(flag=flag))
+            (tmp / "manual").mkdir()
+            cfg = build.load_config(tmp / "config.yaml")
+            prev = tmp / "prev"; prev.mkdir()
+            (prev / "final_hi.yaml").write_text("payload:\n  - 'a.com'\n")
+            (prev / "final_hi_ipcidr.yaml").write_text("payload:\n  - '1.2.3.0/24'\n")
+            return build.cmd_build(cfg, tmp, tmp / "out", prev,
+                                   lambda u, t_, r: "payload:\n  - 'a.com'\n")
+
+    def test_removal_is_gated_by_default_but_has_a_documented_way_out(self):
+        """Creating a product is ungated, destroying one is fatal and
+        self-perpetuating: an upstream that ships one IP rule for a day, then
+        drops it, fails every run from then on because the file is still on the
+        release branch. The knob is the only recovery that is not hand-editing
+        that branch."""
+        self.assertEqual(self._run("false"), 1)
+        self.assertEqual(self._run("true"), 0)

@@ -10,6 +10,11 @@ defaults:
   # 1 行，任何比例阈值都会放行，而它是整个 .cn 直连规则，中国站点全部漏去代理。
   # 要调高先看构建报告里的样本，确认那些行确实是垃圾。
   max-invalid: 0
+  # 产物从上一版消失时构建失败。创建产物不设闸、销毁产物致命，这个不对称会
+  # 自我循环：某个上游某天多写一行 IP 规则会生成 final_<类目>_ipcidr.yaml，
+  # 撤掉的第二天起每一趟都以同样方式失败（release 分支上文件还在）。
+  # 确认删除是有意的，临时置 true 发一次，然后改回来。
+  allow-product-removal: false
 
 # 路由类目的线性优先级：前者从后者中排除，保证每个域名只落在一个路由类目里。
 # 手工指派（manual/<cat>.txt）优先于此顺序。reject 不在此列（策略叠加层）。
@@ -18,9 +23,11 @@ priority: [microsoft, apple, icloud, proxy, direct]
 categories:
   reject:
     description: 广告拦截规则
-    # 唯一放宽 max-invalid 的类目：拦截规则丢一条只是少拦一个广告，不会把流量
-    # 送错方向，而广告源的行内垃圾多、随上游天天变。当前实测丢 2 行
-    # （一个标签以连字符开头、一个单段裸域名），留 10 倍余量。
+    # 唯一放宽 max-invalid 的类目。理由**不是**「拦截规则丢了没关系」——闸的
+    # 错误是全局收集的，任何一条都会拒绝整次发布，reject 超限一样冻住 direct
+    # 和 proxy。理由是广告源本身行内垃圾多、随上游天天变，而路由类目的源不会，
+    # 这个余量是为了别让那种噪音把发布打死。当前实测恒定丢 2 行（拉了三个月
+    # 11 个历史版本核对，永远是同样那两行），留 10 倍余量。
     max-invalid: 20
     sources:
       - url: https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/reject.txt
