@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-08-12T15:15:35Z
+# 更新时间: 2026-08-13T21:50:53Z
 # 说明: 本文件为自动生成的 Clash DIRECT 规则（behavior: domain）。
 #########################################
 payload:
@@ -2427,6 +2427,7 @@ payload:
   - '+.194nb.com'
   - '+.195155.com'
   - '+.195268032591463.icu'
+  - '+.1958xy.com'
   - '+.195idc.com'
   - '+.196b7adb23969e39.com'
   - '+.196g.com'
@@ -4083,6 +4084,7 @@ payload:
   - '+.36kr.net'
   - '+.36krcdn.com'
   - '+.36krcnd.com'
+  - '+.36linkr.com'
   - '+.36pnes36t0qs.com'
   - '+.36qp.com'
   - '+.36rv3j3.shop'
@@ -14146,7 +14148,6 @@ payload:
   - '+.bamboofactorychina.com'
   - '+.bambooolab.com'
   - '+.bambu-lab.com'
-  - '+.bambulab.com'
   - '+.bamengame.com'
   - '+.bamensq.com'
   - '+.bamenzhushou.com'
@@ -16695,6 +16696,7 @@ payload:
   - '+.bktsj.com'
   - '+.bkvps.com'
   - '+.bkweek.com'
+  - '+.bkzhibo.com'
   - '+.bkzzy.com'
   - '+.bl.com'
   - '+.bl0757.com'
@@ -52605,6 +52607,7 @@ payload:
   - '+.jgsemicon.com'
   - '+.jgstour.com'
   - '+.jgsxfw.com'
+  - '+.jgtab.link'
   - '+.jgtc315.com'
   - '+.jguanjia.com'
   - '+.jgums.com'
@@ -54357,6 +54360,7 @@ payload:
   - '+.jkyule.com'
   - '+.jkzhilu.com'
   - '+.jkzl.com'
+  - '+.jkzlrs.com'
   - '+.jkzn365.com'
   - '+.jl-er.com'
   - '+.jl-jssk.com'
@@ -56019,6 +56023,7 @@ payload:
   - '+.juwanhezi.com'
   - '+.juwanshe.com'
   - '+.juweixin.com'
+  - '+.juwinmedia.com'
   - '+.juxia.com'
   - '+.juxian.com'
   - '+.juxiang3d.com'
@@ -85059,6 +85064,7 @@ payload:
   - '+.sxyj.net'
   - '+.sxyqgs.asia'
   - '+.sxyyc.net'
+  - '+.sxyygh.com'
   - '+.sxzhaobiao.com'
   - '+.sxzhongfei.com'
   - '+.sxzhyy.com'
@@ -97544,6 +97550,7 @@ payload:
   - '+.xhscdn.net'
   - '+.xhsd.com'
   - '+.xhsd.net'
+  - '+.xhsdzd.com'
   - '+.xhsf.com'
   - '+.xhslink.com'
   - '+.xhslw.com'
@@ -103925,7 +103932,6 @@ payload:
   - '+.youlesp.com'
   - '+.youletd.com'
   - '+.youleyou.com'
-  - '+.youlian.fun'
   - '+.youlianfuwu.com'
   - '+.youliangda.com'
   - '+.youlianghz.com'
