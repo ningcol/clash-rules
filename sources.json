@@ -17,7 +17,7 @@
     "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/proxy.txt": 27042
   },
   "reject": {
-    "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/reject.txt": 164585,
+    "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/reject.txt": 164883,
     "https://raw.githubusercontent.com/TG-Twilight/AWAvenue-Ads-Rule/refs/heads/main/Filters/AWAvenue-Ads-Rule-Clash.yaml": 898,
     "https://raw.githubusercontent.com/qq5460168/AD886/refs/heads/main/clash_meta.yaml": 17223
   }
