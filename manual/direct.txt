@@ -99,3 +99,5 @@ v.cdnlz30.com
 +.1panel.live
 # 1ms.run Docker 镜像加速站，走代理会失败，2026-07-19
 +.1ms.run
+# 点读君 App 接口及其子域名走直连，2026-08-18
++.diandujun.com
