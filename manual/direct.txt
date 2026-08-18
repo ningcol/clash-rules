@@ -101,3 +101,5 @@ v.cdnlz30.com
 +.1ms.run
 # 点读君 App 接口及其子域名走直连，2026-08-18
 +.diandujun.com
+# beisu666.com 域名及子域名走直连（连接日志里 beisu-js.beisu666.com 走了节点），2026-08-18
++.beisu666.com
