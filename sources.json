@@ -14,10 +14,10 @@
     "https://ruleset.skk.moe/Clash/non_ip/microsoft.txt": 81
   },
   "proxy": {
-    "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/proxy.txt": 27043
+    "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/proxy.txt": 27044
   },
   "reject": {
-    "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/reject.txt": 185704,
+    "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/reject.txt": 186000,
     "https://raw.githubusercontent.com/TG-Twilight/AWAvenue-Ads-Rule/refs/heads/main/Filters/AWAvenue-Ads-Rule-Clash.yaml": 898,
     "https://raw.githubusercontent.com/qq5460168/AD886/refs/heads/main/clash_meta.yaml": 17224
   }
