@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-08-23T21:24:53Z
+# 更新时间: 2026-08-24T21:33:12Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -1824,6 +1824,7 @@ payload:
   - '+.api.moomoobull.com'
   - '+.api.news'
   - '+.api.palworldgame.com'
+  - '+.api.shuaiapi.com'
   - '+.apiary.io'
   - '+.apiauto.ru'
   - '+.apibay.org'
@@ -24736,6 +24737,7 @@ payload:
   - '+.x3guide.com'
   - '+.x3vid.com'
   - '+.x6av.com'
+  - '+.x86.fr'
   - '+.x99av.com'
   - '+.xamarin.com'
   - '+.xandr.com'
