@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-08-28T05:09:33Z
+# 更新时间: 2026-08-29T03:06:29Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -19319,6 +19319,7 @@ payload:
   - '+.relateiq.com'
   - '+.religionnews.com'
   - '+.remirepo.net'
+  - '+.remna.st'
   - '+.rencapbank.ru'
   - '+.renchead.com'
   - '+.rencredit.ru'
@@ -24630,6 +24631,7 @@ payload:
   - '+.wpoforum.com'
   - '+.wpvip.com'
   - '+.wrenchead.com'
+  - '+.write.as'
   - '+.writesonic.com'
   - '+.ws-blau.com'
   - '+.ws-tcg.com'
