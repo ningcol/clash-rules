@@ -3,7 +3,7 @@
     "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/apple.txt": 165
   },
   "direct": {
-    "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/direct.txt": 111142
+    "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/direct.txt": 111159
   },
   "icloud": {
     "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/icloud.txt": 53
@@ -14,10 +14,10 @@
     "https://ruleset.skk.moe/Clash/non_ip/microsoft.txt": 81
   },
   "proxy": {
-    "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/proxy.txt": 27079
+    "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/proxy.txt": 27085
   },
   "reject": {
-    "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/reject.txt": 189166,
+    "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/reject.txt": 189486,
     "https://raw.githubusercontent.com/TG-Twilight/AWAvenue-Ads-Rule/refs/heads/main/Filters/AWAvenue-Ads-Rule-Clash.yaml": 897,
     "https://raw.githubusercontent.com/qq5460168/AD886/refs/heads/main/clash_meta.yaml": 17225
   }
