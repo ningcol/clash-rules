@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-09-26T23:25:56Z
+# 更新时间: 2026-09-27T23:42:36Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -4755,6 +4755,7 @@ payload:
   - '+.c-msedge.net'
   - '+.c-span.org'
   - '+.c-spanvideo.org'
+  - '+.c.go-mpulse.net'
   - '+.c.mi.com'
   - '+.c0930.com'
   - '+.c2cx.com'
@@ -23181,6 +23182,7 @@ payload:
   - '+.vaultify.info'
   - '+.vaultify.net'
   - '+.vaultproject.io'
+  - '+.vava8.com'
   - '+.vbcdn.com'
   - '+.vbcdn.net'
   - '+.vbejeyv.shop'
