@@ -103,3 +103,5 @@ v.cdnlz30.com
 +.diandujun.com
 # beisu666.com 域名及子域名走直连（连接日志里 beisu-js.beisu666.com 走了节点），2026-08-18
 +.beisu666.com
+# pqs.pw 实测国内直连可用（Cloudflare 源站滑块验证与代理无关），2026-09-29
++.pqs.pw
