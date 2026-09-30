@@ -2,6 +2,7 @@
   "apple": {
     "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/apple.txt": 165
   },
+  "claude": {},
   "direct": {
     "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/direct.txt": 111353
   },

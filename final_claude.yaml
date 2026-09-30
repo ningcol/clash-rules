@@ -1,0 +1,13 @@
+#########################################
+# 作者: ningcol
+# 项目地址: https://github.com/ningcol/clash-rules
+# 更新时间: 2026-09-30T03:09:24Z
+# 说明: 本文件为自动生成的 Clash CLAUDE 规则（behavior: domain）。
+#########################################
+payload:
+  - '+.anthropic.com'
+  - '+.claude.ai'
+  - '+.claude.com'
+  - '+.claudemcpclient.com'
+  - '+.claudemcpcontent.com'
+  - '+.claudeusercontent.com'
