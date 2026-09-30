@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-09-29T14:26:47Z
+# 更新时间: 2026-09-30T00:09:59Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -11601,6 +11601,7 @@ payload:
   - '+.huaren.us'
   - '+.huarenav.com'
   - '+.huarenporn.com'
+  - '+.huarun.win'
   - '+.huashangnews.com'
   - '+.huashundg.com'
   - '+.huati.cc'
@@ -14840,6 +14841,7 @@ payload:
   - '+.met-nude.com'
   - '+.meta.ai'
   - '+.meta.com'
+  - '+.metaaivm.com'
   - '+.metabora.io'
   - '+.metabrainz.org'
   - '+.metacloud.com'
@@ -15834,6 +15836,7 @@ payload:
   - '+.muscache.com'
   - '+.muscdn.com'
   - '+.musclegirlflix.com'
+  - '+.muse.ai'
   - '+.mushroomtrack.com'
   - '+.mushymush.tv'
   - '+.musical.ly'
@@ -17288,6 +17291,7 @@ payload:
   - '+.openbook.org.tw'
   - '+.opencas.io'
   - '+.openclaw.ai'
+  - '+.opencode.ai'
   - '+.opencollective.com'
   - '+.opencreate.org'
   - '+.opencritic.com'
