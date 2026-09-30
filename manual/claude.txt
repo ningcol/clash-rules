@@ -17,3 +17,18 @@
 +.claudemcpclient.com
 +.claudemcpcontent.com
 +.claudeusercontent.com
+# 制品发布域（网页上 Publish 出来的 artifact 应用挂在 *.claude.site）与
+# Claude 开发者域，通配符证书活跃续期中（2026-09-30 官方文档 + 证书透明
+# 日志核查确认，主流规则库尚未收录）  2026-09-30
++.claude.site
++.claude.dev
+# anthropic.com 官网本身的 BunnyCDN 分发主机（blackmatrix7 收录；b-cdn.net
+# 是共享 CDN，只能精确到这一台，不许写成后缀）  2026-09-30
+servd-anthropic-website.b-cdn.net
+#
+# 刻意不收的共享第三方（Claude Code 会碰，但钉进 claude 会殃及别家流量，
+# 它们落 gfw/兜底组同样走代理）：storage.googleapis.com（旧版安装器）、
+# registry.npmjs.org、github.com / raw.githubusercontent.com（插件与更新日志）、
+# datadoghq.com（可选遥测，可用环境变量关）、artifacts 运行时 CDN 库与 Google 字体。
+# statsig.anthropic.com 见上面的拦截备注。IP 侧无需规则：官方域全在
+# Cloudflare/GCP 后面，没有专属网段，域名规则在链中也先于一切 IP 规则命中。
