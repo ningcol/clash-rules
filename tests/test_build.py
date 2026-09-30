@@ -890,8 +890,22 @@ class TestRealConfig(unittest.TestCase):
         self.assertFalse(self.cfg.allow_tld_removal)
 
     def test_every_category_has_at_least_one_source(self):
+        """A category with neither sources nor manual entries builds an empty
+        product — subscribers reference a rule set that matches nothing, and
+        nothing distinguishes that from a config typo that dropped `sources`.
+        claude is the one deliberate manual-only category: no public
+        Claude-only upstream exists (Sukka's non_ip/ai.txt bundles 50+ other
+        AI vendors), so a source-less category is legal only with a non-empty
+        manual file — asserted here, not exempted."""
         for name, c in self.cfg.categories.items():
-            self.assertTrue(c.sources, name)
+            if c.sources:
+                continue
+            manual = REPO / "manual" / f"{name}.txt"
+            self.assertTrue(
+                manual.exists() and any(
+                    line.strip() and not line.strip().startswith("#")
+                    for line in manual.read_text(encoding="utf-8").splitlines()),
+                f"{name}: no sources and no manual entries — product would be empty")
 
     def test_every_source_url_is_https(self):
         for name, c in self.cfg.categories.items():

@@ -16,6 +16,7 @@
 | MICROSOFT | 微软服务规则 | [raw](https://raw.githubusercontent.com/ningcol/clash-rules/release/final_microsoft.yaml) | [jsDelivr](https://cdn.jsdelivr.net/gh/ningcol/clash-rules@release/final_microsoft.yaml) |
 | APPLE | 苹果服务规则 | [raw](https://raw.githubusercontent.com/ningcol/clash-rules/release/final_apple.yaml) | [jsDelivr](https://cdn.jsdelivr.net/gh/ningcol/clash-rules@release/final_apple.yaml) |
 | ICLOUD | iCloud 服务规则 | [raw](https://raw.githubusercontent.com/ningcol/clash-rules/release/final_icloud.yaml) | [jsDelivr](https://cdn.jsdelivr.net/gh/ningcol/clash-rules@release/final_icloud.yaml) |
+| CLAUDE | Claude 服务规则 | [raw](https://raw.githubusercontent.com/ningcol/clash-rules/release/final_claude.yaml) | [jsDelivr](https://cdn.jsdelivr.net/gh/ningcol/clash-rules@release/final_claude.yaml) |
 | PROXY | 代理规则 | [raw](https://raw.githubusercontent.com/ningcol/clash-rules/release/final_proxy.yaml) | [jsDelivr](https://cdn.jsdelivr.net/gh/ningcol/clash-rules@release/final_proxy.yaml) |
 | DIRECT | 直连规则 | [raw](https://raw.githubusercontent.com/ningcol/clash-rules/release/final_direct.yaml) | [jsDelivr](https://cdn.jsdelivr.net/gh/ningcol/clash-rules@release/final_direct.yaml) |
 | REJECT | 广告拦截规则 | [raw](https://raw.githubusercontent.com/ningcol/clash-rules/release/final_reject.yaml) | [jsDelivr](https://cdn.jsdelivr.net/gh/ningcol/clash-rules@release/final_reject.yaml) |
@@ -49,6 +50,12 @@ rule-providers:
     url: "https://raw.githubusercontent.com/ningcol/clash-rules/release/final_icloud.yaml"
     path: ./ruleset/icloud.yaml
     interval: 86400
+  claude:
+    type: http
+    behavior: domain
+    url: "https://raw.githubusercontent.com/ningcol/clash-rules/release/final_claude.yaml"
+    path: ./ruleset/claude.yaml
+    interval: 86400
   proxy:
     type: http
     behavior: domain
@@ -67,18 +74,19 @@ rules:
   - RULE-SET,microsoft,DIRECT
   - RULE-SET,apple,DIRECT
   - RULE-SET,icloud,DIRECT
+  - RULE-SET,claude,PROXY
   - RULE-SET,proxy,PROXY
   - RULE-SET,direct,DIRECT
   - MATCH,PROXY
 ```
 
-> 规则集之间基本互不重叠（同一域名只出现在一个路由类目里），因此绝大多数域名的路由与 RULE-SET 顺序无关。**建议保持上面的顺序**（与构建优先级 `microsoft → apple → icloud → proxy → direct` 一致）：少数域名被上游的广义后缀规则（如 direct 源里的 `+.mi.com`、proxy 源里的共享 CA `+.digicert.com`）覆盖，而 domain 格式无法对后缀做“减一个子域”的裁剪，这些域名依赖此顺序才能路由到正确的策略。
+> 规则集之间基本互不重叠（同一域名只出现在一个路由类目里），因此绝大多数域名的路由与 RULE-SET 顺序无关。**建议保持上面的顺序**（与构建优先级 `microsoft → apple → icloud → claude → proxy → direct` 一致）：少数域名被上游的广义后缀规则（如 direct 源里的 `+.mi.com`、proxy 源里的共享 CA `+.digicert.com`）覆盖，而 domain 格式无法对后缀做“减一个子域”的裁剪，这些域名依赖此顺序才能路由到正确的策略。
 
 > **jsDelivr 缓存**：`@release` 分支形式的 jsDelivr 链接有约 12 小时 CDN 缓存，push 后最长约半天才刷新；想立即生效可用上面的 raw 链接，或访问一次 `https://purge.jsdelivr.net/gh/ningcol/clash-rules@release/<文件名>` 强制回源。
 
 ## 🧩 工作原理
 
-- **划分（partition）**：路由类目（microsoft / apple / icloud / proxy / direct）构成一个划分——每个域名基本只出现在其中一个规则集里，因此路由基本与 RULE-SET 顺序无关。极少数域名因上游广义后缀规则重叠（构建时会报告 conflict、不影响构建），需靠上面推荐的 RULE-SET 顺序消歧。`reject` 是策略叠加层，不参与划分。
+- **划分（partition）**：路由类目（microsoft / apple / icloud / claude / proxy / direct）构成一个划分——每个域名基本只出现在其中一个规则集里，因此路由基本与 RULE-SET 顺序无关。极少数域名因上游广义后缀规则重叠（构建时会报告 conflict、不影响构建），需靠上面推荐的 RULE-SET 顺序消歧。`reject` 是策略叠加层，不参与划分。`claude` 是纯手工类目（无上游源，内容全靠 `manual/claude.txt` 钉住）。
 - **优先级 + 手工指派**：域名归属由 `config.yaml` 的 `priority` 顺序决定（前者从后者中排除）；`manual/<类目>.txt` 里的手工指派**优先于**此顺序——写进哪个类目就钉在哪个类目，并自动从其他路由类目移除。
 - **语义去重**：用域名后缀树去重，`+.example.com` 存在时自动压掉其覆盖的所有子域。
 

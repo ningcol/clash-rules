@@ -33,7 +33,10 @@ defaults:
 
 # 路由类目的线性优先级：前者从后者中排除，保证每个域名只落在一个路由类目里。
 # 手工指派（manual/<cat>.txt）优先于此顺序。reject 不在此列（策略叠加层）。
-priority: [microsoft, apple, icloud, proxy, direct]
+# claude 排在 proxy 之前：Anthropic 封中国区、Claude 全系域名必须走代理，
+# 但要在划分层面从 proxy 手里接过 anthropic.com / claude.ai 等域名的归属权，
+# 订阅侧才能用独立策略组（「🤖 Claude服务」）单独控制它们的走向。
+priority: [microsoft, apple, icloud, claude, proxy, direct]
 
 categories:
   reject:
@@ -73,6 +76,13 @@ categories:
     sources:
       - url: https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/icloud.txt
         note: Loyalsoldier/clash-rules
+
+  claude:
+    description: Claude 服务规则
+    # 纯手工类目、无上游源：Anthropic 没有可订阅的域名清单，域名数量也少而稳。
+    # 三条广义后缀钉在 manual/claude.txt。它参与 priority 划分（排在 proxy 前），
+    # proxy 上游日后新收的 Claude 域名会被自动从 proxy 移除、归到这里。
+    sources: []
 
   proxy:
     description: 代理规则
