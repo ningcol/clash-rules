@@ -51,7 +51,7 @@ Rules to follow:
 
 ## Architecture: the routing partition
 
-The routing categories listed in `config.yaml`'s `priority` (`microsoft, apple, icloud, proxy, direct`) form a **partition**: every domain lands in at most one of them. This is a correctness requirement, not a size optimization — subscribers order their `RULE-SET` lines arbitrarily, so routing determinism must live in the product content, not in config ordering.
+The routing categories listed in `config.yaml`'s `priority` (`microsoft, apple, icloud, claude, proxy, direct`) form a **partition**: every domain lands in at most one of them. This is a correctness requirement, not a size optimization — subscribers order their `RULE-SET` lines arbitrarily, so routing determinism must live in the product content, not in config ordering.
 
 Two things decide a domain's category, **manual assignment winning over priority**:
 
@@ -65,7 +65,7 @@ Because domain-behavior format cannot trim a subdomain out of a `+.suffix`, the 
 - **Exclusion impossible** → `## conflicts`. One category carries a broad suffix (direct's `+.mi.com`, proxy's shared-CA `+.digicert.com`) covering another category's specific domain, so the narrow rule cannot be subtracted out. Both rule sets match it and routing becomes order-dependent (~330 cases). The README's recommended RULE-SET order is the build's `priority` order, which resolves them correctly — keep the two in sync; `tests/test_build.py::TestRealConfig` pins it.
 - **Exclusion succeeded** → `## partition transfers`. The broad suffix wins outright and the specific hosts are *deleted* from the losing category. This is the expensive direction and it used to be entirely unreported. Measured 2026-08: microsoft took 137 hosts from proxy (largely via Akamai/Azure suffixes it should not own), and proxy took 403 from direct — among them China-region endpoints of foreign vendors (`account-cn.alibabacloud.com`, `images-cn.ssl-images-amazon.com`, `ea2cn-prod-outlet.dell.com`) that upstream listed in direct precisely so they would *not* go out over a proxy. Watch the totals in the report; a suffix in that list that the winner does not actually own belongs in its `-exclude.txt`.
 
-**apple and icloud are effectively manual-only today.** Their upstream contributes 0 and 2 net entries respectively — `manual/apple.txt`'s broad suffixes (`+.apple.com`, `+.mzstatic.com`, …) compress away everything the source provides. Consequence: a new Apple domain that those suffixes do not cover (the `akadns.net` / `edgekey.net` families) will **not** arrive on its own; it has to be added by hand.
+**apple and icloud are effectively manual-only today.** Their upstream contributes 0 and 2 net entries respectively — `manual/apple.txt`'s broad suffixes (`+.apple.com`, `+.mzstatic.com`, …) compress away everything the source provides. Consequence: a new Apple domain that those suffixes do not cover (the `akadns.net` / `edgekey.net` families) will **not** arrive on its own; it has to be added by hand. **claude is manual-only by design** (no source at all — no public Claude-only list exists; Sukka's `non_ip/ai.txt` bundles 50+ other AI vendors): a new Anthropic domain never arrives on its own, add it to `manual/claude.txt`. Note that `reject` still overlays it — `+.statsig.anthropic.com` (Anthropic telemetry) is carried by Loyalsoldier's reject list and is blocked before any routing category is consulted.
 
 ## Safety mechanisms
 

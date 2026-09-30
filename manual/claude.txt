@@ -2,7 +2,10 @@
 # Anthropic 封中国区，全系域名必须走代理；订阅侧由「🤖 Claude服务」组承载，
 # 与微软/苹果「国内有分发、默认直连」相反，该组默认走代理。
 
-# Claude Code 的 API / 控制台 / 遥测（api. / console. / statsig.anthropic.com 均在其下）  2026-09-30
+# Claude Code 的 API / 控制台 / 网页版（api. / console. / claude.ai 均在此后缀下）。
+# 注：statsig.anthropic.com 虽被此后缀覆盖，但它同时在 Loyalsoldier 拦截清单里、
+# 订阅侧拦截引用排在一切服务组之前，实际被拒——刻意保留（Claude Code 不依赖
+# 遥测）；要放开在 manual/reject-exclude.txt 写一行  2026-09-30
 +.anthropic.com
 # Claude 网页版与 OAuth 登录（Claude Code 的授权回调走这里）  2026-09-30
 +.claude.ai
