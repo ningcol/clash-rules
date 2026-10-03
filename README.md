@@ -162,3 +162,8 @@ python -m unittest discover -s tests        # 跑单元测试
 
 - [Clash.Meta / mihomo](https://github.com/MetaCubeX/mihomo)
 - 规则源：[Loyalsoldier/clash-rules](https://github.com/Loyalsoldier/clash-rules)、[SukkaW/Surge](https://github.com/SukkaW/Surge)、[ACL4SSR](https://github.com/ACL4SSR/ACL4SSR)、[AWAvenue-Ads-Rule](https://github.com/TG-Twilight/AWAvenue-Ads-Rule)
+
+## 相关项目
+
+- [cf-optimizer](../cf/README.md)：引用本规则集的订阅生成器；规则分类名称需保持一致。
+- [Stash / OpenClash](../../stash/README.md)：客户端加载规则、DNS 与实际出口的排查记录。
