@@ -109,3 +109,6 @@ v.cdnlz30.com
 # 注册域（别的子域属于其他客户），故只按本线路给的精确主机钉、不放宽后缀，2026-09-30
 3pye.xc6t.a8ji.a.rros.cc
 3pye.xc6t.a8ji.a.vvps.xyz
+# 独立600M台湾VPS的SSH/DDNS入口，钉直连避免TUN兜底代理；共享注册域只匹配本机精确主机，2026-10-08
+48g7.5th7.x3kw.a.rros.cc
+48g7.5th7.x3kw.a.vvps.xyz
