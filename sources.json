@@ -3,10 +3,12 @@
     "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/apple.txt": 165
   },
   "chatgpt": {
+    "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/OpenAi.list": 16,
     "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/openai.list": 22
   },
   "claude": {
-    "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/anthropic.list": 9
+    "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/anthropic.list": 9,
+    "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Claude/Claude.list": 3
   },
   "direct": {
     "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/direct.txt": 111724

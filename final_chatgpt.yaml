@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-10-10T01:30:42Z
+# 更新时间: 2026-10-10T01:44:12Z
 # 说明: 本文件为自动生成的 Clash CHATGPT 规则（behavior: domain）。
 #########################################
 payload:
@@ -13,10 +13,10 @@ payload:
   - '+.oaiusercontent.com'
   - '+.openai.com'
   - '+.openai.com.cdn.cloudflare.net'
+  - '+.openaiapi-site.azureedge.net'
   - '+.sora.com'
   - 'cdn.openaimerge.com'
   - 'openai.qualtrics.com'
-  - 'openaiapi-site.azureedge.net'
   - 'openaiassets.blob.core.windows.net'
   - 'openaicom-api-bdcpf8c6d2e9atf6.z01.azurefd.net'
   - 'openaicom.imgix.net'
