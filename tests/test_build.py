@@ -893,10 +893,8 @@ class TestRealConfig(unittest.TestCase):
         """A category with neither sources nor manual entries builds an empty
         product — subscribers reference a rule set that matches nothing, and
         nothing distinguishes that from a config typo that dropped `sources`.
-        claude is the one deliberate manual-only category: no public
-        Claude-only upstream exists (Sukka's non_ip/ai.txt bundles 50+ other
-        AI vendors), so a source-less category is legal only with a non-empty
-        manual file — asserted here, not exempted."""
+        A source-less category is legal only with a non-empty manual file;
+        service categories now use dedicated upstreams instead of broad AI lists."""
         for name, c in self.cfg.categories.items():
             if c.sources:
                 continue
@@ -938,27 +936,6 @@ class TestRealConfig(unittest.TestCase):
 
 
 class TestRealManualFiles(unittest.TestCase):
-    def test_service_domains_are_pinned_without_shared_suffixes(self):
-        """独立服务应覆盖真实入口，并保留共享认证/CDN的原归属，避免扩大分流。"""
-        cfg = build.load_config(REPO / "config.yaml")
-        expected = {
-            "youtube": ["www.youtube.com", "www.youtube.co.jp", "r1.googlevideo.com", "i.ytimg.com"],
-            "speedtest": ["www.speedtest.net", "server.ooklaserver.net", "speed.cloudflare.com", "fast.com"],
-            "chatgpt": ["chatgpt.com", "api.openai.com", "cdn.oaistatic.com", "files.oaiusercontent.com", "openaiassets.blob.core.windows.net", "openaiapi-site.azureedge.net"],
-        }
-        shared = ["auth0.com", "stripe.com", "sentry.io", "challenges.cloudflare.com", "gvt1.com", "ggpht.com"]
-        for name, domains in expected.items():
-            self.assertLess(cfg.priority.index(name), cfg.priority.index("proxy"))
-            if name == "chatgpt":
-                self.assertLess(cfg.priority.index(name), cfg.priority.index("microsoft"))
-            ds = DomainSet()
-            for rule in build._read_manual(REPO / "manual", name):
-                ds.add(rule)
-            for domain in domains:
-                self.assertTrue(ds.covered(Rule("exact", domain)), (name, domain))
-            for domain in shared:
-                self.assertFalse(ds.covered(Rule("exact", domain)), (name, domain))
-
     def test_the_repos_own_manual_files_lint_clean(self):
         cfg = build.load_config(REPO / "config.yaml")
         self.assertEqual(build.lint(cfg, REPO), [])

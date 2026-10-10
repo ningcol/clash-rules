@@ -1,9 +1,0 @@
-# 参考 IOPUT openclash 的 Speedtest 类别。2026-10-10
-# Ookla 测速站与自定义测试、Netflix Fast、CF 专用测速端点、Dler 精确主机。
-+.fast.com
-+.speed.cloudflare.com
-+.ooklaserver.net
-speed.dler.io
-+.speedtest.co
-+.speedtest.net
-+.speedtestcustom.com

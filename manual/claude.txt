@@ -1,34 +1,7 @@
-# Claude Code / Claude 网页版域名（钉在 claude，自动从其他路由类目移除）。
-# Anthropic 封中国区，全系域名必须走代理；订阅侧由「🤖 Claude服务」组承载，
-# 与微软/苹果「国内有分发、默认直连」相反，该组默认走代理。
-
-# Claude Code 的 API / 控制台 / 网页版（api. / console. / claude.ai 均在此后缀下）。
-# 注：statsig.anthropic.com 虽被此后缀覆盖，但它同时在 Loyalsoldier 拦截清单里、
-# 订阅侧拦截引用排在一切服务组之前，实际被拒——刻意保留（Claude Code 不依赖
-# 遥测）；要放开在 manual/reject-exclude.txt 写一行  2026-09-30
-+.anthropic.com
-# Claude 网页版与 OAuth 登录（Claude Code 的授权回调走这里）  2026-09-30
-+.claude.ai
-# Anthropic 官方新主域（自 claude.ai 迁移）  2026-09-30
-+.claude.com
-# Claude Code 远程 MCP 连接器（claudemcpclient/content）与用户文件 CDN
-# （claudeusercontent，网页版上传/附件走这里）——Loyalsoldier proxy 上游
-# 原已收录、被划分留在 proxy，钉回 claude 使其随新组走  2026-09-30
-+.claudemcpclient.com
-+.claudemcpcontent.com
-+.claudeusercontent.com
-# 制品发布域（网页上 Publish 出来的 artifact 应用挂在 *.claude.site）与
-# Claude 开发者域，通配符证书活跃续期中（2026-09-30 官方文档 + 证书透明
-# 日志核查确认，主流规则库尚未收录）  2026-09-30
+# 上游优先；只补 Anthropic 官方文档已确认、MetaCubeX 尚未收录的域名。2026-10-10
+# 桌面版预览与应用域：https://code.claude.com/docs/en/desktop#network-access-requirements
++.claude.app
+# 公开制品发布域，官方文档与证书记录已确认；既有分流保留。2026-10-10
+# 既有 2026-09-30 公开制品域核查记录；本次不复制上游、不删除既有补充。
 +.claude.site
-+.claude.dev
-# anthropic.com 官网本身的 BunnyCDN 分发主机（blackmatrix7 收录；b-cdn.net
-# 是共享 CDN，只能精确到这一台，不许写成后缀）  2026-09-30
-servd-anthropic-website.b-cdn.net
-#
-# 刻意不收的共享第三方（Claude Code 会碰，但钉进 claude 会殃及别家流量，
-# 它们落 gfw/兜底组同样走代理）：storage.googleapis.com（旧版安装器）、
-# registry.npmjs.org、github.com / raw.githubusercontent.com（插件与更新日志）、
-# datadoghq.com（可选遥测，可用环境变量关）、artifacts 运行时 CDN 库与 Google 字体。
-# statsig.anthropic.com 见上面的拦截备注。IP 侧无需规则：官方域全在
-# Cloudflare/GCP 后面，没有专属网段，域名规则在链中也先于一切 IP 规则命中。
+# statsig.anthropic.com 的广告拦截保持原样；共享安装、插件、字体/CDN 保留原分流。

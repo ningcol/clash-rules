@@ -1,0 +1,11 @@
+# 上游快照：https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/anthropic.list
+# 采集日期：2026-10-10；供离线回归验证。
+servd-anthropic-website.b-cdn.net
++.anthropic.com
++.clau.de
++.claude.ai
++.claude.com
++.claude.dev
++.claudemcpclient.com
++.claudemcpcontent.com
++.claudeusercontent.com

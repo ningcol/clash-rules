@@ -30,6 +30,9 @@ defaults:
   # 实测 direct 有 50 条、proxy 有 71 条、其余类目 0 条，近 12 次发布零抖动。
   # 确认某个顶级域该消失，临时置 true 发一次，然后改回来。
   allow-tld-removal: false
+  # 单次移交只允许 +.youtube 在目标产物中完整保留；发布后删除此条。2026-10-10
+  tld-transfers:
+    - {domain: youtube, from: proxy, to: youtube}
 
 # 路由类目的线性优先级：前者从后者中排除，保证每个域名只落在一个路由类目里。
 # 手工指派（manual/<cat>.txt）优先于此顺序。reject 不在此列（策略叠加层）。
@@ -79,26 +82,47 @@ categories:
 
   claude:
     description: Claude 服务规则
-    # 纯手工类目、无上游源：Anthropic 没有可订阅的域名清单，域名数量也少而稳。
-    # 三条广义后缀钉在 manual/claude.txt。它参与 priority 划分（排在 proxy 前），
-    # proxy 上游日后新收的 Claude 域名会被自动从 proxy 移除、归到这里。
-    sources: []
+    # 上游优先；manual 只补官方已确认、上游尚未收录的域名。
+    sources:
+      - url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/anthropic.list
+        note: MetaCubeX Anthropic 专属域名
 
   youtube:
     description: YouTube 网页与视频规则
     sources:
+      - url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/youtube.list
+        note: MetaCubeX YouTube；国际站点、播放器与头像资源
+        # Google 共享头像域不整体归入 YouTube；ACL4SSR 的精确 yt3 主机保留。
+        exclude: [+.ggpht.com, +.ggpht.cn]
       - url: https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/YouTube.list
-        note: ACL4SSR YouTube；国际站点与专属域名由 manual 补齐
+        note: ACL4SSR YouTube；专属资源补充
 
   speedtest:
     description: Speedtest 测速服务规则
-    # 参考 openclash 的独立测速类别，精确维护专属域名。
-    sources: []
+    sources:
+      - url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/speedtest.list
+        note: MetaCubeX Speedtest；Ookla 与测速资源
+      - url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Speedtest/Speedtest.list
+        note: blackmatrix7 Speedtest；Fast、Cloudflare 与 Dler 补充
 
   chatgpt:
     description: ChatGPT 与 OpenAI 服务规则
-    # 仅维护专属域名；共享认证、支付、验证码及 CDN 不整体归入此类别。
-    sources: []
+    sources:
+      - url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/openai.list
+        note: MetaCubeX OpenAI 专属域名
+        # 未被官方确认的第三方站点、共享语音服务与遥测保留原有分流。
+        # 固定过滤共享认证/支付后缀，避免上游日后加入时扩大分流范围。
+        exclude:
+          - +.chatgpt.site
+          - +.crixet.com
+          - +.host.livekit.cloud
+          - +.turn.livekit.cloud
+          - browser-intake-datadoghq.com
+          - o33249.ingest.sentry.io
+          - +.auth0.com
+          - +.stripe.com
+          - +.sentry.io
+          - challenges.cloudflare.com
 
   proxy:
     description: 代理规则

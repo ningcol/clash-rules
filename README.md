@@ -104,14 +104,15 @@ rules:
   - MATCH,PROXY
 ```
 
-> 规则集之间基本互不重叠（同一域名只出现在一个路由类目里），因此绝大多数域名的路由与 RULE-SET 顺序无关。**建议保持上面的顺序**（与构建优先级 `microsoft → apple → icloud → claude → proxy → direct` 一致）：少数域名被上游的广义后缀规则（如 direct 源里的 `+.mi.com`、proxy 源里的共享 CA `+.digicert.com`）覆盖，而 domain 格式无法对后缀做“减一个子域”的裁剪，这些域名依赖此顺序才能路由到正确的策略。
+> 规则集之间基本互不重叠（同一域名只出现在一个路由类目里），因此绝大多数域名的路由与 RULE-SET 顺序无关。**建议保持上面的顺序**（与构建优先级 `youtube → speedtest → chatgpt → microsoft → apple → icloud → claude → proxy → direct` 一致）：少数域名被上游的广义后缀规则（如 direct 源里的 `+.mi.com`、proxy 源里的共享 CA `+.digicert.com`）覆盖，而 domain 格式无法对后缀做“减一个子域”的裁剪，这些域名依赖此顺序才能路由到正确的策略。
 
 > **jsDelivr 缓存**：`@release` 分支形式的 jsDelivr 链接有约 12 小时 CDN 缓存，push 后最长约半天才刷新；想立即生效可用上面的 raw 链接，或访问一次 `https://purge.jsdelivr.net/gh/ningcol/clash-rules@release/<文件名>` 强制回源。
 
 ## 🧩 工作原理
 
-- **划分（partition）**：路由类目（microsoft / apple / icloud / claude / proxy / direct）构成一个划分——每个域名基本只出现在其中一个规则集里，因此路由基本与 RULE-SET 顺序无关。极少数域名因上游广义后缀规则重叠（构建时会报告 conflict、不影响构建），需靠上面推荐的 RULE-SET 顺序消歧。`reject` 是策略叠加层，不参与划分。`claude` 是纯手工类目（无上游源，内容全靠 `manual/claude.txt` 钉住）。
+- **划分（partition）**：路由类目（youtube / speedtest / chatgpt / microsoft / apple / icloud / claude / proxy / direct）构成一个划分——每个域名基本只出现在其中一个规则集里，因此路由基本与 RULE-SET 顺序无关。极少数域名因上游广义后缀规则重叠（构建时会报告 conflict、不影响构建），需靠上面推荐的 RULE-SET 顺序消歧。`reject` 是策略叠加层，不参与划分。四个服务类目优先合并专属上游，`manual/` 只补上游尚未收录的已确认域名。
 - **优先级 + 手工指派**：域名归属由 `config.yaml` 的 `priority` 顺序决定（前者从后者中排除）；`manual/<类目>.txt` 里的手工指派**优先于**此顺序——写进哪个类目就钉在哪个类目，并自动从其他路由类目移除。
+- **单源过滤**：`sources[].exclude` 只排除对应上游的共享或非专属域名，在合并前执行；其他来源的精确主机与手工补充保留。排除无法裁剪上游宽后缀时构建失败，不静默放行。
 - **语义去重**：用域名后缀树去重，`+.example.com` 存在时自动压掉其覆盖的所有子域。
 
 ## 🛠️ 如何维护
@@ -169,6 +170,7 @@ python -m unittest discover -s tests        # 跑单元测试
 | 裸顶级域闸 | `+.cn` / `+.icbc` 这类单段后缀从上一版消失 | 上面三道量的都是条数，而丢一个顶级域的跌幅是 0.0009%，三道全绿 |
 | 逐源闸 | 单个上游源的解析条数塌方（归零一律致命） | 数量闸量的是整个类目，多源类目里死一个源会被其他源盖住；实测 10 个源里 7 个整份变空都不到 8% |
 
+- **显式顶级域移交**：`defaults.tld-transfers` 可单次声明 `{domain: youtube, from: proxy, to: youtube}`。来源类目仅豁免这一个顶级域，且目标构建产物必须完整保留同一个后缀；其他顶级域仍受门禁保护。发布完成后移除声明，`allow-tld-removal` 始终保持 `false`。
 - **失败会主动找上门**：闸门拦下时 `publish.yml` 自动开 Issue —— 规则冻结在订阅侧完全不可观测，客户端会继续拉到那份旧规则。另有 `heartbeat.yml` 每周检查 `release` 分支有多久没更新，覆盖「流程根本没跑」的情况。
 - **CI**：`check.yml` 在每次 PR/push 跑 lint + 测试 + 干跑构建（拉上一版 release 当基线，让全部闸门在 PR 上也生效）；`publish.yml` 每日构建、过闸门后发布到 `release` 分支。
 
@@ -185,7 +187,7 @@ python -m unittest discover -s tests        # 跑单元测试
 ## 🔗 相关链接
 
 - [Clash.Meta / mihomo](https://github.com/MetaCubeX/mihomo)
-- 规则源：[Loyalsoldier/clash-rules](https://github.com/Loyalsoldier/clash-rules)、[SukkaW/Surge](https://github.com/SukkaW/Surge)、[ACL4SSR](https://github.com/ACL4SSR/ACL4SSR)、[AWAvenue-Ads-Rule](https://github.com/TG-Twilight/AWAvenue-Ads-Rule)
+- 规则源：[Loyalsoldier/clash-rules](https://github.com/Loyalsoldier/clash-rules)、[SukkaW/Surge](https://github.com/SukkaW/Surge)、[ACL4SSR](https://github.com/ACL4SSR/ACL4SSR)、[MetaCubeX/meta-rules-dat](https://github.com/MetaCubeX/meta-rules-dat)、[blackmatrix7/ios_rule_script](https://github.com/blackmatrix7/ios_rule_script)、[AWAvenue-Ads-Rule](https://github.com/TG-Twilight/AWAvenue-Ads-Rule)
 
 ## 相关项目
 
@@ -194,4 +196,13 @@ python -m unittest discover -s tests        # 跑单元测试
 
 ## 服务专属分流
 
-YouTube 订阅 ACL4SSR 规则，并由手工清单补齐各地区域名。Speedtest 和 ChatGPT 使用参考 openclash 配置整理的专属域名清单；新增域名维护对应的 `manual/` 文件。共享 Google CDN、认证、支付和验证码服务保留原有路由，避免影响其他服务。
+| 类目 | 自动跟随的上游 | 本地补充 |
+|---|---|---|
+| YouTube | MetaCubeX YouTube + ACL4SSR YouTube | 无重复域名清单 |
+| Speedtest | MetaCubeX Speedtest + blackmatrix7 Speedtest | 无重复域名清单 |
+| ChatGPT | MetaCubeX OpenAI | 官方网络清单中的 `cdn.openaimerge.com` |
+| Claude | MetaCubeX Anthropic | 官方已确认的 `+.claude.app`，以及已有的 `+.claude.site` |
+
+每天北京时间 05:00 自动拉取上游并通过发布门禁，客户端仍使用原来的 `final_*.yaml` 地址，每天刷新规则。上游已有的域名不在手工清单重复维护；官方新增、上游尚未收录的专属域名才补入 `manual/`。
+
+YouTube 的共享 `ggpht.com` / `ggpht.cn` 只从 MetaCubeX 单源中排除，ACL4SSR 的 `yt3.ggpht.com` 精确规则保留。`gvt2.com` 继续通过类目排除保留原有路由。ChatGPT 的共享语音命名空间、遥测、未确认的第三方站点及共享认证/支付后缀在单源过滤；保留原有分流，不将整个共享服务交给 ChatGPT。Claude 的 `statsig.anthropic.com` 仍由广告规则优先拦截。

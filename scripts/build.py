@@ -473,6 +473,8 @@ class DomainSet:
 class Source:
     url: str
     note: str = ""
+    # 只过滤这一份上游；在合并前执行，其他来源与手工补充的精确域名不受影响。
+    exclude: list[Rule] = field(default_factory=list)
 
 
 @dataclass
@@ -496,6 +498,8 @@ class Config:
     publish_branch: str
     priority: list[str]
     categories: dict[str, Category]
+    # 单次显式迁移：只有目标产物确实保留同一顶级域时，才允许来源类目移交。
+    tld_transfers: list[tuple[str, str, str]] = field(default_factory=list)
 
     def routing(self) -> list[str]:
         return list(self.priority)
@@ -512,7 +516,18 @@ def load_config(path: Path) -> Config:
     priority = list(data.get("priority", []))
     cats: dict[str, Category] = {}
     for name, c in (data.get("categories") or {}).items():
-        srcs = [Source(s["url"], s.get("note", "")) for s in (c.get("sources") or [])]
+        srcs = []
+        for s in (c.get("sources") or []):
+            values = s.get("exclude", [])
+            if not isinstance(values, list):
+                raise SystemExit(f"config error: {name} source exclude must be a list")
+            exclusions = []
+            for value in values:
+                status, rule = parse_line(value) if isinstance(value, str) else ("invalid", None)
+                if status != "ok" or rule is None or rule.kind not in ("exact", "suffix"):
+                    raise SystemExit(f"config error: {name} source exclude must contain domains: {value!r}")
+                exclusions.append(rule)
+            srcs.append(Source(s["url"], s.get("note", ""), exclusions))
         cats[name] = Category(
             name=name,
             description=c.get("description", name),
@@ -523,6 +538,20 @@ def load_config(path: Path) -> Config:
     for p in priority:
         if p not in cats:
             raise SystemExit(f"config error: priority category '{p}' is not defined")
+    transfers = []
+    transfer_values = d.get("tld-transfers", [])
+    if not isinstance(transfer_values, list):
+        raise SystemExit("config error: tld-transfers must be a list")
+    for transfer in transfer_values:
+        if not isinstance(transfer, dict) or set(transfer) != {"domain", "from", "to"}:
+            raise SystemExit("config error: tld-transfer requires domain/from/to")
+        domain = transfer["domain"]
+        source, target = transfer["from"], transfer["to"]
+        if (not isinstance(domain, str) or "." in domain
+                or _normalize_domain(domain, allow_tld=True) != domain
+                or source not in priority or target not in priority or source == target):
+            raise SystemExit(f"config error: invalid tld-transfer: {transfer!r}")
+        transfers.append((domain, source, target))
     return Config(
         timeout=int(d.get("timeout-seconds", 30)),
         retries=int(d.get("retries", 3)),
@@ -534,6 +563,7 @@ def load_config(path: Path) -> Config:
         publish_branch=d.get("publish-branch", "release"),
         priority=priority,
         categories=cats,
+        tld_transfers=transfers,
     )
 
 
@@ -619,6 +649,20 @@ def build_category(cat: Category, cfg: Config, manual_dir: Path,
     for src in cat.sources:
         body = fetcher(src.url, cfg.timeout, cfg.retries)
         rules, st = parse_text(body)
+        filtered = 0
+        if src.exclude:
+            # 先过滤单源的宽后缀，再与其他源合并。若到类目合并之后才排除
+            # ggpht.com，ACL4SSR 的 yt3.ggpht.com 也会一起被删掉。
+            source_domains = DomainSet.from_rules(
+                r for r in rules if r.kind in ("exact", "suffix"))
+            source_domains.compress()
+            filtered, conflicts = source_domains.subtract(DomainSet.from_rules(src.exclude))
+            if conflicts:
+                # 上游把精确主机扩成共享后缀时，不可静默放过无法裁剪的排除。
+                raise GateError(f"{cat.name}: source exclusion cannot be applied to {src.url}: "
+                                + "; ".join(c.detail for c in conflicts))
+            rules = list(source_domains.iter_rules()) + [
+                r for r in rules if r.kind not in ("exact", "suffix")]
         ingest(rules)
         source_counts[src.url] = st.parsed
         invalid_total += st.dropped_invalid
@@ -633,7 +677,8 @@ def build_category(cat: Category, cfg: Config, manual_dir: Path,
                      f"({','.join(sorted(st.unsupported_types))})")
         notes.append(f"{src.note or src.url}: {st.parsed} rules, "
                      f"{st.dropped_invalid} invalid, "
-                     f"{st.dropped_keyword} keyword{unsup}")
+                     f"{st.dropped_keyword} keyword{unsup}"
+                     + (f", {filtered} source-filtered" if src.exclude else ""))
 
     manual = _read_manual(manual_dir, cat.name)
     covered = sum(1 for r in manual if r.kind in ("exact", "suffix") and domains.covered(r))
@@ -1148,7 +1193,12 @@ def cmd_build(cfg: Config, root: Path, out: Path, previous: Path | None,
             gate_errors.append(str(e))
         if not cfg.allow_tld_removal:
             try:
-                check_tld_gate(dpath.name, dpay, old_pay)
+                # 默认门禁保持关闭逃生开关；显式移交只能豁免同一个裸顶级域，
+                # 且它必须已经出现在目标类目的实际构建结果里，不能变成真删除。
+                moved = {f"+.{domain}" for domain, source, target in cfg.tld_transfers
+                         if source == name and f"+.{domain}" in results[target].domains.to_payload()}
+                tld_old = [rule for rule in old_pay if rule not in moved] if old_pay is not None else None
+                check_tld_gate(dpath.name, dpay, tld_old)
             except GateError as e:
                 gate_errors.append(str(e))
         planned.append((dpath, dpay, name, False))
