@@ -108,9 +108,11 @@ categories:
 
   chatgpt:
     description: ChatGPT 与 OpenAI 服务规则
+    # 完整规则保留 ChatGPT 专用 Azure 动态主机；旧 domain 产物继续兼容既有订阅。
+    classical: true
     sources:
-      - url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/openai.list
-        note: MetaCubeX OpenAI 专属域名
+      - url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/openai.yaml
+        note: MetaCubeX OpenAI 专属域名及 Azure 动态匹配
         # 未被官方确认的第三方站点、共享语音服务与遥测保留原有分流。
         # 固定过滤共享认证/支付后缀，避免上游日后加入时扩大分流范围。
         exclude:

@@ -213,5 +213,82 @@ class TestMultiSourceBaseline(unittest.TestCase):
             self.assertFalse((failed / "final_service.yaml").exists())
 
 
+class TestClassicalChatGPT(unittest.TestCase):
+    def test_actual_upstream_dynamic_azure_is_preserved_and_precise(self):
+        """退回纯域名来源或漏收正则都会变红；地区与编号变化要命中，共享 Azure 不可误收。"""
+        import re
+        cfg = build.load_config(REPO / "config.yaml")
+        bodies = {}
+        for file in (REPO / "tests/fixtures/services").glob("*.txt"):
+            body = file.read_text()
+            bodies[body.splitlines()[0].split("：", 1)[1]] = body
+        result = build.build_category(cfg.categories["chatgpt"], cfg, REPO / "manual",
+                                      lambda u, t, r: bodies[u])
+        self.assertTrue(cfg.categories["chatgpt"].classical)
+        self.assertEqual(len(result.regexes), 1)
+        regex = re.compile(result.regexes[0])
+        for domain in ["chatgpt-async-webps-prod-eastus-18.webpubsub.azure.com",
+                       "chatgpt-async-webps-prod-japaneast-27.webpubsub.azure.com"]:
+            self.assertIsNotNone(regex.fullmatch(domain))
+        for domain in ["customer.webpubsub.azure.com", "portal.azure.com",
+                       "chatgpt-async-webps-prod-eastus-18.webpubsub.azure.com.evil.example"]:
+            self.assertIsNone(regex.fullmatch(domain))
+
+    def test_regex_parsing_preserves_quantifiers_case_and_yaml_quotes(self):
+        """逗号拆分、# 注释和 YAML 引号处理不能破坏正则，非法或非全域匹配须报错。"""
+        pattern = r"^prefix-\S{1,3}-[A-Z'#]+\.example$"
+        line = "  - 'DOMAIN-REGEX," + pattern.replace("'", "''") + "'"
+        self.assertEqual(build.parse_line(line, allow_regex=True), ("ok", Rule("regex", pattern)))
+        for bad in ["DOMAIN-REGEX,", "DOMAIN-REGEX,^[$", "DOMAIN-REGEX,example"]:
+            self.assertEqual(build.parse_line(bad, allow_regex=True)[0], "invalid")
+        self.assertEqual(build.parse_line("DOMAIN-REGEX,^example$")[0], "unsupported")
+
+    def test_classical_follows_partition_filters_and_roundtrips(self):
+        """完整产物须来自已过滤、已划分的域名，不能重放原始上游绕过过宽后缀过滤。"""
+        import yaml
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            (root / "manual").mkdir()
+            (root / "config.yaml").write_text(yaml.safe_dump({
+                "priority": ["service", "other"], "categories": {
+                    "service": {"classical": True, "sources": [{"url": "one", "exclude": ["+.shared.example"]}]},
+                    "other": {"sources": []}}}))
+            cfg = build.load_config(root / "config.yaml")
+            pattern = r"^tenant-[A-Z'#]{1,3}\.azure\.example$"
+            body = "+.service.example\n+.shared.example\nDOMAIN-REGEX," + pattern + "\n"
+            # 手工指派的独立域名须从完整产物中移交。
+            (root / "manual/other.txt").write_text("pin.other.example\n")
+            body += "pin.other.example\n"
+            fetch = lambda u, t, r: body
+            first = root / "first"
+            self.assertEqual(build.cmd_build(cfg, root, first, None, fetch), 0)
+            classical = first / "final_service_classical.yaml"
+            payload = yaml.safe_load(classical.read_text())["payload"]
+            self.assertEqual(sorted(payload), ["DOMAIN-REGEX," + pattern, "DOMAIN-SUFFIX,service.example"])
+            self.assertEqual(build.read_payload(classical), sorted(payload))
+            self.assertEqual(build.read_payload(first / "final_service.yaml"), ["+.service.example"])
+            self.assertFalse((first / "final_service_ipcidr.yaml").exists())
+            second = root / "second"
+            self.assertEqual(build.cmd_build(cfg, root, second, first, fetch), 0)
+            self.assertEqual((second / "changed.txt").read_text().strip(), "false")
+            cfg.categories["service"].classical = False
+            failed = root / "failed"
+            self.assertEqual(build.cmd_build(cfg, root, failed, first, fetch), 1)
+            self.assertFalse((failed / "final_service.yaml").exists())
+
+    def test_malformed_regex_blocks_publication(self):
+        """完整来源的坏正则不能静默丢弃并发布，否则 Azure 流量又回到微软组。"""
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            (root / "manual").mkdir()
+            (root / "config.yaml").write_text(
+                "priority: [service]\ncategories:\n  service:\n    classical: true\n    sources: [{url: one}]\n")
+            cfg = build.load_config(root / "config.yaml")
+            out = root / "out"
+            self.assertEqual(build.cmd_build(cfg, root, out, None,
+                                             lambda u, t, r: "+.service.example\nDOMAIN-REGEX,^[$\n"), 1)
+            self.assertFalse((out / "final_service_classical.yaml").exists())
+
+
 if __name__ == "__main__":
     unittest.main()

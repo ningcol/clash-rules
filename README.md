@@ -16,6 +16,7 @@
 | YOUTUBE | YouTube 网页与视频规则 | [raw](https://raw.githubusercontent.com/ningcol/clash-rules/release/final_youtube.yaml) | [jsDelivr](https://cdn.jsdelivr.net/gh/ningcol/clash-rules@release/final_youtube.yaml) |
 | SPEEDTEST | Speedtest 测速服务规则 | [raw](https://raw.githubusercontent.com/ningcol/clash-rules/release/final_speedtest.yaml) | [jsDelivr](https://cdn.jsdelivr.net/gh/ningcol/clash-rules@release/final_speedtest.yaml) |
 | CHATGPT | ChatGPT 与 OpenAI 服务规则 | [raw](https://raw.githubusercontent.com/ningcol/clash-rules/release/final_chatgpt.yaml) | [jsDelivr](https://cdn.jsdelivr.net/gh/ningcol/clash-rules@release/final_chatgpt.yaml) |
+| CHATGPT CLASSICAL | ChatGPT 与 OpenAI 服务规则（含动态匹配） | [raw](https://raw.githubusercontent.com/ningcol/clash-rules/release/final_chatgpt_classical.yaml) | [jsDelivr](https://cdn.jsdelivr.net/gh/ningcol/clash-rules@release/final_chatgpt_classical.yaml) |
 | MICROSOFT | 微软服务规则 | [raw](https://raw.githubusercontent.com/ningcol/clash-rules/release/final_microsoft.yaml) | [jsDelivr](https://cdn.jsdelivr.net/gh/ningcol/clash-rules@release/final_microsoft.yaml) |
 | APPLE | 苹果服务规则 | [raw](https://raw.githubusercontent.com/ningcol/clash-rules/release/final_apple.yaml) | [jsDelivr](https://cdn.jsdelivr.net/gh/ningcol/clash-rules@release/final_apple.yaml) |
 | ICLOUD | iCloud 服务规则 | [raw](https://raw.githubusercontent.com/ningcol/clash-rules/release/final_icloud.yaml) | [jsDelivr](https://cdn.jsdelivr.net/gh/ningcol/clash-rules@release/final_icloud.yaml) |
@@ -73,9 +74,9 @@ rule-providers:
     interval: 86400
   chatgpt:
     type: http
-    behavior: domain
-    url: "https://raw.githubusercontent.com/ningcol/clash-rules/release/final_chatgpt.yaml"
-    path: ./ruleset/chatgpt.yaml
+    behavior: classical
+    url: "https://raw.githubusercontent.com/ningcol/clash-rules/release/final_chatgpt_classical.yaml"
+    path: ./ruleset/chatgpt_classical.yaml
     interval: 86400
   proxy:
     type: http
@@ -107,6 +108,8 @@ rules:
 > 规则集之间基本互不重叠（同一域名只出现在一个路由类目里），因此绝大多数域名的路由与 RULE-SET 顺序无关。**建议保持上面的顺序**（与构建优先级 `youtube → speedtest → chatgpt → microsoft → apple → icloud → claude → proxy → direct` 一致）：少数域名被上游的广义后缀规则（如 direct 源里的 `+.mi.com`、proxy 源里的共享 CA `+.digicert.com`）覆盖，而 domain 格式无法对后缀做“减一个子域”的裁剪，这些域名依赖此顺序才能路由到正确的策略。
 
 > **jsDelivr 缓存**：`@release` 分支形式的 jsDelivr 链接有约 12 小时 CDN 缓存，push 后最长约半天才刷新；想立即生效可用上面的 raw 链接，或访问一次 `https://purge.jsdelivr.net/gh/ningcol/clash-rules@release/<文件名>` 强制回源。
+
+ChatGPT 推荐使用 `final_chatgpt_classical.yaml`，并配合 `behavior: classical`。它合并两份上游的专属域名，同时保留 MetaCubeX 完整 OpenAI 上游的 Azure 动态域名匹配。ChatGPT 必须先于 Microsoft 引用，因为动态主机属于微软广义 `azure.com` 后缀；正则无法从宽后缀中裁剪。旧 `final_chatgpt.yaml` 继续保持 `behavior: domain`，供现有域名清单订阅兼容使用，但不含动态匹配。共享认证、支付、语音与遥测的来源过滤在两种产物中一致。
 
 ## 🧩 工作原理
 
@@ -153,6 +156,7 @@ python -m unittest discover -s tests        # 跑单元测试
 
 - `DOMAIN,x` / `x` → 完整域名匹配
 - `DOMAIN-SUFFIX,x` / `+.x` / `*.x` / `.x` → 域名后缀匹配
+- 显式启用类目 `classical: true` 后，接收以 `^` / `$` 锚定、可解析的 `DOMAIN-REGEX`，保留原始大小写、量词与转义，生成域名及动态匹配的 `final_<类目>_classical.yaml`。正则不进入 domain / ipcidr 产物；坏正则计入非法输入，由门禁拒绝发布。其他类目继续跳过正则。
 - `IP-CIDR,1.1.1.0/24` / `IP-CIDR6,::/0` / `IP-ASN,AS13335` → 单独生成 `final_<类目>_ipcidr.yaml`
 - `DOMAIN-KEYWORD` → 忽略；非法通配（如 `*cdn.x`）、裸 IP 等垃圾行会被丢弃并计数
 

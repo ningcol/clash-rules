@@ -82,11 +82,12 @@ UNSUPPORTED_TYPES = {
 
 ROUTING_HEADER = "# 说明: 本文件为自动生成的 Clash {up} 规则（behavior: domain）。"
 IP_HEADER = "# 说明: 本文件为自动生成的 Clash {up} IP规则（behavior: ipcidr）。"
+CLASSICAL_HEADER = "# 说明: 本文件为自动生成的 Clash {up} 域名及动态匹配规则（behavior: classical）。"
 
 
 @dataclass(frozen=True)
 class Rule:
-    kind: str   # exact | suffix | ip-cidr | ip-cidr6 | ip-asn
+    kind: str   # exact | suffix | regex | ip-cidr | ip-cidr6 | ip-asn
     value: str
 
 
@@ -174,7 +175,7 @@ class ParseStats:
     unsupported_types: set[str] = field(default_factory=set)
 
 
-def parse_line(line: str) -> tuple[str, Rule | None]:
+def parse_line(line: str, *, allow_regex: bool = False) -> tuple[str, Rule | None]:
     """Return ('ok'|'skip'|'keyword'|'unsupported'|'invalid', rule).
 
     'unsupported' means a well-formed rule of a type this builder does not
@@ -187,6 +188,20 @@ def parse_line(line: str) -> tuple[str, Rule | None]:
     # comment nor a rule -> 'invalid' -> with the gate at 0, one upstream edit
     # from a Windows editor takes the whole publish down.
     s = line.lstrip("\ufeff").rstrip("\r\n").strip()
+    # 只有显式提供 classical 产物的类目才接收正则；其余来源保持原有行为。
+    # 正则不能按逗号或 # 拆分，也不能转小写，否则量词、字符类与转义会变义。
+    candidate = s[2:].strip() if s.startswith("- ") else s
+    if candidate.startswith("'") and candidate.endswith("'"):
+        candidate = candidate[1:-1].replace("''", "'")
+    if allow_regex and candidate.partition(",")[0].upper() == "DOMAIN-REGEX":
+        value = candidate.partition(",")[2].strip()
+        try:
+            if not value.startswith("^") or not value.endswith("$"):
+                return "invalid", None
+            re.compile(value)
+        except re.error:
+            return "invalid", None
+        return "ok", Rule("regex", value)
     # Trailing comment after a rule (`DOMAIN-SUFFIX,cn # China`) is common in
     # .list files; without this the whole line is judged as one token.
     if "#" in s:
@@ -256,14 +271,14 @@ def parse_line(line: str) -> tuple[str, Rule | None]:
     return ("ok", r) if r else ("invalid", None)
 
 
-def parse_text(text: str) -> tuple[list[Rule], ParseStats]:
+def parse_text(text: str, *, allow_regex: bool = False) -> tuple[list[Rule], ParseStats]:
     rules: list[Rule] = []
     st = ParseStats()
     for line in text.splitlines():
         if not line.strip() or line.lstrip().startswith("#"):
             continue
         st.total += 1
-        status, rule = parse_line(line)
+        status, rule = parse_line(line, allow_regex=allow_regex)
         if status == "ok" and rule is not None:
             rules.append(rule)
             st.parsed += 1
@@ -484,6 +499,7 @@ class Category:
     sources: list[Source]
     max_shrink: int
     max_invalid: int
+    classical: bool = False
 
 
 @dataclass
@@ -516,6 +532,9 @@ def load_config(path: Path) -> Config:
     priority = list(data.get("priority", []))
     cats: dict[str, Category] = {}
     for name, c in (data.get("categories") or {}).items():
+        classical = c.get("classical", False)
+        if not isinstance(classical, bool):
+            raise SystemExit(f"config error: {name} classical must be a boolean")
         srcs = []
         for s in (c.get("sources") or []):
             values = s.get("exclude", [])
@@ -534,6 +553,7 @@ def load_config(path: Path) -> Config:
             sources=srcs,
             max_shrink=int(c.get("max-shrink-percent", default_shrink)),
             max_invalid=int(c.get("max-invalid", default_invalid)),
+            classical=classical,
         )
     for p in priority:
         if p not in cats:
@@ -619,6 +639,7 @@ class CatResult:
     # Sources that rejected more lines than they accepted — a format change,
     # not junk. Judged per source; see check_invalid_gate.
     format_suspects: list[str] = field(default_factory=list)
+    regexes: list[str] = field(default_factory=list)
 
 
 def _read_manual(manual_dir: Path, name: str) -> list[Rule]:
@@ -633,12 +654,15 @@ def build_category(cat: Category, cfg: Config, manual_dir: Path,
                    fetcher: Callable[[str, int, int], str]) -> CatResult:
     domains = DomainSet()
     ips: dict[str, Rule] = {}
+    regexes: set[str] = set()
     notes: list[str] = []
 
     def ingest(rules: list[Rule]) -> None:
         for r in rules:
             if r.kind in ("exact", "suffix"):
                 domains.add(r)
+            elif r.kind == "regex":
+                regexes.add(r.value)
             else:
                 ips[f"{r.kind},{r.value}"] = r
 
@@ -648,7 +672,7 @@ def build_category(cat: Category, cfg: Config, manual_dir: Path,
     invalid_samples: list[str] = []
     for src in cat.sources:
         body = fetcher(src.url, cfg.timeout, cfg.retries)
-        rules, st = parse_text(body)
+        rules, st = parse_text(body, allow_regex=cat.classical)
         filtered = 0
         if src.exclude:
             # 先过滤单源的宽后缀，再与其他源合并。若到类目合并之后才排除
@@ -698,7 +722,7 @@ def build_category(cat: Category, cfg: Config, manual_dir: Path,
 
     return CatResult(cat.name, domains, list(ips.values()), dedup, covered, conflicts,
                      notes, invalid_total, invalid_samples, excl_noop,
-                     source_counts, format_suspects)
+                     source_counts, format_suspects, sorted(regexes))
 
 
 def apply_partition(cfg: Config, results: dict[str, CatResult],
@@ -953,10 +977,11 @@ def _header(cat_upper: str, template: str) -> list[str]:
     ]
 
 
-def write_yaml(path: Path, payload: list[str], cat: str, ip: bool) -> None:
+def write_yaml(path: Path, payload: list[str], cat: str, ip: bool,
+               *, classical: bool = False) -> None:
     up = cat.upper()
-    lines = _header(up, IP_HEADER if ip else ROUTING_HEADER)
-    lines += [f"  - '{p}'" for p in payload]
+    lines = _header(up, CLASSICAL_HEADER if classical else IP_HEADER if ip else ROUTING_HEADER)
+    lines += ["  - '" + p.replace("'", "''") + "'" for p in payload]
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
@@ -967,12 +992,9 @@ def read_payload(path: Path) -> list[str] | None:
     changed anything."""
     if not path.exists():
         return None
-    out = []
-    for line in path.read_text(encoding="utf-8").splitlines():
-        s = line.lstrip()
-        if s.startswith("- "):
-            out.append(s[2:].strip().strip("'\""))
-    return sorted(out)
+    # 正则中的引号与反斜线必须按 YAML 语义读取；否则同一份产物会每天误报变化。
+    data = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+    return sorted(data.get("payload") or [])
 
 
 def count_payload(path: Path) -> int | None:
@@ -999,6 +1021,10 @@ def render_readme_table(cfg: Config) -> str:
         f = f"final_{name}.yaml"
         rows.append(f"| {name.upper()} | {cat.description} | "
                     f"[raw]({raw}/{f}) | [jsDelivr]({jsd}/{f}) |")
+        if cat.classical:
+            f = f"final_{name}_classical.yaml"
+            rows.append(f"| {name.upper()} CLASSICAL | {cat.description}（含动态匹配） | "
+                        f"[raw]({raw}/{f}) | [jsDelivr]({jsd}/{f}) |")
     return "\n".join(rows)
 
 
@@ -1163,7 +1189,7 @@ def cmd_build(cfg: Config, root: Path, out: Path, previous: Path | None,
 
     # Plan every product + gate (before writing anything).
     out.mkdir(parents=True, exist_ok=True)
-    planned: list[tuple[Path, list[str], str, bool]] = []
+    planned: list[tuple[Path, list[str], str, str]] = []
     gate_errors: list[str] = []
     prev_sources = read_source_counts(previous) if previous else None
     if previous is not None and prev_sources is None:
@@ -1201,7 +1227,21 @@ def cmd_build(cfg: Config, root: Path, out: Path, previous: Path | None,
                 check_tld_gate(dpath.name, dpay, tld_old)
             except GateError as e:
                 gate_errors.append(str(e))
-        planned.append((dpath, dpay, name, False))
+        planned.append((dpath, dpay, name, "domain"))
+        if cfg.categories[name].classical:
+            # 域名先完成去重、过滤和优先级划分，再生成完整规则；不能重读原始源，
+            # 否则共享认证/支付后缀会绕过上述过滤重新进入服务组。
+            classical_pay = sorted([
+                ("DOMAIN-SUFFIX," + p[2:]) if p.startswith("+.") else ("DOMAIN," + p)
+                for p in dpay] + ["DOMAIN-REGEX," + p for p in res.regexes])
+            classical_path = out / f"final_{name}_classical.yaml"
+            try:
+                check_gate(classical_path.name, len(classical_pay),
+                           count_payload(previous / classical_path.name) if previous else None,
+                           cfg.categories[name].max_shrink)
+            except GateError as e:
+                gate_errors.append(str(e))
+            planned.append((classical_path, classical_pay, name, "classical"))
         if res.ips:
             # `behavior: ipcidr` payloads carry CIDRs only; an `AS####` entry
             # makes mihomo reject the whole provider. Keep them out, and say so
@@ -1219,7 +1259,7 @@ def cmd_build(cfg: Config, root: Path, out: Path, previous: Path | None,
                 check_gate(ippath.name, len(ippay), old_ip, cfg.categories[name].max_shrink)
             except GateError as e:
                 gate_errors.append(str(e))
-            planned.append((ippath, ippay, name, True))
+            planned.append((ippath, ippay, name, "ipcidr"))
 
     planned_names = {p.name for p, _, _, _ in planned}
     # Gate products that existed in the last release but are gone now — a removed
@@ -1276,8 +1316,8 @@ def cmd_build(cfg: Config, root: Path, out: Path, previous: Path | None,
             print("[build] forcing a publish to update the upstream source baseline",
                   file=sys.stderr)
 
-    for path, payload, name, ip in planned:
-        write_yaml(path, payload, name, ip)
+    for path, payload, name, behavior in planned:
+        write_yaml(path, payload, name, behavior == "ipcidr", classical=behavior == "classical")
         print(f"  wrote {path.name} ({len(payload)})", file=sys.stderr)
 
     # Ships with the products so the next run has a per-source baseline. It is
@@ -1360,6 +1400,10 @@ def _write_report(order: list[str], results: dict[str, CatResult],
         for note in r.source_notes:
             lines.append(f"- {note}")
         msg_lines.append(f"{name}: {n} domains")
+        if r.regexes:
+            lines.append(f"- classical 动态域名匹配：{len(r.regexes)} 条；必须按 priority 引用，正则无法从其他类目的宽后缀中裁剪。")
+            lines += [f"  - `{regex}`" for regex in r.regexes]
+            msg_lines.append(f"{name}: {len(r.regexes)} domain regexes")
     _report_transfers(lines, results, taken or {})
     if conflicts:
         lines += ["", "## conflicts (exclusions that could NOT be applied)"]
