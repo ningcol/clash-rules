@@ -1,0 +1,18 @@
+# 从 IOPUT openclash 的 AI 类别提取 OpenAI 专属域名。2026-10-10
+# 不整体收 auth0.com / stripe.com / sentry.io / challenges.cloudflare.com 等共享服务。
++.chat.com
++.chatgpt.com
++.chatgpt.livekit.cloud
++.oaistatic.com
++.oaistatsig.com
++.oaiusercontent.com
++.openai.com
++.sora.com
+openai.qualtrics.com
+openaicom-api-bdcpf8c6d2e9atf6.z01.azurefd.net
+openaiapi-site.azureedge.net
+openaiassets.blob.core.windows.net
+openaicom.imgix.net
+openaicomproductionae4b.blob.core.windows.net
+production-openaicom-storage.azureedge.net
++.openai.com.cdn.cloudflare.net

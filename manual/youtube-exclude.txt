@@ -1,0 +1,2 @@
+# gvt2.com 是共享 Google 分发域，不将整个后缀分配给 YouTube。2026-10-10
++.gvt2.com

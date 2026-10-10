@@ -13,6 +13,9 @@
 <!-- BUILD:SUBSCRIPTIONS:BEGIN -->
 | 规则类型 | 说明 | raw 订阅 | jsDelivr 订阅（国内更稳） |
 |---------|------|----------|--------------------------|
+| YOUTUBE | YouTube 网页与视频规则 | [raw](https://raw.githubusercontent.com/ningcol/clash-rules/release/final_youtube.yaml) | [jsDelivr](https://cdn.jsdelivr.net/gh/ningcol/clash-rules@release/final_youtube.yaml) |
+| SPEEDTEST | Speedtest 测速服务规则 | [raw](https://raw.githubusercontent.com/ningcol/clash-rules/release/final_speedtest.yaml) | [jsDelivr](https://cdn.jsdelivr.net/gh/ningcol/clash-rules@release/final_speedtest.yaml) |
+| CHATGPT | ChatGPT 与 OpenAI 服务规则 | [raw](https://raw.githubusercontent.com/ningcol/clash-rules/release/final_chatgpt.yaml) | [jsDelivr](https://cdn.jsdelivr.net/gh/ningcol/clash-rules@release/final_chatgpt.yaml) |
 | MICROSOFT | 微软服务规则 | [raw](https://raw.githubusercontent.com/ningcol/clash-rules/release/final_microsoft.yaml) | [jsDelivr](https://cdn.jsdelivr.net/gh/ningcol/clash-rules@release/final_microsoft.yaml) |
 | APPLE | 苹果服务规则 | [raw](https://raw.githubusercontent.com/ningcol/clash-rules/release/final_apple.yaml) | [jsDelivr](https://cdn.jsdelivr.net/gh/ningcol/clash-rules@release/final_apple.yaml) |
 | ICLOUD | iCloud 服务规则 | [raw](https://raw.githubusercontent.com/ningcol/clash-rules/release/final_icloud.yaml) | [jsDelivr](https://cdn.jsdelivr.net/gh/ningcol/clash-rules@release/final_icloud.yaml) |
@@ -56,6 +59,24 @@ rule-providers:
     url: "https://raw.githubusercontent.com/ningcol/clash-rules/release/final_claude.yaml"
     path: ./ruleset/claude.yaml
     interval: 86400
+  youtube:
+    type: http
+    behavior: domain
+    url: "https://raw.githubusercontent.com/ningcol/clash-rules/release/final_youtube.yaml"
+    path: ./ruleset/youtube.yaml
+    interval: 86400
+  speedtest:
+    type: http
+    behavior: domain
+    url: "https://raw.githubusercontent.com/ningcol/clash-rules/release/final_speedtest.yaml"
+    path: ./ruleset/speedtest.yaml
+    interval: 86400
+  chatgpt:
+    type: http
+    behavior: domain
+    url: "https://raw.githubusercontent.com/ningcol/clash-rules/release/final_chatgpt.yaml"
+    path: ./ruleset/chatgpt.yaml
+    interval: 86400
   proxy:
     type: http
     behavior: domain
@@ -71,6 +92,9 @@ rule-providers:
 
 rules:
   - RULE-SET,reject,REJECT
+  - RULE-SET,youtube,PROXY
+  - RULE-SET,speedtest,PROXY
+  - RULE-SET,chatgpt,PROXY
   - RULE-SET,microsoft,DIRECT
   - RULE-SET,apple,DIRECT
   - RULE-SET,icloud,DIRECT
@@ -167,3 +191,7 @@ python -m unittest discover -s tests        # 跑单元测试
 
 - [cf-optimizer](../cf/README.md)：引用本规则集的订阅生成器；规则分类名称需保持一致。
 - [Stash / OpenClash](../../stash/README.md)：客户端加载规则、DNS 与实际出口的排查记录。
+
+## 服务专属分流
+
+YouTube 订阅 ACL4SSR 规则，并由手工清单补齐各地区域名。Speedtest 和 ChatGPT 使用参考 openclash 配置整理的专属域名清单；新增域名维护对应的 `manual/` 文件。共享 Google CDN、认证、支付和验证码服务保留原有路由，避免影响其他服务。

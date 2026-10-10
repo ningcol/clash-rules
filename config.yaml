@@ -36,7 +36,7 @@ defaults:
 # claude 排在 proxy 之前：Anthropic 封中国区、Claude 全系域名必须走代理，
 # 但要在划分层面从 proxy 手里接过 anthropic.com / claude.ai 等域名的归属权，
 # 订阅侧才能用独立策略组（「🤖 Claude服务」）单独控制它们的走向。
-priority: [microsoft, apple, icloud, claude, proxy, direct]
+priority: [youtube, speedtest, chatgpt, microsoft, apple, icloud, claude, proxy, direct]
 
 categories:
   reject:
@@ -82,6 +82,22 @@ categories:
     # 纯手工类目、无上游源：Anthropic 没有可订阅的域名清单，域名数量也少而稳。
     # 三条广义后缀钉在 manual/claude.txt。它参与 priority 划分（排在 proxy 前），
     # proxy 上游日后新收的 Claude 域名会被自动从 proxy 移除、归到这里。
+    sources: []
+
+  youtube:
+    description: YouTube 网页与视频规则
+    sources:
+      - url: https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/YouTube.list
+        note: ACL4SSR YouTube；国际站点与专属域名由 manual 补齐
+
+  speedtest:
+    description: Speedtest 测速服务规则
+    # 参考 openclash 的独立测速类别，精确维护专属域名。
+    sources: []
+
+  chatgpt:
+    description: ChatGPT 与 OpenAI 服务规则
+    # 仅维护专属域名；共享认证、支付、验证码及 CDN 不整体归入此类别。
     sources: []
 
   proxy:
