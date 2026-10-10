@@ -1,14 +1,23 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-10-10T00:56:50Z
+# 更新时间: 2026-10-10T01:30:42Z
 # 说明: 本文件为自动生成的 Clash SPEEDTEST 规则（behavior: domain）。
 #########################################
 payload:
+  - '+.cdnst.net'
+  - '+.cellmaps.com'
+  - '+.ekahau.cloud'
+  - '+.ekahau.com'
   - '+.fast.com'
+  - '+.ookla-speedtest-central.hgconair.hgc.com.hk'
+  - '+.ookla.com'
   - '+.ooklaserver.net'
+  - '+.pingtest.net'
   - '+.speed.cloudflare.com'
+  - '+.speed.dler.io'
   - '+.speedtest.co'
   - '+.speedtest.net'
   - '+.speedtestcustom.com'
-  - 'speed.dler.io'
+  - '+.webtest.net'
+  - 'www.speedtest.net.cdn.cloudflare.net'

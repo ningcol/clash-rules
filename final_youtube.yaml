@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-10-10T00:56:50Z
+# 更新时间: 2026-10-10T01:30:42Z
 # 说明: 本文件为自动生成的 Clash YOUTUBE 规则（behavior: domain）。
 #########################################
 payload:
@@ -9,6 +9,7 @@ payload:
   - '+.wide-youtube.l.google.com'
   - '+.withyoutube.com'
   - '+.youtu.be'
+  - '+.youtube'
   - '+.youtube-nocookie.com'
   - '+.youtube-ui.l.google.com'
   - '+.youtube.ae'
@@ -164,9 +165,19 @@ payload:
   - '+.youtube.uy'
   - '+.youtube.vn'
   - '+.youtubeeducation.com'
+  - '+.youtubeembeddedplayer.googleapis.com'
+  - '+.youtubefanfest.com'
   - '+.youtubegaming.com'
+  - '+.youtubego.co.id'
+  - '+.youtubego.co.in'
+  - '+.youtubego.com'
+  - '+.youtubego.com.br'
+  - '+.youtubego.id'
+  - '+.youtubego.in'
   - '+.youtubei.googleapis.com'
   - '+.youtubekids.com'
+  - '+.youtubemobilesupport.com'
   - '+.yt.be'
-  - '+.yt3.ggpht.com'
   - '+.ytimg.com'
+  - 'yt3.ggpht.com'
+  - 'yt3.googleusercontent.com'
