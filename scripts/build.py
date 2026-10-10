@@ -1268,6 +1268,13 @@ def cmd_build(cfg: Config, root: Path, out: Path, previous: Path | None,
             changed = True
             print("[build] forcing a publish to lay down the per-source baseline",
                   file=sys.stderr)
+        elif ({n: set(results[n].source_counts) for n in order}
+              != {n: set(urls) for n, urls in prev_sources.items()}):
+            # 新来源可能全被已有后缀覆盖，规则条数不变也必须发布一次来源基线。
+            # 否则它下一次整份变空时，逐源门禁因没有上一版记录而看不见故障。
+            changed = True
+            print("[build] forcing a publish to update the upstream source baseline",
+                  file=sys.stderr)
 
     for path, payload, name, ip in planned:
         write_yaml(path, payload, name, ip)

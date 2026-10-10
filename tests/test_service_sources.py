@@ -120,6 +120,13 @@ class TestRealServiceSources(unittest.TestCase):
         return build.build_category(self.cfg.categories[name], self.cfg, REPO / "manual",
                                     lambda u, t, r: sources[u])
 
+    def test_every_service_has_multiple_distinct_upstreams(self):
+        """删除第二来源后必须失败：四个服务都由两份不同上游互补，不能退回单来源。"""
+        for name in ["youtube", "speedtest", "chatgpt", "claude"]:
+            urls = [source.url for source in self.cfg.categories[name].sources]
+            self.assertGreaterEqual(len(set(urls)), 2, name)
+            self.assertEqual(len(urls), len(set(urls)), name)
+
     def test_core_and_previously_missing_domains_are_covered(self):
         """实际来源、过滤和补充一起验证，防止上游接上但播放器、头像、官方新域仍漏配。"""
         expected = {
@@ -135,7 +142,9 @@ class TestRealServiceSources(unittest.TestCase):
                        "livepreview.claude.app", "claude.site"],
         }
         shared = ["auth0.com", "stripe.com", "sentry.io", "challenges.cloudflare.com",
-                  "gvt1.com", "gvt2.com", "ggpht.com", "ggpht.cn", "host.livekit.cloud", "turn.livekit.cloud"]
+                  "gvt1.com", "gvt2.com", "ggpht.com", "ggpht.cn", "host.livekit.cloud", "turn.livekit.cloud",
+                  "client-api.arkoselabs.com", "events.statsigapi.net", "featuregates.org", "identrust.com",
+                  "intercom.io", "intercomcdn.com", "cdn.usefathom.com"]
         for name, domains in expected.items():
             result = self.category(name)
             self.assertTrue(result.source_counts, name + " 未接入上游")
@@ -150,11 +159,12 @@ class TestRealServiceSources(unittest.TestCase):
             with self.subTest(name=name):
                 category = self.cfg.categories[name]
                 self.assertTrue(category.sources, name)
-                url = category.sources[0].url
-                domain = "future-" + name + ".example"
-                bodies = dict(self.bodies)
-                bodies[url] += domain + "\n"
-                self.assertTrue(self.category(name, bodies).domains.covered(Rule("exact", domain)))
+                for index, source in enumerate(category.sources):
+                    domain = f"future-{name}-{index}.example"
+                    bodies = dict(self.bodies)
+                    bodies[source.url] += domain + "\n"
+                    self.assertTrue(self.category(name, bodies).domains.covered(Rule("exact", domain)),
+                                    source.url)
 
     def test_manual_files_do_not_duplicate_upstream_domains(self):
         """重复手工钉住上游域名会使上游删除无法生效，只保留确实缺失的本地补充。"""
@@ -168,6 +178,39 @@ class TestRealServiceSources(unittest.TestCase):
                         upstream.add(rule)
             for rule in build._read_manual(REPO / "manual", name):
                 self.assertFalse(upstream.covered(rule), (name, rule))
+
+
+class TestMultiSourceBaseline(unittest.TestCase):
+    def test_redundant_new_source_is_published_then_gated(self):
+        """新增上游没有新增域名也要发布基线，否则它随后清空时逐源门禁永远不生效。"""
+        import json
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            (root / "manual").mkdir()
+            (root / "config.yaml").write_text(
+                "priority: [service]\ncategories:\n  service:\n    sources:\n"
+                "      - {url: 'https://one.example/list'}\n")
+            cfg = build.load_config(root / "config.yaml")
+            bodies = {"https://one.example/list": "+.service.example\n",
+                      "https://two.example/list": "api.service.example\n"}
+            fetch = lambda u, t, r: bodies[u]
+            first = root / "first"
+            self.assertEqual(build.cmd_build(cfg, root, first, None, fetch), 0)
+            cfg.categories["service"].sources.append(build.Source("https://two.example/list"))
+            second = root / "second"
+            self.assertEqual(build.cmd_build(cfg, root, second, first, fetch), 0)
+            self.assertEqual(build.read_payload(first / "final_service.yaml"),
+                             build.read_payload(second / "final_service.yaml"))
+            self.assertEqual((second / "changed.txt").read_text().strip(), "true")
+            self.assertEqual(json.loads((second / "sources.json").read_text())["service"],
+                             {url: 1 for url in bodies})
+            third = root / "third"
+            self.assertEqual(build.cmd_build(cfg, root, third, second, fetch), 0)
+            self.assertEqual((third / "changed.txt").read_text().strip(), "false")
+            bodies["https://two.example/list"] = ""
+            failed = root / "failed"
+            self.assertEqual(build.cmd_build(cfg, root, failed, second, fetch), 1)
+            self.assertFalse((failed / "final_service.yaml").exists())
 
 
 if __name__ == "__main__":

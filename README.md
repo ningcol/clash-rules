@@ -200,9 +200,11 @@ python -m unittest discover -s tests        # 跑单元测试
 |---|---|---|
 | YouTube | MetaCubeX YouTube + ACL4SSR YouTube | 无重复域名清单 |
 | Speedtest | MetaCubeX Speedtest + blackmatrix7 Speedtest | 无重复域名清单 |
-| ChatGPT | MetaCubeX OpenAI | 官方网络清单中的 `cdn.openaimerge.com` |
-| Claude | MetaCubeX Anthropic | 官方已确认的 `+.claude.app`，以及已有的 `+.claude.site` |
+| ChatGPT | MetaCubeX OpenAI + ACL4SSR OpenAi | 官方网络清单中的 `cdn.openaimerge.com` |
+| Claude | MetaCubeX Anthropic + blackmatrix7 Claude | 官方已确认的 `+.claude.app`，以及已有的 `+.claude.site` |
 
 每天北京时间 05:00 自动拉取上游并通过发布门禁，客户端仍使用原来的 `final_*.yaml` 地址，每天刷新规则。上游已有的域名不在手工清单重复维护；官方新增、上游尚未收录的专属域名才补入 `manual/`。
 
-YouTube 的共享 `ggpht.com` / `ggpht.cn` 只从 MetaCubeX 单源中排除，ACL4SSR 的 `yt3.ggpht.com` 精确规则保留。`gvt2.com` 继续通过类目排除保留原有路由。ChatGPT 的共享语音命名空间、遥测、未确认的第三方站点及共享认证/支付后缀在单源过滤；保留原有分流，不将整个共享服务交给 ChatGPT。Claude 的 `statsig.anthropic.com` 仍由广告规则优先拦截。
+四个服务均合并至少两个不同上游，取并集并自动去重；任一来源新增专属域名都会被跟进。多个上游能降低遗漏风险，但不能保证穷尽所有域名。新增来源即使没有改变规则内容，也会发布一次逐源基线，使随后来源清空或异常缩水能被门禁发现；任一来源异常仍阻止发布，保留上一版，不自动跳过故障来源。
+
+YouTube 的共享 `ggpht.com` / `ggpht.cn` 只从 MetaCubeX 单源中排除，ACL4SSR 的 `yt3.ggpht.com` 精确规则保留。`gvt2.com` 继续通过类目排除保留原有路由。ChatGPT 的共享语音命名空间、遥测、未确认的第三方站点及共享认证/支付后缀在单源过滤；ACL4SSR 的共享验证码、证书和客服后缀也排除，保留原有分流。Claude 的共享统计主机 `cdn.usefathom.com` 从 blackmatrix7 单源排除，`statsig.anthropic.com` 仍由广告规则优先拦截。
