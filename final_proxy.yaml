@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-10-14T23:46:53Z
+# 更新时间: 2026-10-15T23:35:37Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -18209,6 +18209,7 @@ payload:
   - '+.playstation'
   - '+.playstation.com'
   - '+.playstation.net'
+  - '+.playstationnetwork.com'
   - '+.playvalorant.com'
   - '+.playvids.com'
   - '+.playwarcraft3.com'
@@ -19965,6 +19966,7 @@ payload:
   - '+.scatville.com'
   - '+.scb.ru'
   - '+.scdn.co'
+  - '+.scea.com'
   - '+.scene7.com'
   - '+.scenesource.me'
   - '+.scharferporno.com'
@@ -20922,6 +20924,7 @@ payload:
   - '+.sony.com.pa'
   - '+.sony.com.pe'
   - '+.sony.com.ph'
+  - '+.sony.com.py'
   - '+.sony.com.sg'
   - '+.sony.com.sv'
   - '+.sony.com.tr'
@@ -20965,8 +20968,10 @@ payload:
   - '+.sonydna.com'
   - '+.sonyentertainmentnetwork.com'
   - '+.sonyglobalsolutions.jp'
+  - '+.sonyinteractive.com'
   - '+.sonykigyo.jp'
   - '+.sonylatvija.com'
+  - '+.sonymusic.com.hk'
   - '+.sonynetwork.co.jp'
   - '+.sonypcl.jp'
   - '+.sonypictures.com'
