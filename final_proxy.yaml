@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-10-16T23:20:40Z
+# 更新时间: 2026-10-17T22:57:45Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -6106,6 +6106,7 @@ payload:
   - '+.cursor.com'
   - '+.cursor.sh'
   - '+.cursorapi.com'
+  - '+.cursorvm.com'
   - '+.curve.fi'
   - '+.curvefish.com'
   - '+.curvybbwwives.com'
@@ -17348,6 +17349,7 @@ payload:
   - '+.op7979.com'
   - '+.opac-project.eu'
   - '+.open.firstory.me'
+  - '+.openai.org'
   - '+.openamt.com'
   - '+.openapiplatform.com'
   - '+.openapiservice.com'
@@ -19981,6 +19983,7 @@ payload:
   - '+.schwab.com.hk'
   - '+.schwab.com.sg'
   - '+.schwabassetmanagement.com'
+  - '+.schwabcdn.com'
   - '+.schwabplan.com'
   - '+.sci-hub.ee'
   - '+.sci-hub.it.nf'
@@ -22322,6 +22325,8 @@ payload:
   - '+.timestalks.com'
   - '+.timeweb.cloud'
   - '+.timeweb.com'
+  - '+.timeweb.tech'
+  - '+.timewebcloud.kz'
   - '+.timi1.me'
   - '+.timo0.com'
   - '+.timtales.com'
@@ -22898,6 +22903,7 @@ payload:
   - '+.typekit.net'
   - '+.typenetwork.com'
   - '+.typepad.com'
+  - '+.typesafe.ai'
   - '+.typeset.io'
   - '+.typesquare.com'
   - '+.typography.com'
