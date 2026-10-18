@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-10-17T22:57:45Z
+# 更新时间: 2026-10-18T22:53:44Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -2364,7 +2364,6 @@ payload:
   - '+.asmr.gay'
   - '+.asmrbuluo.com'
   - '+.asn-online.org'
-  - '+.asobostudio.com'
   - '+.asp-cc.com'
   - '+.aspbjournals.org'
   - '+.aspenpublishing.com'
@@ -3344,8 +3343,15 @@ payload:
   - '+.beforeigners.com'
   - '+.befuck.com'
   - '+.befuck.net'
+  - '+.beget.app'
+  - '+.beget.cloud'
   - '+.beget.com'
+  - '+.beget.de'
+  - '+.beget.hosting'
+  - '+.beget.pro'
   - '+.beget.ru'
+  - '+.beget.tech'
+  - '+.begetcdn.cloud'
   - '+.begin-trade.com'
   - '+.behance.net'
   - '+.behindthescreenz.com'
@@ -3378,6 +3384,7 @@ payload:
   - '+.berlinerbericht.de'
   - '+.berlintwitterwall.com'
   - '+.beru.ru'
+  - '+.beserver.ru'
   - '+.best-sex-games.com'
   - '+.best2pay.net'
   - '+.best4bim.com'
@@ -3488,6 +3495,7 @@ payload:
   - '+.bffshd.com'
   - '+.bfnn.org'
   - '+.bfsh.hk'
+  - '+.bget.ru'
   - '+.bgicdn.com'
   - '+.bgm.tv'
   - '+.bgme.me'
@@ -8925,7 +8933,6 @@ payload:
   - '+.flickr'
   - '+.flickr.com'
   - '+.flickr.net'
-  - '+.flightsimulator.com'
   - '+.flipboard.com'
   - '+.flipfap.com'
   - '+.flipkart.com'
@@ -17349,7 +17356,6 @@ payload:
   - '+.op7979.com'
   - '+.opac-project.eu'
   - '+.open.firstory.me'
-  - '+.openai.org'
   - '+.openamt.com'
   - '+.openapiplatform.com'
   - '+.openapiservice.com'
@@ -18945,6 +18951,7 @@ payload:
   - '+.pussyspace.net'
   - '+.putinho.net'
   - '+.putty.org'
+  - '+.pv-cdn.net'
   - '+.pvp.net'
   - '+.pvp.tv'
   - '+.pvt.sexy'
@@ -21126,6 +21133,7 @@ payload:
   - '+.springwood.me'
   - '+.sprinklesapp.com'
   - '+.sproutcore.com'
+  - '+.sprut.io'
   - '+.sptvbroadcast.com'
   - '+.sputnikglobe.com'
   - '+.sputnikimages.com'
@@ -25084,6 +25092,7 @@ payload:
   - '+.xn--90ab.com'
   - '+.xn--90ab2c.xn--p1ai'
   - '+.xn--90absjljw3g.xn--p1ai'
+  - '+.xn--90aefb9d.xn--p1ai'
   - '+.xn--90aifd0az.shop'
   - '+.xn--90aifd0azb.xn--p1acf'
   - '+.xn--90wwvt03e.com'
