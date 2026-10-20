@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-10-20T00:09:45Z
+# 更新时间: 2026-10-20T23:41:15Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -2679,8 +2679,10 @@ payload:
   - '+.avinin.com'
   - '+.avira.com'
   - '+.avistaz.to'
+  - '+.avito.com'
   - '+.avito.ru'
   - '+.avito.st'
+  - '+.avito.tech'
   - '+.avizoon.site'
   - '+.avizoone.com'
   - '+.avjb.com'
