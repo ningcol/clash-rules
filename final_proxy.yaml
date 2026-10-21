@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-10-20T23:41:15Z
+# 更新时间: 2026-10-21T23:56:43Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -8964,6 +8964,17 @@ payload:
   - '+.fluidpreview.com'
   - '+.flutter.dev'
   - '+.flutterapp.com'
+  - '+.fluxer.app'
+  - '+.fluxer.com'
+  - '+.fluxer.dev'
+  - '+.fluxer.gg'
+  - '+.fluxer.gift'
+  - '+.fluxer.media'
+  - '+.fluxer.tools'
+  - '+.fluxerapp.com'
+  - '+.fluxerstatic.com'
+  - '+.fluxerstatus.com'
+  - '+.fluxerusercontent.com'
   - '+.fly.dev'
   - '+.fly.io'
   - '+.flyflv.com'
