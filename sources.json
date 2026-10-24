@@ -11,10 +11,10 @@
     "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Claude/Claude.list": 3
   },
   "direct": {
-    "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/direct.txt": 110235
+    "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/direct.txt": 110241
   },
   "icloud": {
-    "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/icloud.txt": 53
+    "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/icloud.txt": 52
   },
   "microsoft": {
     "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/refs/heads/master/Clash/Bing.list": 3,
@@ -22,15 +22,15 @@
     "https://ruleset.skk.moe/Clash/non_ip/microsoft.txt": 81
   },
   "proxy": {
-    "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/proxy.txt": 27313
+    "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/proxy.txt": 27317
   },
   "reject": {
-    "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/reject.txt": 200290,
+    "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/reject.txt": 200546,
     "https://raw.githubusercontent.com/TG-Twilight/AWAvenue-Ads-Rule/refs/heads/main/Filters/AWAvenue-Ads-Rule-Clash.yaml": 972,
     "https://raw.githubusercontent.com/qq5460168/AD886/refs/heads/main/clash_meta.yaml": 17339
   },
   "speedtest": {
-    "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/speedtest.list": 13,
+    "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/speedtest.list": 20,
     "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Speedtest/Speedtest.list": 7
   },
   "youtube": {

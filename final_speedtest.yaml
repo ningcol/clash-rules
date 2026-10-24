@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-10-23T23:47:09Z
+# 更新时间: 2026-10-24T23:00:04Z
 # 说明: 本文件为自动生成的 Clash SPEEDTEST 规则（behavior: domain）。
 #########################################
 payload:
@@ -16,8 +16,15 @@ payload:
   - '+.pingtest.net'
   - '+.speed.cloudflare.com'
   - '+.speed.dler.io'
+  - '+.speedtest.app'
+  - '+.speedtest.cc'
   - '+.speedtest.co'
+  - '+.speedtest.ee'
+  - '+.speedtest.in'
+  - '+.speedtest.me'
   - '+.speedtest.net'
+  - '+.speedtest.ng'
+  - '+.speedtest.tv'
   - '+.speedtestcustom.com'
   - '+.webtest.net'
   - 'www.speedtest.net.cdn.cloudflare.net'
