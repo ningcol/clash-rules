@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-10-28T00:20:09Z
+# 更新时间: 2026-10-29T00:40:22Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -12927,6 +12927,7 @@ payload:
   - '+.iutunes.com'
   - '+.ivacy.com'
   - '+.ivi.ru'
+  - '+.ivi.tv'
   - '+.ivicdn.tv'
   - '+.ivintageporn.com'
   - '+.ivonblog.com'
