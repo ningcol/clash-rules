@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-10-30T00:41:22Z
+# 更新时间: 2026-10-31T00:34:08Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -125,6 +125,7 @@ payload:
   - '+.18comic-god.xyz'
   - '+.18comic.cc'
   - '+.18comic.company'
+  - '+.18comic.ink'
   - '+.18comic.org'
   - '+.18comic.vip'
   - '+.18commic.com'
@@ -3643,6 +3644,7 @@ payload:
   - '+.bingoporno.com'
   - '+.bingparachute.com'
   - '+.bingsandbox.com'
+  - '+.bingstatic.com'
   - '+.bingvisualsearch.com'
   - '+.bingworld.com'
   - '+.bingx.com'
@@ -4598,6 +4600,7 @@ payload:
   - '+.bscdnweb.com'
   - '+.bsi.ir'
   - '+.bsky.app'
+  - '+.bsky.chat'
   - '+.bsky.network'
   - '+.bsky.social'
   - '+.bspb.ru'
@@ -10011,6 +10014,7 @@ payload:
   - '+.githubassets.com'
   - '+.githubcopilot.com'
   - '+.githubhackathon.com'
+  - '+.githubhelp.com'
   - '+.githubnext.com'
   - '+.githubpreview.dev'
   - '+.githubstatus.com'
@@ -15878,6 +15882,7 @@ payload:
   - '+.msfteducation.ca'
   - '+.msftncsi.com'
   - '+.msftnet.org'
+  - '+.msftstatic.com'
   - '+.msgamesresearch.com'
   - '+.msgamestudios.com'
   - '+.msha.gov'
@@ -22352,9 +22357,12 @@ payload:
   - '+.tiktokglobalshopv.com'
   - '+.tiktokminis.us'
   - '+.tiktokrow-cdn.com'
+  - '+.tiktokshop.com'
+  - '+.tiktokstaticb.com'
   - '+.tiktokv.com'
   - '+.tiktokv.eu'
   - '+.tiktokv.us'
+  - '+.tiktokvapp.com'
   - '+.tiktokw.eu'
   - '+.tiktokw.us'
   - '+.tilda.cc'
