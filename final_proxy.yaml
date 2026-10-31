@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-10-31T00:34:08Z
+# 更新时间: 2026-10-31T23:58:39Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -22545,6 +22545,7 @@ payload:
   - '+.torproject.org'
   - '+.torrentgalaxy.to'
   - '+.torrentkitty.tv'
+  - '+.torrentleech.org'
   - '+.torrentprivacy.com'
   - '+.torrentproject.se'
   - '+.torrenty.org'
@@ -25943,6 +25944,7 @@ payload:
   - '+.youtrannytube.com'
   - '+.youtubecisco.com'
   - '+.youversion.com'
+  - '+.youversionapi.com'
   - '+.youwin.com'
   - '+.youwuss.com'
   - '+.youx.xxx'
