@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-10-31T23:58:39Z
+# 更新时间: 2026-11-02T00:26:01Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -3930,6 +3930,7 @@ payload:
   - '+.bmia.org'
   - '+.bmj.com'
   - '+.bml.info'
+  - '+.bmonkeys.net'
   - '+.bmw'
   - '+.bmw-abudhabi.com'
   - '+.bmw-adventskalender.com'
@@ -4354,6 +4355,7 @@ payload:
   - '+.bokep.net'
   - '+.bokepseks.org'
   - '+.bokepvidz.com'
+  - '+.boldgrid.com'
   - '+.bolehvpn.net'
   - '+.bollywoodlife.com'
   - '+.boltdns.net'
@@ -5668,6 +5670,7 @@ payload:
   - '+.cloudproxy.app'
   - '+.cloudrobotics.com'
   - '+.cloudvolumes.com'
+  - '+.cloudwp.dev'
   - '+.cloudyzgirl.com'
   - '+.cloupia.com'
   - '+.cloupia.net'
@@ -21424,6 +21427,7 @@ payload:
   - '+.steamladder.com'
   - '+.steamofporn.com'
   - '+.steamos.cloud'
+  - '+.steampeek.hu'
   - '+.steampowered.com'
   - '+.steamserver.net'
   - '+.steamstatic.com'
@@ -23954,6 +23958,7 @@ payload:
   - '+.vodafone.de'
   - '+.vodafone.it'
   - '+.vodafone.nl'
+  - '+.vodafoneziggo.nl'
   - '+.voicettank.org'
   - '+.vokevr.com'
   - '+.vol.moe'
@@ -24412,7 +24417,9 @@ payload:
   - '+.webex.de'
   - '+.webex.es'
   - '+.webex.fr'
+  - '+.webflow-ext.com'
   - '+.webflow.com'
+  - '+.webflow.io'
   - '+.webgata.net'
   - '+.webgirlsonline.net'
   - '+.webhosting.com'
@@ -24435,6 +24442,7 @@ payload:
   - '+.webrtc.org'
   - '+.websdr.org'
   - '+.webshare.io'
+  - '+.website-files.com'
   - '+.website.new'
   - '+.webtoons.com'
   - '+.webtoonscorp.com'
@@ -26099,6 +26107,7 @@ payload:
   - '+.zhuzhushipin-app.com'
   - '+.zi.media'
   - '+.zibacity.com'
+  - '+.ziggo.nl'
   - '+.ziglang.org'
   - '+.zigzag.kr'
   - '+.zillionk.com'
