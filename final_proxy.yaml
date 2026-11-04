@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-11-03T02:48:50Z
+# 更新时间: 2026-11-04T01:07:45Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -3355,6 +3355,7 @@ payload:
   - '+.beget.cloud'
   - '+.beget.com'
   - '+.beget.de'
+  - '+.beget.email'
   - '+.beget.hosting'
   - '+.beget.pro'
   - '+.beget.ru'
@@ -3578,6 +3579,7 @@ payload:
   - '+.bili2.cc'
   - '+.bili888.com'
   - '+.bili999.com'
+  - '+.bilibili.tv'
   - '+.bilinovel.com'
   - '+.biliplus.com'
   - '+.biliworld.com'
