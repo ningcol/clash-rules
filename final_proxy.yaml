@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-11-04T01:07:45Z
+# 更新时间: 2026-11-05T01:22:52Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -14048,6 +14048,9 @@ payload:
   - '+.lilhumpers.com'
   - '+.liliav.com'
   - '+.lilith-soft.com'
+  - '+.limbuscompany.global'
+  - '+.limbuscompanyapi.com'
+  - '+.limbuscompanycdn.org'
   - '+.limedia.tw'
   - '+.limelight.com'
   - '+.limer.tw'
@@ -18904,6 +18907,7 @@ payload:
   - '+.projectcircuitbreaker.com'
   - '+.projecteuclid.org'
   - '+.projectjav.com'
+  - '+.projectmoon.studio'
   - '+.projectmurphy.net'
   - '+.projectpoint.com'
   - '+.projectpoint.net'
@@ -20749,6 +20753,7 @@ payload:
   - '+.skillshare.com'
   - '+.skimtube.com'
   - '+.skinstrip.net'
+  - '+.skinswap.com'
   - '+.skokka.com'
   - '+.sksarab.top'
   - '+.skunkgirl.cc'
