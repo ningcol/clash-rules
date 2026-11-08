@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-11-07T00:44:01Z
+# 更新时间: 2026-11-08T00:17:38Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -10610,6 +10610,7 @@ payload:
   - '+.gridaware.app'
   - '+.grindr.com'
   - '+.grok.com'
+  - '+.grokbot.com'
   - '+.grokipedia.com'
   - '+.grooby.com'
   - '+.groq.com'
@@ -26264,6 +26265,7 @@ payload:
   - 'hb4bbbbb.pmhcjk.com'
   - 'holoxx.f5.si'
   - 'hpstore.corpmerchandise.com'
+  - 'http-intake.logs.us5.datadoghq.com'
   - 'hub.slarker.me'
   - 'i.jeded.com'
   - 'imperial.insendi.com'
