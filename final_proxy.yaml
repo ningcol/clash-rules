@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-11-10T03:18:19Z
+# 更新时间: 2026-11-11T01:06:28Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -10557,6 +10557,8 @@ payload:
   - '+.grabhentai.com'
   - '+.grabpussy.com'
   - '+.gradeuptube.com'
+  - '+.grafana.com'
+  - '+.grafana.net'
   - '+.grafolio.com'
   - '+.graias.com'
   - '+.graiasmovies.com'
@@ -19139,6 +19141,7 @@ payload:
   - '+.quatrowireless.com'
   - '+.quatrum.com.br'
   - '+.quay.io'
+  - '+.questionablequesting.com'
   - '+.questvisual.com'
   - '+.quicinc.com'
   - '+.quickbook.com.br'
@@ -21115,6 +21118,7 @@ payload:
   - '+.soyjak.party'
   - '+.soyjak.st'
   - '+.sp.cool'
+  - '+.spacebattles.com'
   - '+.spaceexplored.com'
   - '+.spaceforce.mil'
   - '+.spacely.com.au'
@@ -23273,6 +23277,7 @@ payload:
   - '+.v.recipes'
   - '+.v2.help'
   - '+.v2.hysteria.network'
+  - '+.v2ex.co'
   - '+.v2ex.com'
   - '+.v2fly.org'
   - '+.v2ph.com'
