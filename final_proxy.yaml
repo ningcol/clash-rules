@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-11-18T02:48:00Z
+# 更新时间: 2026-11-19T02:23:27Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -7771,6 +7771,7 @@ payload:
   - '+.elephanttubenew.com'
   - '+.elevenlabs.com'
   - '+.elevenlabs.io'
+  - '+.elevenlabsusercontent.com'
   - '+.elgaronline.com'
   - '+.elgoog.im'
   - '+.elifesciences.org'
@@ -25775,7 +25776,6 @@ payload:
   - '+.yandexgo.com'
   - '+.yandexlyceum.ru'
   - '+.yandexwebcache.net'
-  - '+.yandexwebcache.org'
   - '+.yango-b2b.com'
   - '+.yango-team.com'
   - '+.yango-tech.com'
