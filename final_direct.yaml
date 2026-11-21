@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-11-20T02:07:55Z
+# 更新时间: 2026-11-21T02:01:43Z
 # 说明: 本文件为自动生成的 Clash DIRECT 规则（behavior: domain）。
 #########################################
 payload:
@@ -30639,6 +30639,7 @@ payload:
   - '+.echo-isoftstone.com'
   - '+.echo188.com'
   - '+.echoing.tech'
+  - '+.echooai.com'
   - '+.echoteen.com'
   - '+.echovelle.com'
   - '+.echu-cable.com'
@@ -32887,6 +32888,7 @@ payload:
   - '+.fayufaguo.com'
   - '+.fazhi12368.com'
   - '+.fazhijx.com'
+  - '+.fazhipro.com'
   - '+.fazz.fun'
   - '+.fb32dc52302e6b9b.com'
   - '+.fb46cd5483f029aa.com'
@@ -76420,6 +76422,7 @@ payload:
   - '+.saaas.com'
   - '+.saagasports.com'
   - '+.saasddos.com'
+  - '+.saasfz.com'
   - '+.saaslb.com'
   - '+.saasops.tech'
   - '+.saasruanjian.com'
