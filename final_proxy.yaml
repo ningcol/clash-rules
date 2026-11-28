@@ -1,7 +1,7 @@
 #########################################
 # 作者: ningcol
 # 项目地址: https://github.com/ningcol/clash-rules
-# 更新时间: 2026-11-27T03:33:06Z
+# 更新时间: 2026-11-28T03:10:03Z
 # 说明: 本文件为自动生成的 Clash PROXY 规则（behavior: domain）。
 #########################################
 payload:
@@ -1070,6 +1070,7 @@ payload:
   - '+.ai91porn.cc'
   - '+.aiaa.org'
   - '+.aiasahi.jp'
+  - '+.aicu.cc'
   - '+.aidc.com.tw'
   - '+.aihub.top'
   - '+.aimei133.com'
@@ -6224,6 +6225,7 @@ payload:
   - '+.dandanplay.net'
   - '+.dandanzan.cc'
   - '+.danke4china.net'
+  - '+.danmakus.com'
   - '+.danmarkbeatsbydrdre.com'
   - '+.danskpornofilm.com'
   - '+.dansmovies.com'
@@ -8670,6 +8672,7 @@ payload:
   - '+.fc2ppv.tv'
   - '+.fcacebook.com'
   - '+.fcaebook.com'
+  - '+.fce.gg'
   - '+.fcebook.com'
   - '+.fcebookk.com'
   - '+.fcfacebook.com'
@@ -21052,6 +21055,7 @@ payload:
   - '+.soyjak.st'
   - '+.sp.cool'
   - '+.spacebattles.com'
+  - '+.spacedesk.net'
   - '+.spaceexplored.com'
   - '+.spaceforce.mil'
   - '+.spacely.com.au'
@@ -26177,6 +26181,7 @@ payload:
   - 'agb9r0ad.qllfkl.com'
   - 'angle.com.tw'
   - 'api-p.videomarket.jp'
+  - 'aurora-customization-usw2.lithium.com'
   - 'bbs.boingboing.net'
   - 'beck-online.beck.de'
   - 'blizzard.nefficient.co.kr'
